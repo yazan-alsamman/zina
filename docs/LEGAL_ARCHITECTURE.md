@@ -1,13 +1,14 @@
 # Legal Architecture
 
-**Structure and honest placeholders. No jurisdiction is invented, and nothing here is legal
+**Structure and honest placeholders. No legal entity is invented, and nothing here is legal
 advice.**
 
 | | |
 |---|---|
-| **Status** | Architecture implemented; content **BLOCKED** (Phase 7) |
+| **Status** | Architecture implemented (Phase 7); **U-03 partially resolved Phase 9** |
 | **Routes** | 4 — `/{locale}/privacy/`, `/{locale}/terms/` |
-| **Blocking unknown** | **U-03 — jurisdiction unresolved** |
+| **Jurisdiction** | **CONFIRMED — Syria** (project owner, Phase 9) |
+| **Still unresolved** | Legal entity, specific privacy regime, data controller, retention, governing-law clause, liability limitation |
 | **Cookie banner** | **None**, because there are no cookies |
 | **Structured data** | `BreadcrumbList` only |
 
@@ -151,11 +152,72 @@ identical on both, so neither can drift into looking more operative than the oth
 
 | # | Item | Owner action |
 |---|---|---|
-| **U-03** | Jurisdiction | **Blocking.** Determines everything else in this document |
+| ~~U-03~~ | ~~Jurisdiction~~ | **Resolved Phase 9 — Syria.** See §10. |
 | L-1 | Legal entity | Name, form and registered details, or a decision to publish personally |
 | L-2 | Data controller | Required once any channel collects data |
 | L-3 | Real legal text | **Must be written or reviewed by a qualified professional.** Nothing here substitutes for that |
-| L-4 | Contact route for data requests | Depends on the unresolved contact channel |
+| L-4 | Contact route for data requests | **Resolved Phase 9** — `contact@zinaalmokri.com` now exists (`docs/CONTACT_IMPLEMENTATION.md`) |
+| L-5 | Specific privacy statute/regime | Knowing the jurisdiction is not knowing which law applies within it |
+| L-6 | Governing-law clause, liability limitation | Not inferred from jurisdiction alone — no entity exists yet to attach them to |
 
 **These pages are architecture. They are not legal advice, and they must not ship as final legal
 text.**
+
+---
+
+## 10. Phase 9 update — jurisdiction confirmed, the gate restructured to say so precisely
+
+The project owner supplied the primary jurisdiction: **Syria**. `site.json → legal.jurisdiction`
+is now `{ "value": "Syria", "_verification": "CONFIRMED" }`. `jurisdictionIsKnown()` reads it
+exactly as §6/§7 above already describe — no new code, the same `verified()` gate every other
+confirmed field in this project uses.
+
+### Global audience, explicitly not "every visitor's own jurisdiction"
+
+The project owner was explicit: the site's audience is global, and stating Syria as the
+jurisdiction is **not** a claim that every reader's own laws are the same. Both legal pages state
+this directly, in the same sentence that states the jurisdiction, so the two facts cannot be read
+apart from each other.
+
+### The gate had to become finer-grained than "known / unknown"
+
+Before Phase 9 there was exactly one fact to know: the jurisdiction. `LegalDocument.astro`'s status
+band was correspondingly binary — `!jurisdictionIsKnown()` showed the "not yet operative" notice,
+full stop. Confirming jurisdiction while entity/controller/retention/rights/governing-law/liability
+remain unsupplied produced a THIRD state the binary gate could not express: known-but-incomplete.
+
+The component now gates on `blockedItems.length === 0` (is there anything AT ALL still missing)
+rather than on jurisdiction specifically, and renders one of two honest messages:
+
+| State | Condition | Message |
+|---|---|---|
+| Fully unknown | `!jurisdictionIsKnown()` | "This document is not yet operative" (unchanged Phase 7 copy) |
+| Partially resolved | `jurisdictionIsKnown() && blockedItems.length > 0` | "This document is not yet complete" — states Syria explicitly, lists only what is STILL missing |
+
+Privacy's blocked-item list changed shape correspondingly: the old single item "the jurisdiction
+and the privacy regime that applies to it" is now `legalMissingRegimeSpecifics` — "the specific
+privacy statute or regulation that applies **within the stated jurisdiction**" — because half of
+the original item is no longer missing. Terms' blocked items (`legalMissingGoverningLaw`,
+`legalMissingEntity`, `legalMissingLiability`) are unchanged: none of them follows from jurisdiction
+alone, and none was supplied.
+
+### What is rendered now
+
+The "Who publishes this" section (§ identity, unchanged code) now shows:
+
+```
+Copyright       Zina Almokri
+Jurisdiction    Syria
+```
+
+with the pre-existing "No legal entity has been established for this site yet" note still present,
+unchanged — entity remains exactly as unconfirmed as it was before Phase 9.
+
+### Deployment dependency, explicitly out of scope here
+
+The project owner named Hostinger (domain registrar) and a future Hostinger VPS (hosting) as
+infrastructure decisions. Neither implies a jurisdiction, an entity, or a governing-law clause on
+its own, and this phase makes no inference from either. Server/DNS/TLS configuration is unaffected
+by this document and was not touched — the repository contains no deployment configuration file of
+any kind to update (checked: no `.htaccess`, `nginx.conf`, `vercel.json`, `netlify.toml`, or
+`Dockerfile` exists in this project).

@@ -142,6 +142,24 @@ What it does carry: `name`, `jobTitle`, `description`, `@id`. All from the recor
 | The entire biography is placeholder text | **Owner must supply real copy** |
 | No portrait or photography | Every image path is a placeholder with no asset |
 | Location unknown | MOCK; blocks dialect targeting and any climate claim |
-| No verified social account | All `sameAsEligible: false` |
+| No verified social account | ~~All `sameAsEligible: false`~~ **Instagram confirmed Phase 9** — see §10 |
 | Arabic copy | Unreviewed by a native reader (H-1) |
-| The six-stage Method | **PROJECT MOCK METHOD** — not Zina's confirmed practice |
+| The six-stage Method | Still **PROJECT MOCK METHOD** — not Zina's confirmed practice. The real process is now documented separately on the Method page (`docs/METHOD_IMPLEMENTATION.md` §9); About does not restate it, by design (§6 above) |
+
+---
+
+## 10. Phase 9 update — biography unchanged, one structured-data field added
+
+**Nothing on this page's visible content changed.** The biography remains exactly the Phase 0
+placeholder text it always was, still under its mock notice, still unconfirmed — the project owner
+supplied contact and process facts, not a biography, and none was invented to fill that gap.
+
+The one change is in the Person JSON-LD this page emits: `sameAs` now carries Zina's confirmed
+Instagram URL, because `eligibleSocialProfiles()` (`src/lib/content.ts`) returns it the moment
+`sameAsEligible: true` is set on the record — a mechanism that has existed since Phase 4/5 and
+simply had nothing to return before now. No code on this page changed to make that happen.
+
+`email` and `telephone` are deliberately **not** added to About's Person schema, even though both
+are now confirmed — `personSchema()`'s rule that structured data must match visible page content
+(`src/lib/seo.ts`) means contact fields belong only to the Contact page, where they are actually
+shown. See `docs/CONTACT_IMPLEMENTATION.md` §9.

@@ -1,6 +1,11 @@
 # Method Implementation
 
-**Status:** Phase 5. Routes: `/en/method/`, `/ar/method/`.
+**Status:** Phase 5, **real process added Phase 9**. Routes: `/en/method/`, `/ar/method/`.
+
+**Phase 9 note, read this first:** the six-stage system this document describes below is
+UNCHANGED and remains exactly as unconfirmed as Phase 5 left it. Phase 9 added a SEPARATE,
+CONFIRMED section — Zina's actual, real process, supplied by the project owner — that now renders
+above it on the same page. See §9.
 
 The trust moment in every user flow, and the destination of the most-repeated internal link on
 the site.
@@ -156,3 +161,84 @@ whose core differentiator exists in one language is not bilingual.
 
 Browser verification: five widths × two locales — **10 checks, all clean**. No overflow, no
 clipping, no reversed ranges, no Arabic tracking, no floor violations, one `h1`, no heading skips.
+
+---
+
+## 9. Phase 9 — the real process
+
+The project owner supplied Zina's actual practice, in these terms:
+
+> A product arrives. Zina personally uses the product on her own skin. She records herself
+> using/testing the product on camera. The experience is published on her Instagram page. She then
+> uses/observes the product for several days. After the observation period, she publishes her
+> evaluation and states whether, based on her personal experience, the product achieves the
+> intended/claimed result.
+
+This is explicitly **a personal, real-world product experience and evaluation** — not a laboratory
+test, a clinical trial, a dermatological assessment, an independent scientific study, a guarantee
+of results for other people, or proof a product works for every skin type. The brief was explicit
+that the Method/Standards language must preserve exactly that distinction, and forbade adding
+anything the real process does not actually contain: no numerical scoring formula, no controlled
+experiment, no sample size, no statistical claim, no ingredient laboratory analysis, no clinical
+endpoint, no dermatologist approval, no universal efficacy claim. None of those was added.
+
+### Why this is new content, not a rewrite of the six-stage system
+
+The six-stage framework (`baseline`, `application`, `wear-window`, `conditions`, `comparison`,
+`revisit`) is more elaborate than the real process — it describes timed check-ins, a logged
+temperature/humidity record, and a controlled comparison protocol, none of which the project owner
+confirmed. Flipping the SIX-STAGE content to `CONFIRMED` would have meant presenting Phase 0's
+invented elaboration as if the owner had confirmed those specific granular mechanics, which the
+owner did not do. So the six-stage system's own `_verification`, `boundaryStatement` and
+`whatThisCannotTell` are **completely unchanged** — still `MOCK`, still the exact Phase 5 wording —
+and it continues to do the job it has always done: structuring how each (still mock) review's
+write-up is organised.
+
+The real process is new, separate content, added as its own field:
+
+```jsonc
+// content/mock/method.json — locales.en (and .ar)
+"actualProcess": {
+  "_verification": "CONFIRMED",
+  "_source": "Project owner, Phase 9",
+  "heading": "How this actually works",
+  "steps": [ /* five steps, verbatim from the sequence above */ ],
+  "boundary": "This is Zina's own, first-hand experience with a product — not a laboratory
+    test, a clinical trial, a dermatological assessment, or an independent scientific study.
+    It does not guarantee the same result for anyone else, and it is not a claim that a
+    product suits every skin type."
+}
+```
+
+`MethodLocale` in `content/schema/types.ts` gained this field as a required, typed addition —
+additive, not a schema replacement.
+
+### Page order: the real process comes first
+
+```
+h1 / tagline
+  ↓
+NEW  "How this actually works"   — actualProcess, CONFIRMED, its own heading and boundary
+  ↓
+intro paragraphs                 — unchanged Phase 5 copy, about why the six stages help compare
+  ↓
+boundary band + mock notice      — unchanged, still describes the SIX-STAGE framework specifically
+  ↓
+the six stages, ordered list     — unchanged
+```
+
+The real, confirmed fact is placed ahead of the proposal it sits beside, because it is the more
+important, more true statement. The existing boundary band's mock notice was deliberately left
+**unedited** rather than reworded to acknowledge the new section — it is still entirely accurate
+about the thing it describes (the six-stage mechanics), and a reader now meets the real process
+first, the proposal second, each correctly labelled as what it is.
+
+### Testing
+
+`tests/phase9.test.mjs` (checklist items 11–14) asserts, against the built HTML in both locales:
+the real-process section exists and precedes the six-stage section in document order; it has
+exactly five steps; the boundary text explicitly denies a guaranteed or universal result; no
+numerical-scoring or statistical-significance language was introduced; and — checked as a denial
+pattern, not a bare substring ban, since the boundary sentence must NAME "laboratory test" and
+"clinical trial" in order to deny them — that the section never claims those things are what this
+is.

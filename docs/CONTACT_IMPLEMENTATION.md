@@ -1,13 +1,14 @@
 # Contact Implementation
 
-**A contact surface with no form and no address — and why both absences are the correct
-implementation rather than an incomplete one.**
+**A contact surface with no form — the address, phone and Instagram now render because the
+project owner confirmed them (Phase 9); everything else about the architecture is unchanged.**
 
 | | |
 |---|---|
-| **Status** | Implemented (Phase 7) |
+| **Status** | Implemented (Phase 7); **verified channels added Phase 9** |
 | **Routes** | 2 — `/en/contact/`, `/ar/contact/` |
-| **Contact channels published** | **0** — none is CONFIRMED |
+| **Contact channels published** | **3** — general email, phone, Instagram (all CONFIRMED, Phase 9) |
+| **Still unconfirmed** | Collaboration email, press email, management/agency |
 | **Forms** | **0** |
 | **Client JavaScript** | 0 bytes |
 
@@ -160,7 +161,61 @@ The route remains `/{locale}/contact/`, which is the canonical route shape decla
 
 | Limit | Status |
 |---|---|
-| No verified contact channel | **Blocking for launch** — owner must supply one |
-| No backend | By design this phase |
-| Management representation unknown | `NEEDS_VERIFICATION` |
+| No backend | By design — still true, unaffected by Phase 9 |
+| Management representation unknown | `NEEDS_VERIFICATION`, still absent |
+| Collaboration / press email unconfirmed | Only the general address was supplied |
 | Arabic copy | Unreviewed by a native reader (H-1) |
+
+---
+
+## 9. Phase 9 update — the channels are no longer absent
+
+The project owner supplied three real, verified channels. They were added as data, through the
+exact mechanism this document already describes in §1–§7 — nothing about the architecture changed,
+only the values in `content/mock/site.json` and `content/mock/social-profiles.json`:
+
+| Channel | Value | Field |
+|---|---|---|
+| Email | `contact@zinaalmokri.com` | `site.json → contact.generalEmail`, `_verification: "CONFIRMED"` |
+| Phone | `0989 000 009` | `site.json → contact.phone`, `_verification: "CONFIRMED"` |
+| Instagram | `https://www.instagram.com/zina.almokri?stkn=MTI4aHRmMGZ0bDdibw==` | `social-profiles.json`, `sameAsEligible: true` |
+
+**Everything §1's original reasoning warned against remains true of what was NOT supplied.**
+`collaborationEmail` and `pressEmail` are still `@zinaalmokri.example.com`, still `_verification:
+"MOCK"`, still absent from every page — publishing a guess for either would be exactly the mistake
+this document originally described.
+
+### The phone number: display text vs. `tel:` href
+
+Rendered verbatim in visible text ("0989 000 009"), bidi-isolated with `<bdi dir="ltr">` because it
+sits inside Arabic RTL prose on the Arabic page. The `tel:` href is a digits-only normalisation of
+the *same* stored value (`telHref()` in `src/lib/trust.ts`) — a `tel:` URI containing spaces is not
+a functioning link on most platforms. This is the one case the Phase 9 brief names explicitly as a
+"technically equivalent normalised representation": the display text is never altered, only the
+href.
+
+### The Instagram link: `rel="me"`, not `nofollow`
+
+Every other outbound link on this site carries `nofollow` — a review linking to a brand's official
+site does not vouch for it. A link to Zina's own confirmed Instagram is the opposite claim: it
+asserts "this profile and this page are the same entity" (IndieWeb identity verification), which is
+exactly what `rel="me"` means and `nofollow` would contradict. The same relation is used on the
+shared site footer's social row (`src/components/shell/SiteFooter.astro`), which activated
+automatically the moment `sameAsEligible` became `true` — that row has existed since Phase 4/5 and
+was simply waiting for a confirmed profile.
+
+### Structured data: `email`/`telephone` only on THIS page
+
+`personSchema()` (`src/lib/seo.ts`) gained an opt-in third argument so `email`/`telephone` can be
+emitted in JSON-LD — but only where the values are *also* visible text on the page, per the file's
+own rule 4 ("everything marked up is visible on the page"). Every other caller of `personSchema()`
+(home, about, review, journal, work) omits the option and still gets no contact fields. `sameAs`
+needed no such option — it already rendered wherever `personSchema()` was called once the profile
+became eligible, because a link to an external profile does not need to be repeated as on-page text
+to be honest.
+
+### What is still exactly as absent as before
+
+Management/agency representation, collaboration email, press email — none of these was supplied,
+none is rendered, and the "no channel published" band (§ THE ABSENCE, STATED PLAINLY, above) is
+simply gone from the build because it is no longer true, not because it was removed.
