@@ -1,0 +1,284 @@
+{
+  "__MOCK_DATA__": true,
+  "collection": "brands",
+  "schemaVersion": "1.0.0",
+  "notice": "FICTIONAL MOCK CONTENT. Every brand below is INVENTED and does not exist. No real company is named, referenced or implied anywhere in this file, deliberately: a placeholder must never imply a commercial relationship with a real business. Relationship types are also invented. PHASE 1 CHANGE: added per-locale content, indexPolicy, and the thin-page gate described in docs/BRAND_ARCHITECTURE.md.",
+  "indexGate": {
+    "_rule": "A brand page is generated as an indexable route in a given locale only when, IN THAT LOCALE, it has (reviews >= 2) OR (reviews >= 1 AND work >= 1), AND has an original description of >= 120 characters, AND has a logo asset. Otherwise the brand exists as an entity and as a filter value on /reviews but no page is generated. Evaluated per locale, because review coverage differs by language.",
+    "minReviews": 2,
+    "minReviewsWithWork": 1,
+    "minDescriptionChars": 120,
+    "requiresLogo": true,
+    "_fixtureNote": "The mock set deliberately produces three states: brands indexable in both locales, one brand (veloura-beauty) indexable in English but gated in Arabic, and one brand (terra-sana) gated in both. All three must render correctly."
+  },
+  "items": [
+    {
+      "id": "mock-brand-maison-eclat",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "slug": "maison-eclat",
+      "foundedYear": 2011,
+      "originCountry": "France",
+      "categoryKey": "complexion-colour",
+      "indexPolicy": "auto",
+      "logo": { "src": "/mock-media/brands/maison-eclat-logo.svg", "alt": "Maison Eclat logo (placeholder)", "width": 320, "height": 96, "_mock": true },
+      "identity": { "accentColor": "#8C7A66", "wordmarkStyle": "High-contrast serif, wide letterspacing" },
+      "officialUrl": "https://maison-eclat.example.com",
+      "relationship": {
+        "type": "Campaign",
+        "status": "MOCK",
+        "since": "2025-02",
+        "_verification": "MOCK",
+        "_warning": "A brand must never be shown as client, partner, sponsor or collaborator without written verification. See docs/CONTENT_VERIFICATION_MATRIX.md"
+      },
+      "productIds": ["mock-product-voile-lumiere-skin-tint"],
+      "reviewIds": ["mock-review-voile-lumiere-skin-tint"],
+      "workIds": ["mock-work-voile-lumiere-launch"],
+      "locales": {
+        "en": {
+          "slug": "maison-eclat",
+          "translationStatus": "original",
+          "name": "Maison Eclat",
+          "nameStylised": "Maison Éclat",
+          "category": "Complexion and colour",
+          "positioning": "Heritage French complexion house. Skin-first formulas, restrained shade naming, high price tier.",
+          "description": "Maison Eclat is a Paris complexion house best known for thin, buildable base formulas that prioritise the appearance of skin over coverage. Its shade architecture is organised by undertone family rather than by number, which makes it easier to match in person and harder to shop online.",
+          "relationshipSummary": "Fictional paid launch campaign for a complexion product.",
+          "seo": {
+            "title": "Maison Eclat: reviews and collaborations",
+            "description": "Every Maison Eclat product tested and reviewed by Zina Almokri, plus selected collaboration work.",
+            "focusKeyword": "maison eclat review",
+            "canonicalPath": "/en/brands/maison-eclat/"
+          }
+        },
+        "ar": {
+          "slug": "maison-eclat",
+          "translationStatus": "adapted",
+          "name": "ميزون إيكلا",
+          "nameStylised": "Maison Éclat",
+          "category": "منتجات البشرة والألوان",
+          "positioning": "دار فرنسية عريقة لمنتجات البشرة. تركيبات تضع البشرة أولا، وتسمية درجات مقتصدة، وفئة سعرية مرتفعة.",
+          "description": "ميزون إيكلا دار باريسية متخصصة في منتجات البشرة، تشتهر بتركيبات خفيفة قابلة للبناء تركز على مظهر البشرة أكثر من التغطية. تُنظم درجاتها بحسب عائلة التحت-لون لا بالأرقام، ما يسهّل تحديد الدرجة عند التجربة ويصعّبه عند الشراء عبر الإنترنت.",
+          "relationshipSummary": "حملة إطلاق مدفوعة خيالية لمنتج بشرة.",
+          "seo": {
+            "title": "ميزون إيكلا: المراجعات والتعاونات",
+            "description": "كل منتجات ميزون إيكلا التي اختبرتها وراجعتها زينا المقري، إضافة إلى أعمال تعاون مختارة.",
+            "focusKeyword": "مراجعة ميزون إيكلا",
+            "canonicalPath": "/ar/brands/maison-eclat/"
+          }
+        }
+      }
+    },
+    {
+      "id": "mock-brand-veloura-beauty",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "slug": "veloura-beauty",
+      "foundedYear": 2019,
+      "originCountry": "United States",
+      "categoryKey": "colour-cosmetics",
+      "indexPolicy": "auto",
+      "_gateNote": "FIXTURE: indexable in English (2 reviews) but GATED in Arabic (1 review, 0 localised work). The Arabic brand page must not be generated, and the Arabic language switcher on the English brand page must fall back to /ar/brands/.",
+      "logo": { "src": "/mock-media/brands/veloura-logo.svg", "alt": "Veloura Beauty logo (placeholder)", "width": 320, "height": 96, "_mock": true },
+      "identity": { "accentColor": "#7E2438", "wordmarkStyle": "Tight geometric sans, all caps" },
+      "officialUrl": "https://veloura-beauty.example.com",
+      "relationship": { "type": "Editorial", "status": "MOCK", "since": "2024-09", "_verification": "MOCK" },
+      "productIds": ["mock-product-velvet-hour-lip-cream", "mock-product-cils-infini-mascara"],
+      "reviewIds": ["mock-review-velvet-hour-lip-cream", "mock-review-cils-infini-mascara"],
+      "workIds": ["mock-work-velvet-hour-wear-series"],
+      "locales": {
+        "en": {
+          "slug": "veloura-beauty",
+          "translationStatus": "original",
+          "name": "Veloura Beauty",
+          "nameStylised": "VELOURA",
+          "category": "Colour cosmetics",
+          "positioning": "Performance-led colour brand. Long-wear claims, saturated pigment, mid price tier, direct-to-consumer.",
+          "description": "Veloura Beauty builds its range around wear-time claims: transfer resistance, pigment load and all-day stability. The brand publishes its own internal wear-test figures on its packaging, which is unusual and makes it an unusually interesting brand to test independently, because there is a stated number to check.",
+          "relationshipSummary": "Fictional independent editorial coverage. No commercial relationship.",
+          "seo": {
+            "title": "Veloura Beauty: reviews and testing",
+            "description": "Independent wear tests of Veloura Beauty products by Zina Almokri, including lip and lash formulas.",
+            "focusKeyword": "veloura beauty review",
+            "canonicalPath": "/en/brands/veloura-beauty/"
+          }
+        },
+        "ar": {
+          "slug": "veloura-beauty",
+          "translationStatus": "adapted",
+          "name": "فيلورا",
+          "nameStylised": "VELOURA",
+          "category": "مستحضرات التجميل الملونة",
+          "positioning": "علامة تركز على الأداء. ادعاءات ثبات طويل، وتصبغ عال، وفئة سعرية متوسطة، وبيع مباشر.",
+          "description": "تبني فيلورا مجموعتها حول ادعاءات الثبات: مقاومة الانتقال، وكثافة التصبغ، والاستقرار طوال اليوم. تنشر العلامة أرقام اختباراتها الداخلية على العبوة، وهو أمر غير معتاد يجعلها علامة مثيرة للاهتمام عند اختبارها بشكل مستقل، لأن هناك رقما معلنا يمكن التحقق منه.",
+          "relationshipSummary": "تغطية تحريرية مستقلة خيالية. لا توجد علاقة تجارية.",
+          "seo": {
+            "title": "فيلورا: المراجعات والاختبارات",
+            "description": "اختبارات ثبات مستقلة لمنتجات فيلورا أجرتها زينا المقري.",
+            "focusKeyword": "مراجعة فيلورا",
+            "canonicalPath": "/ar/brands/veloura-beauty/"
+          }
+        }
+      }
+    },
+    {
+      "id": "mock-brand-lune-skin",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "slug": "lune-skin",
+      "foundedYear": 2020,
+      "originCountry": "United Kingdom",
+      "categoryKey": "skincare",
+      "indexPolicy": "auto",
+      "logo": { "src": "/mock-media/brands/lune-skin-logo.svg", "alt": "Lune Skin logo (placeholder)", "width": 320, "height": 96, "_mock": true },
+      "identity": { "accentColor": "#4A5B63", "wordmarkStyle": "Low-contrast humanist sans, lowercase" },
+      "officialUrl": "https://lune-skin.example.com",
+      "relationship": { "type": "Product Testing", "status": "MOCK", "since": "2025-05", "_verification": "MOCK" },
+      "productIds": ["mock-product-nuit-barrier-serum"],
+      "reviewIds": ["mock-review-nuit-barrier-serum"],
+      "workIds": ["mock-work-barrier-season-campaign"],
+      "locales": {
+        "en": {
+          "slug": "lune-skin",
+          "translationStatus": "original",
+          "name": "Lune Skin",
+          "nameStylised": "Luné Skin",
+          "category": "Skincare",
+          "positioning": "Minimalist barrier-focused skincare. Short ingredient lists, plain packaging, no active-percentage marketing.",
+          "description": "Lune Skin sells a deliberately small range built around barrier support rather than around actives. The brand refuses percentage-led marketing, which removes the usual way of judging a product on paper and makes its formulas easier to assess on texture, comfort and routine compatibility instead.",
+          "relationshipSummary": "Fictional gifted long-term testing arrangement, unpaid, no editorial control.",
+          "seo": {
+            "title": "Lune Skin: reviews and long-term testing",
+            "description": "Multi-week testing of Lune Skin barrier products by Zina Almokri.",
+            "focusKeyword": "lune skin review",
+            "canonicalPath": "/en/brands/lune-skin/"
+          }
+        },
+        "ar": {
+          "slug": "lune-skin",
+          "translationStatus": "adapted",
+          "name": "لونيه سكِن",
+          "nameStylised": "Luné Skin",
+          "category": "العناية بالبشرة",
+          "positioning": "عناية بالبشرة مبسطة تركز على حاجز البشرة. قوائم مكونات قصيرة، وعبوات بسيطة، وبلا تسويق بالنسب.",
+          "description": "تبيع لونيه سكِن مجموعة صغيرة عن قصد، مبنية على دعم حاجز البشرة لا على المكونات الفعالة. ترفض العلامة التسويق بالنسب، ما يلغي الطريقة المعتادة للحكم على المنتج نظريا ويجعل تقييم تركيباتها أسهل من حيث الملمس والراحة والانسجام مع الروتين.",
+          "relationshipSummary": "ترتيب اختبار طويل الأمد بمنتجات مُهداة، غير مدفوع وبلا تحكم تحريري.",
+          "seo": {
+            "title": "لونيه سكِن: المراجعات والاختبارات الطويلة",
+            "description": "اختبارات ممتدة لأسابيع لمنتجات لونيه سكِن أجرتها زينا المقري.",
+            "focusKeyword": "مراجعة لونيه سكِن",
+            "canonicalPath": "/ar/brands/lune-skin/"
+          }
+        }
+      }
+    },
+    {
+      "id": "mock-brand-atelier-noor",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "slug": "atelier-noor",
+      "foundedYear": 2017,
+      "originCountry": "United Arab Emirates",
+      "categoryKey": "complexion-fragrance",
+      "indexPolicy": "auto",
+      "logo": { "src": "/mock-media/brands/atelier-noor-logo.svg", "alt": "Atelier Noor logo (placeholder)", "width": 320, "height": 96, "_mock": true },
+      "identity": { "accentColor": "#1F3A34", "wordmarkStyle": "Bilingual lockup, Latin serif with Naskh companion" },
+      "officialUrl": "https://atelier-noor.example.com",
+      "relationship": { "type": "Beauty Feature", "status": "MOCK", "since": "2025-11", "_verification": "MOCK" },
+      "productIds": ["mock-product-sitara-luminous-concealer"],
+      "reviewIds": ["mock-review-sitara-luminous-concealer"],
+      "workIds": ["mock-work-layers-of-light-campaign"],
+      "locales": {
+        "en": {
+          "slug": "atelier-noor",
+          "translationStatus": "original",
+          "name": "Atelier Noor",
+          "nameStylised": "Atelier Noor",
+          "category": "Complexion and fragrance",
+          "positioning": "Regional luxury house. Formulas developed for warm climates and for medium-to-deep shade ranges.",
+          "description": "Atelier Noor develops complexion products specifically for warm, humid climates and for the shade range most under-served by imported brands. Its concealer range extends further into deep warm tones than most houses at its price tier, which is the main reason it appears on this site.",
+          "relationshipSummary": "Fictional seasonal campaign feature.",
+          "seo": {
+            "title": "Atelier Noor: reviews and campaign work",
+            "description": "Atelier Noor complexion products tested in warm-climate conditions by Zina Almokri.",
+            "focusKeyword": "atelier noor review",
+            "canonicalPath": "/en/brands/atelier-noor/"
+          }
+        },
+        "ar": {
+          "slug": "atelier-noor",
+          "translationStatus": "adapted",
+          "name": "أتيليه نور",
+          "nameStylised": "أتيليه نور",
+          "category": "منتجات البشرة والعطور",
+          "positioning": "دار فخمة إقليمية. تركيبات مطورة للمناخات الحارة ولنطاق الدرجات المتوسطة إلى الداكنة.",
+          "description": "تطور أتيليه نور منتجات البشرة خصيصا للمناخات الحارة والرطبة ولنطاق الدرجات الأكثر إهمالا من العلامات المستوردة. تمتد مجموعة الكونسيلر لديها إلى درجات دافئة داكنة أبعد من معظم الدور في فئتها السعرية، وهذا السبب الرئيسي لظهورها على هذا الموقع.",
+          "relationshipSummary": "ظهور في حملة موسمية خيالية.",
+          "seo": {
+            "title": "أتيليه نور: المراجعات وأعمال الحملات",
+            "description": "منتجات أتيليه نور للبشرة مختبرة في ظروف مناخ حار من زينا المقري.",
+            "focusKeyword": "مراجعة أتيليه نور",
+            "canonicalPath": "/ar/brands/atelier-noor/"
+          }
+        }
+      }
+    },
+    {
+      "id": "mock-brand-terra-sana",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "slug": "terra-sana",
+      "foundedYear": 2015,
+      "originCountry": "Italy",
+      "categoryKey": "skincare",
+      "indexPolicy": "auto",
+      "_gateNote": "FIXTURE: GATED IN BOTH LOCALES. English has 0 reviews; Arabic has 1 review and 0 work. No brand page is generated in either locale. Terra Sana still appears as a filter value on /reviews and as the brand name on the Arabic Verdure Cloud Balm review, which must link to the review rather than to a non-existent brand page.",
+      "logo": { "src": "/mock-media/brands/terra-sana-logo.svg", "alt": "Terra Sana logo (placeholder)", "width": 320, "height": 96, "_mock": true },
+      "identity": { "accentColor": "#3F5540", "wordmarkStyle": "Grotesque sans with wide tracking" },
+      "officialUrl": "https://terra-sana.example.com",
+      "relationship": { "type": "UGC", "status": "MOCK", "since": "2026-01", "_verification": "MOCK" },
+      "productIds": ["mock-product-verdure-cloud-balm"],
+      "reviewIds": ["mock-review-verdure-cloud-balm"],
+      "workIds": [],
+      "locales": {
+        "en": {
+          "slug": "terra-sana",
+          "translationStatus": "original",
+          "name": "Terra Sana",
+          "nameStylised": "TERRA SANA",
+          "category": "Skincare",
+          "positioning": "Botanical skincare with a scientific presentation. Accessible price tier, pharmacy distribution.",
+          "description": "Terra Sana pairs botanical formulation with clinical-style packaging and documentation. It sits at an accessible price point, which makes it a useful reference brand when assessing whether a premium moisturiser justifies its cost.",
+          "relationshipSummary": "Fictional paid user-generated-content package. Assets licensed to the brand, not published as editorial review.",
+          "seo": {
+            "title": "Terra Sana: reviews and testing",
+            "description": "Terra Sana skincare tested over multi-week periods by Zina Almokri.",
+            "focusKeyword": "terra sana review",
+            "canonicalPath": "/en/brands/terra-sana/"
+          }
+        },
+        "ar": {
+          "slug": "terra-sana",
+          "translationStatus": "adapted",
+          "name": "تيرا سانا",
+          "nameStylised": "TERRA SANA",
+          "category": "العناية بالبشرة",
+          "positioning": "عناية بالبشرة نباتية بعرض علمي. فئة سعرية في المتناول وتوزيع عبر الصيدليات.",
+          "description": "تجمع تيرا سانا بين التركيب النباتي والعرض والتوثيق بأسلوب علمي. تقع في فئة سعرية في المتناول، ما يجعلها علامة مرجعية مفيدة عند تقييم ما إذا كان مرطب فاخر يبرر سعره.",
+          "relationshipSummary": "باقة محتوى مدفوعة خيالية. رُخصت الأصول للعلامة ولم تُنشر كمراجعة تحريرية.",
+          "seo": {
+            "title": "تيرا سانا: المراجعات والاختبارات",
+            "description": "منتجات تيرا سانا للعناية بالبشرة مختبرة عبر فترات ممتدة من زينا المقري.",
+            "focusKeyword": "مراجعة تيرا سانا",
+            "canonicalPath": "/ar/brands/terra-sana/"
+          }
+        }
+      }
+    }
+  ]
+}

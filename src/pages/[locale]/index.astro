@@ -1,0 +1,508 @@
+---
+/**
+ * THE HOMEPAGE — /{locale}/
+ *
+ * Built LAST, deliberately. It introduces an editorial system that already exists rather than
+ * promising one: every link on this page goes to a route implemented in Phase 4 or Phase 5, and
+ * every section is populated from real records. Nothing is reserved, teased or coming soon.
+ *
+ * ============================================================================
+ * STATE A / STATE B — the photography dependency, severed
+ * ============================================================================
+ * Phase 3 identified the homepage's dependency on photography that does not exist as its central
+ * weakness. The resolution is not a placeholder: it is that the ARGUMENT of the page is carried
+ * by type and record, and photography only ever carried its ATMOSPHERE.
+ *
+ *   STATE A  a portrait exists  -> asymmetric composition, statement beside the portrait
+ *   STATE B  no portrait        -> the statement widens and takes the space; NO tone field,
+ *                                  NO grey rectangle, NO "coming soon", NO stock photograph
+ *
+ * The state is chosen from whether the asset actually resolves, not from a flag someone sets.
+ * TODAY THE SITE IS IN STATE B, and it is composed for it rather than degraded into it.
+ *
+ * Note that in State B the proof block sits HIGHER on the page than in State A. The photography
+ * adds warmth and costs vertical space; it is not a straight upgrade.
+ *
+ * ============================================================================
+ * THE FIRST VIEWPORT, in order (Phase 5 brief section 17)
+ * ============================================================================
+ *   1 who she is           the name, small, beneath the claim
+ *   2 what she does        the claim itself, as the h1
+ *   3 what is distinctive  the Method line — "Six stages, the same six every time"
+ *   4 what to explore      the record count, and the proof block beginning within one screen
+ *   5 why the Method matters   the boundary, stated in one clause, linked
+ *
+ * THE CLAIM IS THE HEADLINE; THE NAME IS SMALL. A homepage whose largest element is the person's
+ * name is a business card.
+ */
+import type { GetStaticPaths } from "astro";
+import type { Locale } from "../../../content/schema/types";
+import {
+  LOCALES,
+  IS_INDEXABLE_BUILD,
+  featuredReviews,
+  method,
+  person,
+  reviews as reviewsIn,
+} from "../../lib/content";
+import { absoluteUrl, path, robotsContent } from "../../lib/routing";
+import { jsonLd, personSchema, templatedMeta } from "../../lib/seo";
+import { t } from "../../lib/ui-strings";
+import { isolateValue } from "../../lib/bidi";
+import { formatCount } from "../../lib/format";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ReviewEntry from "../../components/review/ReviewEntry.astro";
+import Frame from "../../components/media/Frame.astro";
+
+export const getStaticPaths = (() =>
+  LOCALES.map((locale) => ({ params: { locale } }))) satisfies GetStaticPaths;
+
+const { locale } = Astro.params as { locale: Locale };
+
+const personRecord = person();
+const personLocale = personRecord.locales[locale]!;
+const methodRecord = method();
+const methodLocale = methodRecord.locales[locale]!;
+
+const records = reviewsIn(locale);
+const featured = featuredReviews(locale)[0] ?? records[0];
+const recent = records.filter((r) => r.id !== featured?.id).slice(0, 3);
+
+/**
+ * STATE DETECTION. A `/mock-media/` path is a path to a file that was never created, so it is
+ * treated as absent — the same rule `Frame` applies. No flag, no toggle: the state is a fact
+ * about the assets.
+ */
+const portrait = personRecord.images?.["portrait"] ?? personRecord.images?.["hero"];
+const portraitExists = Boolean(portrait?.src) && !portrait!.src.startsWith("/mock-media/");
+const stateA = portraitExists;
+
+const featuredContent = featured?.locales[locale];
+// At most three conditions from what the featured review actually published. Never padded.
+const conditions = (featuredContent?.conditions ?? []).slice(0, 3);
+// One observation. The homepage carries ONE evidence moment; a second would make it a dashboard.
+const observation = featuredContent?.observations?.[0];
+
+const stages = methodRecord.stageOrder
+  .map((key) => methodLocale.stages.find((s) => s.key === key))
+  .filter((s): s is NonNullable<typeof s> => Boolean(s));
+
+const selfPath = path.home(locale);
+const meta = templatedMeta(personLocale.professionalTitle, personLocale.bios.short, {
+  canonical: absoluteUrl(selfPath),
+  robots: robotsContent(IS_INDEXABLE_BUILD),
+  locale,
+});
+
+const alternates = [
+  ...LOCALES.map((l) => ({ hreflang: l, href: absoluteUrl(path.home(l)) })),
+  { hreflang: "x-default", href: absoluteUrl(path.home("en")) },
+];
+
+/**
+ * Person only. No Organization (there is no verified organisation), no sameAs (no profile is
+ * verified), no award, no credential, no location (unverified). The homepage must not manufacture
+ * professional credentials.
+ */
+const schemas = [jsonLd(personSchema(personRecord, locale))];
+---
+
+<BaseLayout
+  locale={locale}
+  meta={meta}
+  alternates={alternates}
+  schemas={schemas}
+  switcherHref={path.home(locale === "en" ? "ar" : "en")}
+>
+  {/* ---------------------------------------------------------------- 1 · the claim */}
+  <section class:list={["opening", stateA ? "opening--portrait" : "opening--typographic"]}>
+    <div class="container opening-inner">
+      <div class="statement-block">
+        <h1 class="statement">{personLocale.bios.homepageIntro}</h1>
+
+        <p class="attribution">
+          <span class="name">{personRecord.name[locale === "ar" ? "arabic" : "latin"]}</span>
+          <span class="role label">{personLocale.professionalTitle}</span>
+        </p>
+
+        {/* What makes the work distinctive — on screen one, not screen three. */}
+        <p class="method-line">
+          {t(locale, "homeMethodLead")}{" "}
+          <a href={path.method(locale)}>{t(locale, "readTheMethod")}</a>
+        </p>
+      </div>
+
+      {
+        stateA && (
+          <div class="portrait">
+            <Frame
+              src={portrait!.src}
+              alt={portrait!.alt}
+              width={portrait!.width}
+              height={portrait!.height}
+              ratio="4 / 5"
+              priority={true}
+            />
+          </div>
+        )
+      }
+    </div>
+  </section>
+
+  {/* ---------------------------------------------------------------- 2 · the proof */}
+  {
+    featured && featuredContent && (
+      <section class="featured" aria-labelledby="featured-heading">
+        <div class="container">
+          <h2 class="section-heading" id="featured-heading">{t(locale, "featuredReview")}</h2>
+
+          <p class="label disclosure">{featuredContent.disclosureLabel}</p>
+
+          <a class="featured-title-link" href={path.review(locale, featuredContent.slug!)}>
+            <span class="featured-title display-md">{featuredContent.title}</span>
+          </a>
+          <p class="featured-subtitle">{featuredContent.subtitle}</p>
+
+          {/* The site's only homepage instance of record density. */}
+          {conditions.length > 0 && (
+            <dl class="conditions">
+              {conditions.map((condition) => (
+                <div class="condition">
+                  <dt class="label">{condition.label}</dt>
+                  <dd class="record" set:html={isolateValue(condition.value)} />
+                </div>
+              ))}
+            </dl>
+          )}
+
+          {observation && (
+            <blockquote class="observation">
+              <p>{observation.note}</p>
+            </blockquote>
+          )}
+
+          <p class="featured-link">
+            <a href={path.review(locale, featuredContent.slug!)}>{t(locale, "readTheReview")}</a>
+          </p>
+        </div>
+      </section>
+    )
+  }
+
+  {/* ---------------------------------------------------------------- 3 · the method */}
+  <section class="method-well" aria-labelledby="method-heading">
+    <div class="container">
+      <h2 class="section-heading" id="method-heading">{methodLocale.name}</h2>
+
+      {/* Six names and six numbers, set like an index. NOT six icons, not a diagram,
+          not a funnel, not a progress bar. */}
+      <ol class="stages plain">
+        {
+          stages.map((stage, index) => (
+            <li class="stage">
+              <span class="stage-number record" set:html={isolateValue(String(index + 1).padStart(2, "0"))} />
+              <a class="stage-name" href={`${path.method(locale)}#${stage.key}`}>{stage.name}</a>
+            </li>
+          ))
+        }
+      </ol>
+
+      {/* The boundary travels with the method, everywhere it appears. */}
+      <p class="boundary-line">{methodLocale.boundaryStatement}</p>
+
+      <p class="method-cta">
+        <a href={path.method(locale)}>{methodLocale.tagline}</a>
+      </p>
+    </div>
+  </section>
+
+  {/* ---------------------------------------------------------------- 4 · the corpus */}
+  {
+    recent.length > 0 && (
+      <section class="recent" aria-labelledby="recent-heading">
+        <div class="container">
+          <h2 class="section-heading" id="recent-heading">{t(locale, "recentReviews")}</h2>
+
+          <div class="entries">
+            {recent.map((review) => <ReviewEntry locale={locale} review={review} headingLevel={3} />)}
+          </div>
+
+          <p class="all-link">
+            <a href={path.reviewsIndex(locale)}>
+              {t(locale, "viewAllReviews")}
+              <span class="count record">
+                <Fragment set:html={isolateValue(formatCount(records.length, locale))} />
+              </span>
+            </a>
+          </p>
+        </div>
+      </section>
+    )
+  }
+
+  {/*
+    NO further sections. Journal, Work, Brands, Contact and About are not implemented, so they
+    are not presented — not as teasers, not as empty blocks, not as "coming soon". A homepage
+    that advertises pages that do not exist is a homepage that lies about the site.
+  */}
+</BaseLayout>
+
+<style>
+  /* ---------------------------------------------------------------- opening */
+
+  .opening {
+    padding-block: var(--space-8) var(--space-9);
+    border-block-end: var(--border-rule-hairline);
+  }
+
+  .opening-inner {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .statement {
+    /* THE CLAIM IS THE HEADLINE. */
+    font-family: var(--type-family-display);
+    font-size: calc(var(--type-display-xl) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-display-xl) * var(--type-arabic-leading-factor));
+    letter-spacing: var(--type-tracking-display);
+    font-weight: var(--type-weight-regular);
+    text-align: start;
+    max-width: 22ch;
+  }
+
+  /* STATE B: the statement takes the room the portrait would have taken. Not a fallback —
+     a different composition, with more air and a longer measure. */
+  .opening--typographic .statement {
+    max-width: 26ch;
+  }
+
+  .attribution {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-0-5);
+    margin-block-start: var(--space-5);
+  }
+
+  /* THE NAME IS SMALL. */
+  .name {
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-ui-md) * var(--type-arabic-size-factor));
+    color: var(--color-text-primary);
+  }
+
+  .role {
+    color: var(--color-text-muted);
+  }
+
+  .method-line {
+    margin-block-start: var(--space-4);
+    max-width: var(--type-measure-editorial);
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+    color: var(--color-text-secondary);
+  }
+
+  /* ---------------------------------------------------------------- shared headings */
+
+  .section-heading {
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
+    font-weight: var(--type-weight-medium);
+    letter-spacing: var(--type-tracking-label);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  :global(html[lang="ar"]) .section-heading {
+    text-transform: none;
+    font-weight: var(--type-weight-regular);
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+  }
+
+  /* ---------------------------------------------------------------- featured */
+
+  .featured {
+    padding-block: var(--space-9);
+    border-block-end: var(--border-rule-hairline);
+  }
+
+  .disclosure {
+    margin-block-start: var(--space-4);
+    color: var(--color-text-muted);
+  }
+
+  .featured-title-link {
+    display: inline-block;
+    margin-block-start: var(--space-1);
+    text-decoration: none;
+  }
+
+  .featured-title {
+    color: var(--color-text-primary);
+    max-width: 20ch;
+  }
+
+  .featured-title-link:hover .featured-title {
+    color: var(--color-accent-clay-hover);
+    text-decoration: underline;
+  }
+
+  .featured-subtitle {
+    margin-block-start: var(--space-2);
+    max-width: var(--type-measure-editorial);
+    font-size: calc(var(--type-body-md) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-body-md) * var(--type-arabic-leading-factor));
+    color: var(--color-text-secondary);
+  }
+
+  .conditions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-6);
+    margin-block-start: var(--space-5);
+    padding-block: var(--space-3);
+    border-block: var(--border-rule-hairline);
+  }
+
+  .condition {
+    display: grid;
+    gap: var(--space-0-5);
+    min-width: 0;
+  }
+
+  .conditions dd {
+    color: var(--color-accent-mineral);
+  }
+
+  .conditions dd :global(bdi) {
+    white-space: nowrap;
+  }
+
+  .observation {
+    margin-block-start: var(--space-5);
+    border-inline-start: var(--border-rule-observation);
+    padding-inline-start: var(--space-2);
+    max-width: var(--type-measure-editorial);
+    font-size: calc(var(--type-body-md) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-body-md) * var(--type-arabic-leading-factor));
+  }
+
+  .featured-link {
+    margin-block-start: var(--space-5);
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+  }
+
+  /* ---------------------------------------------------------------- method well */
+
+  .method-well {
+    padding-block: var(--space-9);
+    background: var(--color-ground-inset);
+  }
+
+  .stages {
+    display: grid;
+    gap: var(--space-3);
+    margin-block-start: var(--space-4);
+  }
+
+  .stage {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+  }
+
+  .stage-number {
+    color: var(--color-accent-mineral);
+    font-size: var(--type-record-sm);
+    flex: none;
+  }
+
+  .stage-name {
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-ui-md) * var(--type-arabic-size-factor));
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+
+  .stage-name:hover {
+    color: var(--color-accent-clay-hover);
+    text-decoration: underline;
+  }
+
+  .boundary-line {
+    margin-block-start: var(--space-6);
+    padding-block-start: var(--space-3);
+    border-block-start: var(--border-rule-hairline);
+    max-width: var(--type-measure-editorial);
+    font-size: calc(var(--type-body-sm) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-body-sm) * var(--type-arabic-leading-factor));
+    color: var(--color-text-secondary);
+  }
+
+  .method-cta {
+    margin-block-start: var(--space-4);
+    max-width: var(--type-measure-editorial);
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+  }
+
+  /* ---------------------------------------------------------------- recent */
+
+  .recent {
+    padding-block: var(--space-9);
+  }
+
+  .entries {
+    display: grid;
+    gap: var(--space-5);
+    margin-block-start: var(--space-4);
+  }
+
+  .all-link {
+    margin-block-start: var(--space-6);
+    padding-block-start: var(--space-3);
+    border-block-start: var(--border-rule-hairline);
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+  }
+
+  .all-link .count {
+    margin-inline-start: var(--space-1);
+    color: var(--color-text-muted);
+    font-size: var(--type-record-sm);
+  }
+
+  /* ---------------------------------------------------------------- 768+ */
+
+  @media (min-width: 768px) {
+    .conditions {
+      gap: var(--space-4) var(--space-8);
+    }
+
+    .stages {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-3) var(--space-6);
+    }
+  }
+
+  /* ---------------------------------------------------------------- 1024+ */
+
+  @media (min-width: 1024px) {
+    .opening {
+      padding-block: var(--space-10) var(--space-10);
+    }
+
+    /* STATE A: asymmetric — statement in the wider column, portrait beside it. */
+    .opening--portrait .opening-inner {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: var(--space-8);
+      align-items: start;
+    }
+
+    .stages {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

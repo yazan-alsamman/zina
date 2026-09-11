@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phase 3 bilingual type proof — evaluation harness</title>
+
+<!--
+  PHASE 3 EVALUATION HARNESS. NOT PRODUCTION CODE. NOT PART OF THE APPLICATION.
+
+  Purpose: set the ten specimens from docs/BILINGUAL_TYPE_TEST.md in real type, in both
+  directions, at 1440 / 768 / 375, so the ten pass criteria can be MEASURED rather than asserted.
+
+  Type tier used here is the DOCUMENTED OPEN-SOURCE FALLBACK TIER from
+  docs/TYPOGRAPHY_SYSTEM.md section 6, because 29LT Zarid is commercially licensed and no licence
+  has been obtained (Phase 2 open question Q-2). Every result produced by this file is therefore a
+  result about the FALLBACK TIER, not about Zarid. See docs/PHASE_3_BILINGUAL_TYPE_PROOF.md.
+
+  This file writes no production CSS. Its selectors, class names and values exist only to render
+  specimens and must not be copied into Phase 4.
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Noto+Naskh+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  /* ---- Phase 2 colour tokens, verbatim values from docs/DESIGN_TOKENS_SPEC.md ---- */
+  :root{
+    --ground-inset:#0B0A08; --ground-base:#12100D; --ground-raised:#1A1714;
+    --text-primary:#F2EDE3; --text-secondary:#C3BAAC; --text-muted:#9A9184;
+    --line-hairline:#2C2823; --line-strong:#75695C;
+    --clay:#D9906A; --mineral:#A3BCAF; --warning:#DCA95E;
+
+    --f-display:"IBM Plex Serif",Georgia,serif;
+    --f-body:"IBM Plex Serif",Georgia,serif;
+    --f-ui:"IBM Plex Sans",system-ui,sans-serif;
+    --f-record:"IBM Plex Mono",ui-monospace,monospace;
+
+    /* Latin scale at 1440, docs/DESIGN_TOKENS_SPEC.md section 2 */
+    --display-lg:56px; --display-md:40px; --display-sm:30px;
+    --body-lg:21px; --body-md:18px; --body-sm:16px;
+    --ui-md:16px; --ui-sm:14px; --record-md:15px; --record-sm:13px; --label-sm:12px;
+
+    --size-factor:1;      /* Arabic override below */
+    --leading-factor:1;
+    --tracking-label:0.08em;
+    --tracking-display:-0.01em;
+  }
+
+  /* ---- script adaptation, applied at the locale root only ---- */
+  [lang="ar"]{
+    --f-display:"Noto Naskh Arabic","IBM Plex Sans Arabic",serif;
+    --f-body:"Noto Naskh Arabic","IBM Plex Sans Arabic",serif;
+    --f-ui:"IBM Plex Sans Arabic",system-ui,sans-serif;
+    --size-factor:1.12;
+    --leading-factor:1.18;
+    --tracking-label:0;      /* type.tracking.arabic — fixed at 0, never overridable */
+    --tracking-display:0;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--ground-base);color:var(--text-primary);}
+  body{font-family:var(--f-body);}
+
+  .page{max-width:1180px;margin:0 auto;padding:0 24px 96px;}
+  @media (max-width:1023px){.page{padding:0 48px 72px;}}
+  @media (max-width:767px){.page{padding:0 20px 56px;}}
+
+  .harness-bar{background:var(--ground-inset);border-bottom:1px solid var(--line-hairline);
+    font-family:var(--f-ui);font-size:12px;color:var(--text-muted);padding:8px 20px;
+    letter-spacing:0.08em;text-transform:uppercase;}
+
+  .spec{border-top:1px solid var(--line-hairline);padding:48px 0;}
+  .spec > .spec-id{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--mineral);
+    letter-spacing:0.06em;margin:0 0 24px;text-transform:none;}
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:48px;}
+  @media (max-width:1023px){.pair{grid-template-columns:1fr;gap:40px;}}
+  .cell{min-width:0;}
+
+  /* ---- type roles ---- */
+  .display-lg{font-family:var(--f-display);font-weight:400;
+    font-size:calc(var(--display-lg) * var(--size-factor));
+    line-height:calc(1.08 * var(--leading-factor));
+    letter-spacing:var(--tracking-display);margin:0;}
+  .display-md{font-family:var(--f-display);font-weight:400;
+    font-size:calc(var(--display-md) * var(--size-factor));
+    line-height:calc(1.14 * var(--leading-factor));
+    letter-spacing:var(--tracking-display);margin:0;}
+  .display-sm{font-family:var(--f-display);font-weight:400;
+    font-size:calc(var(--display-sm) * var(--size-factor));
+    line-height:calc(1.20 * var(--leading-factor));
+    letter-spacing:var(--tracking-display);margin:0;color:var(--text-secondary);}
+  .body-lg{font-family:var(--f-body);font-size:calc(var(--body-lg) * var(--size-factor));
+    line-height:calc(1.62 * var(--leading-factor));max-width:62ch;margin:0;}
+  .body-md{font-family:var(--f-body);font-size:calc(var(--body-md) * var(--size-factor));
+    line-height:calc(1.68 * var(--leading-factor));max-width:62ch;margin:0;}
+  .body-sm{font-family:var(--f-body);font-size:calc(var(--body-sm) * var(--size-factor));
+    line-height:calc(1.60 * var(--leading-factor));margin:0;color:var(--text-secondary);}
+  .label-sm{font-family:var(--f-ui);font-size:calc(var(--label-sm) * var(--size-factor));
+    line-height:calc(1.35 * var(--leading-factor));color:var(--text-muted);
+    letter-spacing:var(--tracking-label);margin:0;}
+  .record-md{font-family:var(--f-record);font-size:var(--record-md);line-height:1.5;
+    font-variant-numeric:tabular-nums;margin:0;}
+  .record-sm{font-family:var(--f-record);font-size:var(--record-sm);line-height:1.5;
+    font-variant-numeric:tabular-nums;color:var(--mineral);margin:0;}
+  .ui-md{font-family:var(--f-ui);font-size:calc(var(--ui-md) * var(--size-factor));
+    line-height:calc(1.40 * var(--leading-factor));margin:0;}
+
+  /* Latin label uppercase is a LATIN-ONLY device */
+  [lang="en"] .label-sm{text-transform:uppercase;font-weight:500;}
+  [lang="ar"] .label-sm{text-transform:none;font-weight:400;}
+
+  /* ---- header specimen ---- */
+  .hdr{display:flex;align-items:center;gap:32px;border-block:1px solid var(--line-hairline);
+    padding:20px 0;}
+  .hdr-mark{font-family:var(--f-display);font-size:calc(20px * var(--size-factor));
+    white-space:nowrap;}
+  .hdr-nav{display:flex;gap:28px;margin-inline-start:auto;align-items:center;}
+  .hdr-nav a{font-family:var(--f-ui);font-size:calc(var(--ui-sm) * var(--size-factor));
+    color:var(--text-secondary);text-decoration:none;white-space:nowrap;}
+  .hdr-cta{font-family:var(--f-ui);font-size:calc(var(--ui-sm) * var(--size-factor));
+    border:1px solid var(--line-strong);border-radius:2px;padding:10px 20px;white-space:nowrap;}
+  .hdr-switch{font-family:var(--f-ui);font-size:calc(var(--ui-sm) * var(--size-factor));
+    color:var(--text-muted);white-space:nowrap;}
+
+  /* ---- margin index + observations ---- */
+  .obs-grid{display:grid;grid-template-columns:160px 1fr;gap:32px;}
+  @media (max-width:1023px){.obs-grid{grid-template-columns:1fr;gap:8px;}}
+  .obs-index{font-family:var(--f-record);font-size:var(--record-sm);color:var(--mineral);
+    font-variant-numeric:tabular-nums;}
+  [lang="ar"] .obs-index .obs-word{font-family:var(--f-ui);font-size:calc(13px * 1.12);}
+  .obs-note{border-inline-start:1px solid var(--mineral);padding-inline-start:20px;
+    font-family:var(--f-body);font-size:calc(var(--body-md) * var(--size-factor));
+    line-height:calc(1.68 * var(--leading-factor));max-width:62ch;}
+  .obs-inline{display:none;}
+  @media (max-width:1023px){
+    .obs-index{display:none;}
+    .obs-inline{display:flex;gap:12px;align-items:baseline;font-family:var(--f-record);
+      font-size:var(--record-sm);color:var(--mineral);font-variant-numeric:tabular-nums;
+      margin-bottom:8px;}
+    [lang="ar"] .obs-inline .obs-word{font-family:var(--f-ui);font-size:calc(13px * 1.12);}
+  }
+
+  /* ---- conditions well ---- */
+  .well{background:var(--ground-inset);padding:32px;}
+  @media (max-width:767px){.well{padding:20px;}}
+  table.cond{width:100%;border-collapse:collapse;}
+  table.cond th{font-family:var(--f-ui);font-size:calc(var(--ui-sm) * var(--size-factor));
+    font-weight:400;color:var(--text-muted);text-align:start;padding:12px 0;
+    border-bottom:1px solid var(--line-hairline);}
+  table.cond td{font-family:var(--f-record);font-size:var(--record-md);
+    font-variant-numeric:tabular-nums;color:var(--text-primary);text-align:end;padding:12px 0;
+    border-bottom:1px solid var(--line-hairline);white-space:nowrap;}
+  [lang="ar"] table.cond td .cond-word{font-family:var(--f-ui);font-size:calc(14px * 1.12);}
+
+  /* ---- disclosure band ---- */
+  .band{background:var(--ground-raised);border-top:2px solid var(--clay);padding:24px 32px;}
+  @media (max-width:767px){.band{padding:20px;}}
+  .band .label-sm{color:var(--clay);}
+
+  /* ---- plate caption ---- */
+  .plate-img{background:var(--ground-raised);aspect-ratio:3/2;width:100%;}
+  .plate-cap{margin-top:24px;border-bottom:1px solid var(--line-hairline);padding-bottom:12px;}
+
+  /* ---- claim / verdict ---- */
+  .claim{background:var(--ground-raised);border-inline-start:1px dotted var(--line-hairline);
+    padding-inline-start:16px;margin-inline-start:24px;color:var(--text-muted);
+    font-family:var(--f-body);font-size:calc(var(--body-sm) * var(--size-factor));
+    line-height:calc(1.60 * var(--leading-factor));}
+  .verdict{border-top:2px solid var(--clay);padding-top:24px;}
+</style>
+</head>
+<body>
+
+<div class="harness-bar" id="harness-bar">Phase 3 type proof — fallback tier (IBM Plex + Noto Naskh Arabic) — Zarid NOT licensed</div>
+
+<main class="page">
+
+<!-- ============ 1. DISPLAY HEADING ============ -->
+<section class="spec" data-spec="01-display-heading">
+  <p class="spec-id">01 · DISPLAY HEADING · display.lg · criterion 1</p>
+  <div class="pair">
+    <div class="cell" lang="en" dir="ltr">
+      <p class="label-sm" style="margin-bottom:8px">Foundation · Tested June 2026 · Paid partnership</p>
+      <h1 class="display-lg" data-m="display-en">Maison Eclat Voile Lumiere Skin Tint</h1>
+      <p class="display-sm" style="margin-top:16px">Eight hours in 38 degree heat, tested four times</p>
+    </div>
+    <div class="cell" lang="ar" dir="rtl">
+      <p class="label-sm" style="margin-bottom:8px">كريم أساس · اختُبر في يونيو <bdi>2026</bdi> · شراكة مدفوعة</p>
+      <h1 class="display-lg" data-m="display-ar">ميزون إيكلا فوال لوميير سكِن تنت</h1>
+      <p class="display-sm" style="margin-top:16px">ثماني ساعات في حرارة <bdi>38</bdi> درجة، أربع مرات</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2. LONG DISPLAY HEADING ============ -->
+<section class="spec" data-spec="02-long-heading">
+  <p class="spec-id">02 · LONG HEADING WRAP · display.lg · criteria 1, 8</p>
+  <div class="pair">
+    <div class="cell" lang="en" dir="ltr">
+      <h2 class="display-lg" data-m="longhead-en">Atelier Noor Sitara Luminous Concealer and the shade-range problem</h2>
+    </div>
+    <div class="cell" lang="ar" dir="rtl">
+      <h2 class="display-lg" data-m="longhead-ar">أتيليه نور ستارة كونسيلر مضيء ومشكلة مدى الدرجات في البشرة الدافئة</h2>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. BODY TEXT ============ -->
+<section class="spec" data-spec="03-body">
+  <p class="spec-id">03 · BODY TEXT · body.md · criterion 2</p>
+  <div class="pair">
+    <div class="cell" lang="en" dir="ltr">
+      <p class="body-md" data-m="body-en">Maison Eclat paid for the launch campaign this product appeared in, and I tested it four separate times before writing anything down. Those two facts sit next to each other at the top of this page on purpose. The brand claims up to twelve hours of comfortable wear. In 34 to 38 degree heat I could not reproduce that on any of the four tests, and the pattern of failure was identical every time.</p>
+    </div>
+    <div class="cell" lang="ar" dir="rtl">
+      <p class="body-md" data-m="body-ar">دفعت ميزون إيكلا مقابل حملة الإطلاق التي ظهر فيها هذا المنتج، واختبرته أربع مرات منفصلة قبل أن أكتب أي شيء. الحقيقتان موضوعتان جنبا إلى جنب في أعلى هذه الصفحة عن قصد. تدّعي العلامة ثباتا مريحا يصل إلى اثنتي عشرة ساعة. في حرارة تتراوح بين <bdi>34</bdi> و<bdi>38</bdi> درجة لم أتمكن من تكرار ذلك في أي من الاختبارات الأربعة، وكان نمط التراجع متطابقا في كل مرة.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4. UI NAVIGATION / HEADER ============ -->
+<section class="spec" data-spec="04-header">
+  <p class="spec-id">04 · HEADER AND NAVIGATION · criterion 8 — the 1024px Arabic risk</p>
+  <div style="display:grid;gap:32px">
+    <div lang="en" dir="ltr">
+      <div class="hdr" data-m="hdr-en">
+        <span class="hdr-mark">Zina Almokri</span>
+        <nav class="hdr-nav" data-m="nav-en">
+          <a href="#">Reviews</a><a href="#">Method</a><a href="#">Journal</a><a href="#">Work</a><a href="#">About</a>
+          <span class="hdr-cta">Collaborate</span>
+          <span class="hdr-switch">English / <span lang="ar">العربية</span></span>
+        </nav>
+      </div>
+    </div>
+    <div lang="ar" dir="rtl">
+      <div class="hdr" data-m="hdr-ar">
+        <span class="hdr-mark">زينا المقري</span>
+        <nav class="hdr-nav" data-m="nav-ar">
+          <a href="#">المراجعات</a><a href="#">الطريقة</a><a href="#">المجلة</a><a href="#">الأعمال</a><a href="#">عن زينا</a>
+          <span class="hdr-cta">تعاون</span>
+          <span class="hdr-switch"><span lang="en">English</span> / العربية</span>
+        </nav>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5. RECORD METADATA + NUMERALS ============ -->
+<section class="spec" data-spec="05-record">
+  <p class="spec-id">05 · RECORD METADATA AND NUMERALS · criteria 3, 6</p>
+  <div class="pair">
+    <div class="cell" lang="en" dir="ltr">
+      <p class="label-sm" data-m="meta-en">Foundation · Tested June 2026 · Paid partnership</p>
+      <p class="record-md" style="margin-top:16px">Hour 6 · Wear · 34–38 °C · 58–71 %</p>
+      <p class="record-sm" style="margin-top:8px">Plate 03</p>
+    </div>
+    <div class="cell" lang="ar" dir="rtl">
+      <p class="label-sm" data-m="meta-ar">كريم أساس · اختُبر في يونيو <bdi>2026</bdi> · شراكة مدفوعة</p>
+      <p class="record-md" style="margin-top:16px"><span class="cond-word" style="font-family:var(--f-ui)">الساعة</span> <bdi>6</bdi> · <span class="cond-word" style="font-family:var(--f-ui)">الثبات</span> · <bdi>34–38 °م</bdi> · <bdi>58–71 ٪</bdi></p>
+      <p class="record-sm" style="margin-top:8px"><span class="cond-word" style="font-family:var(--f-ui)">لوحة</span> <bdi>03</bdi></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6. MIXED SCRIPT — the critical case ============ -->
+<section class="spec" data-spec="06-mixed">
+  <p class="spec-id">06 · LATIN IDENTIFIER INSIDE ARABIC · criterion 4 — bidi isolation</p>
+  <div class="pair">
+    <div class="cell" lang="ar" dir="rtl">
+      <p class="label-sm" style="margin-bottom:8px">Isolated with &lt;bdi&gt; — correct</p>
+      <p class="body-md" data-m="bidi-good">استخدمت <bdi lang="en">Voile Lumière Skin Tint</bdi> بالدرجة <bdi lang="en">22W Amber Warm</bdi> طوال ثماني ساعات، ثم أزلته بغسول واحد.</p>
+    </div>
+    <div class="cell" lang="ar" dir="rtl">
+      <p class="label-sm" style="margin-bottom:8px">Not isolated — the failure case, shown for comparison</p>
+      <p class="body-md" data-m="bidi-bad">استخدمت Voile Lumière Skin Tint بالدرجة 22W Amber Warm طوال ثماني ساعات، ثم أزلته بغسول واحد.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 7. MARGIN INDEX + OBSERVATIONS ============ -->
+<section class="spec" data-spec="07-margin-index">
+  <p class="spec-id">07 · MARGIN INDEX AND OBSERVATION SEQUENCE · criterion 5</p>
+  <div style="display:grid;gap:48px">
+    <div lang="en" dir="ltr">
+      <div class="obs-grid" data-m="obs-en">
+        <div class="obs-index"><div>Hour 6</div><div style="color:var(--text-muted)">Wear</div></div>
+        <div>
+          <div class="obs-inline"><span>Hour 6</span><span style="color:var(--text-muted)">Wear</span></div>
+          <div class="obs-note">First visible change. Product began to lift around the nose and the chin on all four tests, primer or not.</div>
+        </div>
+      </div>
+    </div>
+    <div lang="ar" dir="rtl">
+      <div class="obs-grid" data-m="obs-ar">
+        <div class="obs-index"><div><span class="obs-word">الساعة</span> <bdi>6</bdi></div><div style="color:var(--text-muted)"><span class="obs-word">الثبات</span></div></div>
+        <div>
+          <div class="obs-inline"><span><span class="obs-word">الساعة</span> <bdi>6</bdi></span><span style="color:var(--text-muted)" class="obs-word">الثبات</span></div>
+          <div class="obs-note">أول تغير ظاهر. بدأ المنتج يتزحزح حول الأنف والذقن في الاختبارات الأربعة كلها، مع البرايمر أو بدونه.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 8. CONDITIONS WELL ============ -->
+<section class="spec" data-spec="08-conditions">
+  <p class="spec-id">08 · CONDITIONS WELL · criterion 6 — numeral column alignment</p>
+  <div class="pair">
+    <div class="cell" lang="en" dir="ltr">
+      <div class="well">
+        <table class="cond" data-m="cond-en">
+          <tbody>
+          <tr><th scope="row">Temperature</th><td>34–38 °C</td></tr>
+          <tr><th scope="row">Humidity</th><td>58–71 %</td></tr>
+          <tr><th scope="row">Environment</th><td>Mixed outdoor / indoor</td></tr>
+          <tr><th scope="row">Activity</th><td>40 min walking</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="cell" lang="ar" dir="rtl">
+      <div class="well">
+        <table class="cond" data-m="cond-ar">
+          <tbody>
+          <tr><th scope="row">الحرارة</th><td><bdi>34–38 °م</bdi></td></tr>
+          <tr><th scope="row">الرطوبة</th><td><bdi>58–71 ٪</bdi></td></tr>
+          <tr><th scope="row">البيئة</th><td><span class="cond-word">مختلطة</span></td></tr>
+          <tr><th scope="row">النشاط</th><td><bdi>40</bdi> <span class="cond-word">دقيقة مشيا</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 9. PLATE CAPTION ============ -->
+<section class="spec" data-spec="09-plate">
+  <p class="spec-id">09 · PLATE AND CAPTION</p>
+  <div class="pair">
+    <div class="cell" lang="en" dir="ltr">
+      <div class="plate-img"></div>
+      <div class="plate-cap">
+        <p class="record-sm">Plate 03</p>
+        <p class="body-sm" style="margin-top:8px">Hour eight. Patchiness across the centre of the face, same window light as the hour-zero reference.</p>
+      </div>
+    </div>
+    <div class="cell" lang="ar" dir="rtl">
+      <div class="plate-img"></div>
+      <div class="plate-cap">
+        <p class="record-sm"><span style="font-family:var(--f-ui)">لوحة</span> <bdi>03</bdi></p>
+        <p class="body-sm" style="margin-top:8px">الساعة الثامنة. تفاوت في وسط الوجه، بنفس إضاءة النافذة المستخدمة في الصورة المرجعية.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 10. DISCLOSURE BAND ============ -->
+<section class="spec" data-spec="10-disclosure">
+  <p class="spec-id">10 · DISCLOSURE BAND · statement never truncated at any width</p>
+  <div style="display:grid;gap:24px">
+    <div lang="en" dir="ltr">
+      <div class="band" data-m="band-en">
+        <p class="label-sm">Paid partnership</p>
+        <p class="body-sm" style="margin-top:8px;color:var(--text-primary)">Maison Eclat paid for a launch campaign that included this product. The brand had no approval over this review, did not see it before publication, and the verdict was not agreed in advance.</p>
+      </div>
+    </div>
+    <div lang="ar" dir="rtl">
+      <div class="band" data-m="band-ar">
+        <p class="label-sm">شراكة مدفوعة</p>
+        <p class="body-sm" style="margin-top:8px;color:var(--text-primary)">دفعت ميزون إيكلا مقابل حملة إطلاق تضمنت هذا المنتج. لم يكن للعلامة أي حق موافقة على هذه المراجعة، ولم تطلع عليها قبل النشر، ولم يُتفق على الحكم مسبقا.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 11. THREE VOICES ============ -->
+<section class="spec" data-spec="11-voices">
+  <p class="spec-id">11 · CLAIM / OBSERVATION / VERDICT — three voices in both scripts</p>
+  <div class="pair">
+    <div class="cell" lang="en" dir="ltr">
+      <p class="label-sm">Claimed by the brand</p>
+      <p class="claim" style="margin-top:8px">Up to 12 hours of comfortable, transfer-resistant wear.</p>
+      <div class="obs-note" style="margin-top:32px">Hour 6. Product began to lift around the nose and the chin on all four tests.</div>
+      <div class="verdict" style="margin-top:32px">
+        <p class="label-sm" style="color:var(--clay)">The verdict</p>
+        <p class="display-md" style="margin-top:12px">A beautiful six-hour product being sold as a twelve-hour one.</p>
+      </div>
+    </div>
+    <div class="cell" lang="ar" dir="rtl">
+      <p class="label-sm">تدّعي العلامة</p>
+      <p class="claim" style="margin-top:8px">ثبات مريح يصل إلى <bdi>12</bdi> ساعة ومقاوم للانتقال.</p>
+      <div class="obs-note" style="margin-top:32px"><span style="font-family:var(--f-ui)">الساعة</span> <bdi>6</bdi>. بدأ المنتج يتزحزح حول الأنف والذقن في الاختبارات الأربعة كلها.</div>
+      <div class="verdict" style="margin-top:32px">
+        <p class="label-sm" style="color:var(--clay)">الحكم</p>
+        <p class="display-md" style="margin-top:12px">منتج ممتاز لست ساعات يُباع على أنه منتج لاثنتي عشرة ساعة.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 12b. NUMERAL + ARABIC UNIT ISOLATION VARIANTS ============ -->
+<section class="spec" data-spec="12b-numeral-isolation">
+  <p class="spec-id">12b · NUMERAL + ARABIC-UNIT ISOLATION · criterion 4 — the measured defect</p>
+  <div lang="ar" dir="rtl" style="display:grid;gap:16px">
+    <p class="body-md">A · whole run in &lt;bdi&gt; — <strong>WRONG</strong>, range reverses to 38–34: <bdi>34–38 °م</bdi></p>
+    <p class="body-md">B · numerals only, dir=ltr — <strong>CORRECT</strong>: <bdi dir="ltr">34–38</bdi> °م</p>
+    <p class="body-md">C · whole run in &lt;bdi&gt; with Arabic percent — <bdi>58–71 ٪</bdi></p>
+    <p class="body-md">D · numerals only, dir=ltr — <strong>CORRECT</strong>: <bdi dir="ltr">58–71</bdi> ٪</p>
+    <p class="body-sm">Verified by Range.getBoundingClientRect() token ordering, not by eye. See
+      docs/PHASE_3_BILINGUAL_TYPE_PROOF.md section 5.</p>
+  </div>
+</section>
+
+<!-- ============ 12. LONG ARABIC PARAGRAPH AT MEASURE ============ -->
+<section class="spec" data-spec="12-long-paragraph">
+  <p class="spec-id">12 · LONG ARABIC PARAGRAPH · criterion 2 — leading and diacritics</p>
+  <div lang="ar" dir="rtl">
+    <p class="body-lg" data-m="long-ar">معظم مراجعات التجميل تُكتب من الذاكرة. تستخدم إحداهن منتجا لفترة، وتتكون لديها انطباع، ثم تكتب الانطباع. هذا ليس بلا قيمة، لكنه غير قابل للمقارنة: مراجعتان مكتوبتان بهذه الطريقة لا يمكن وضعهما جنبا إلى جنب، لأن أيا منهما لا تخبرك بما ثُبّت وما تغيّر. كل منتج يُراجع على هذا الموقع يمر بالمراحل الست نفسها.</p>
+  </div>
+</section>
+
+</main>
+
+<script>
+/* Measurement harness. Returns JSON for the ten pass criteria that can be measured mechanically. */
+window.__proof = function () {
+  const q = s => document.querySelector(s);
+  const m = k => document.querySelector('[data-m="' + k + '"]');
+  const cs = el => el ? getComputedStyle(el) : null;
+  const px = v => Math.round(parseFloat(v) * 100) / 100;
+
+  const out = { viewport: { w: window.innerWidth, h: window.innerHeight }, checks: {} };
+
+  /* --- page-level overflow (criterion: no horizontal scroll at any width, either direction) --- */
+  out.checks.horizontalOverflow = {
+    docScrollW: document.documentElement.scrollWidth,
+    docClientW: document.documentElement.clientWidth,
+    overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1
+  };
+
+  /* --- per-element overflow --- */
+  const overflowing = [];
+  document.querySelectorAll('[data-m], .page, .well, .band, .obs-note, table.cond').forEach(el => {
+    if (el.scrollWidth > el.clientWidth + 1) {
+      overflowing.push({ el: el.getAttribute('data-m') || el.className, scrollW: el.scrollWidth, clientW: el.clientWidth });
+    }
+  });
+  out.checks.elementOverflow = overflowing;
+
+  /* --- criterion 7: no letter-spacing anywhere in Arabic --- */
+  const arTracked = [];
+  document.querySelectorAll('[lang="ar"], [lang="ar"] *').forEach(el => {
+    const ls = cs(el).letterSpacing;
+    if (ls && ls !== 'normal' && Math.abs(parseFloat(ls)) > 0.01) {
+      arTracked.push({ el: el.tagName + '.' + el.className, letterSpacing: ls });
+    }
+  });
+  out.checks.arabicLetterSpacing = { violations: arTracked };
+
+  /* --- criterion 9: size floors (body >=16, mono >=13, nothing <12) --- */
+  const floors = [];
+  document.querySelectorAll('.body-md,.body-sm,.body-lg,.record-md,.record-sm,.label-sm,.ui-md,.obs-note,.claim').forEach(el => {
+    const fs = px(cs(el).fontSize);
+    let min = 12;
+    if (el.classList.contains('body-md') || el.classList.contains('body-sm') || el.classList.contains('body-lg') || el.classList.contains('obs-note') || el.classList.contains('claim')) min = 16;
+    if (el.classList.contains('record-md') || el.classList.contains('record-sm')) min = 13;
+    if (fs < min - 0.01) floors.push({ el: el.className, fontSize: fs, floor: min });
+  });
+  out.checks.sizeFloors = { violations: floors };
+
+  /* --- criterion 1 + 3: optical volume comparison, en vs ar --- */
+  const pairs = [['display-en','display-ar'],['body-en','body-ar'],['meta-en','meta-ar'],['longhead-en','longhead-ar']];
+  out.checks.scriptPairs = pairs.map(([a,b]) => {
+    const ea = m(a), eb = m(b);
+    if (!ea || !eb) return { pair: a + '/' + b, missing: true };
+    const ca = cs(ea), cb = cs(eb);
+    return {
+      pair: a + '/' + b,
+      en: { fontSize: px(ca.fontSize), lineHeight: px(ca.lineHeight), weight: ca.fontWeight,
+            tracking: ca.letterSpacing, height: Math.round(ea.getBoundingClientRect().height),
+            lines: Math.round(ea.getBoundingClientRect().height / parseFloat(ca.lineHeight)) },
+      ar: { fontSize: px(cb.fontSize), lineHeight: px(cb.lineHeight), weight: cb.fontWeight,
+            tracking: cb.letterSpacing, height: Math.round(eb.getBoundingClientRect().height),
+            lines: Math.round(eb.getBoundingClientRect().height / parseFloat(cb.lineHeight)) },
+      sizeRatio: px(parseFloat(cb.fontSize) / parseFloat(ca.fontSize)),
+      leadingRatio: px((parseFloat(cb.lineHeight)/parseFloat(cb.fontSize)) / (parseFloat(ca.lineHeight)/parseFloat(ca.fontSize)))
+    };
+  });
+
+  /* --- criterion 8: header fits in Arabic --- */
+  ['hdr-en','hdr-ar'].forEach(k => {
+    const h = m(k); if (!h) return;
+    const nav = m(k === 'hdr-en' ? 'nav-en' : 'nav-ar');
+    out.checks[k] = {
+      headerScrollW: h.scrollWidth, headerClientW: h.clientWidth,
+      wraps: h.getBoundingClientRect().height > 90,
+      height: Math.round(h.getBoundingClientRect().height),
+      navWidth: nav ? Math.round(nav.getBoundingClientRect().width) : null,
+      overflow: h.scrollWidth > h.clientWidth + 1
+    };
+  });
+
+  /* --- criterion 5: margin index side --- */
+  ['obs-en','obs-ar'].forEach(k => {
+    const g = m(k); if (!g) return;
+    const idx = g.querySelector('.obs-index');
+    const note = g.querySelector('.obs-note');
+    const inline = g.querySelector('.obs-inline');
+    const idxVisible = idx && cs(idx).display !== 'none';
+    out.checks[k] = {
+      indexVisible: idxVisible,
+      inlineVisible: inline ? cs(inline).display !== 'none' : false,
+      indexLeftEdge: idx ? Math.round(idx.getBoundingClientRect().left) : null,
+      noteLeftEdge: note ? Math.round(note.getBoundingClientRect().left) : null,
+      indexIsStartSide: idxVisible && idx && note
+        ? (document.querySelector('[data-m="' + k + '"]').closest('[dir]').dir === 'rtl'
+            ? idx.getBoundingClientRect().left > note.getBoundingClientRect().left
+            : idx.getBoundingClientRect().left < note.getBoundingClientRect().left)
+        : null,
+      ruleSide: note ? cs(note).borderInlineStartWidth : null
+    };
+  });
+
+  /* --- criterion 6: numerals align in a column in the conditions table --- */
+  ['cond-en','cond-ar'].forEach(k => {
+    const t = m(k); if (!t) return;
+    const cells = [...t.querySelectorAll('td')];
+    const dir = t.closest('[dir]').dir;
+    const edges = cells.map(td => Math.round(dir === 'rtl' ? td.getBoundingClientRect().left : td.getBoundingClientRect().right));
+    out.checks[k] = { valueEdges: edges, aligned: new Set(edges).size === 1, rows: cells.length };
+  });
+
+  /* --- criterion 4: bidi isolation, isolated vs not --- */
+  ['bidi-good','bidi-bad'].forEach(k => {
+    const el = m(k); if (!el) return;
+    out.checks[k] = { bdiCount: el.querySelectorAll('bdi').length, height: Math.round(el.getBoundingClientRect().height) };
+  });
+
+  /* --- disclosure statement fully visible, never truncated --- */
+  ['band-en','band-ar'].forEach(k => {
+    const b = m(k); if (!b) return;
+    const p = b.querySelector('.body-sm');
+    out.checks[k] = { clipped: p.scrollHeight > p.clientHeight + 1, height: Math.round(b.getBoundingClientRect().height) };
+  });
+
+  /* --- fonts actually loaded --- */
+  out.checks.fonts = {
+    ready: document.fonts.status,
+    plexSerif: document.fonts.check('16px "IBM Plex Serif"'),
+    plexSansArabic: document.fonts.check('16px "IBM Plex Sans Arabic"'),
+    notoNaskh: document.fonts.check('16px "Noto Naskh Arabic"'),
+    plexMono: document.fonts.check('16px "IBM Plex Mono"')
+  };
+
+  return out;
+};
+</script>
+</body>
+</html>

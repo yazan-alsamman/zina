@@ -1,0 +1,125 @@
+---
+/**
+ * REVIEW REFERENCE — an in-prose citation of a testing record.
+ *
+ * THE MOST IMPORTANT LINK IN THE JOURNAL, and the mechanism Flow E depends on: when an article
+ * states a finding that a review demonstrates, the finding links to the review IN THE SENTENCE,
+ * not only in a block at the bottom (docs/SEO_UX_INTEGRATION.md section 3).
+ *
+ * WHY IT IS A COMPONENT and not a plain `[link](url)`:
+ *
+ *   1. It resolves the ROUTE from the canonical record id, so MDX never contains a URL. A slug
+ *      change in the content layer cannot orphan a link in an article body.
+ *   2. It is LOCALE-SAFE. A reference to a review that does not exist in THIS locale renders as
+ *      plain text rather than a dead link — an Arabic article can cite an English-only review's
+ *      subject matter without inventing an Arabic route for it.
+ *   3. It refuses to render a link to unpublished or unrenderable content.
+ *   4. It carries the record's DISCLOSURE into the citation, because a reader following a
+ *      citation deserves to know the commercial status of what they are about to read, before
+ *      they click.
+ *
+ * That last point is the reason this is not a generic `<Link>`. It is a citation of evidence, and
+ * the evidence language says who paid for it.
+ *
+ * FAILS LOUDLY at build time on an unknown id — a typo in an article body must break the build,
+ * not ship a silent nothing.
+ */
+import type { Locale } from "../../../content/schema/types";
+import { existsInLocale, isRenderable, reviewById } from "../../lib/content";
+import { path } from "../../lib/routing";
+import { t } from "../../lib/ui-strings";
+
+interface Props {
+  locale: Locale;
+  /** Canonical record id, e.g. "mock-review-voile-lumiere-skin-tint". Never a URL. */
+  id: string;
+  /** Optional override for the link text. Defaults to the review's own title. */
+  label?: string;
+  /**
+   * `inline`   inside a sentence — the default, and the form that does the most work
+   * `citation` a standalone citation. It carries its OWN label ("Documented in"), so an article
+   *            body never has to add words around it. That matters: the body files are migrated
+   *            mock content, and a component that needs a hand-written lead-in would mean
+   *            authoring prose nobody wrote.
+   */
+  display?: "inline" | "citation";
+}
+
+const { locale, id, label, display = "inline" } = Astro.props;
+
+const review = reviewById(id);
+if (!review) {
+  throw new Error(
+    `ReviewReference: no review with id "${id}". Article bodies must cite canonical record ids.`
+  );
+}
+
+const content = review.locales[locale];
+const available = isRenderable(review) && existsInLocale(review, locale) && Boolean(content?.slug);
+
+const text = label ?? content?.title ?? review.entity.productId;
+const href = available ? path.review(locale, content!.slug!) : undefined;
+const disclosure = content?.disclosureLabel;
+---
+
+{
+  display === "citation" ? (
+    <p class="citation">
+      <span class="citation-label label">{t(locale, "citedRecord")}</span>
+      {href ? (
+        <a class="review-reference" href={href}>
+          <span class="reference-text">{text}</span>
+          {disclosure && <span class="reference-disclosure label">{disclosure}</span>}
+        </a>
+      ) : (
+        <span class="review-reference review-reference--unavailable">{text}</span>
+      )}
+    </p>
+  ) : href ? (
+    <a class="review-reference" href={href}>
+      <span class="reference-text">{text}</span>
+      {disclosure && <span class="reference-disclosure label">{disclosure}</span>}
+    </a>
+  ) : (
+    /*
+     * Not available in this locale: the citation still names the record, because the reference is
+     * editorially meaningful, but it is NOT a link. No stub route, no cross-locale link, no
+     * machine translation.
+     */
+    <span class="review-reference review-reference--unavailable">{text}</span>
+  )
+}
+
+<style>
+  .review-reference {
+    /* Inline, in the flow of the sentence. Not a card, not a block, not a pull-out. */
+    display: inline;
+  }
+
+  .reference-disclosure {
+    /* The commercial status travels with the citation. */
+    margin-inline-start: var(--space-0-5);
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+
+  .review-reference--unavailable {
+    color: var(--color-text-secondary);
+  }
+
+  /* A standalone citation: the mineral rule marks it as pointing at a record, the same way the
+     observation rule does on a review page. Not a card, not a callout. */
+  .citation {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1);
+    margin-block: var(--space-4);
+    padding-inline-start: var(--space-2);
+    border-inline-start: var(--border-rule-observation);
+  }
+
+  .citation-label {
+    color: var(--color-text-muted);
+  }
+</style>

@@ -1,0 +1,117 @@
+---
+/**
+ * FRAME — the image primitive.
+ *
+ * Reserves space by ASPECT RATIO before anything loads, so a missing, slow or failed image
+ * costs no layout shift. CLS is prevented structurally rather than measured and chased:
+ * `width` and `height` are required fields on ImageAsset, so an image without dimensions cannot
+ * exist in the content layer.
+ *
+ * ============================================================================
+ * THE CURRENT STATE: NO PHOTOGRAPHY EXISTS
+ * ============================================================================
+ * The mock records point at /mock-media/... paths that were never populated. This component
+ * renders the documented no-photography state rather than inventing an image:
+ *
+ *   - a neutral tone field at the CORRECT RATIO on ground.raised
+ *   - NO icon, NO "image unavailable" glyph, NO broken-image symbol
+ *   - the caption and the plate treatment are RETAINED, so the composition is real
+ *   - alt text is still carried for assistive technology
+ *
+ * "An evidence plate whose caption reads 'Hour six, product lifting around the nose' is still
+ * doing most of its job without the photograph."
+ *
+ * NO STOCK IMAGERY OF A PERSON, EVER — an honest gap rather than a borrowed face.
+ *
+ * When real photography arrives, `src` starts resolving and the placeholder branch stops
+ * running. Swapping in astro:assets <Image> is a change to this file only.
+ */
+interface Props {
+  src?: string | undefined;
+  alt: string;
+  width: number;
+  height: number;
+  /** True for the single LCP image on a page. Everything else is lazy. */
+  priority?: boolean;
+  /** Art-directed ratio override, e.g. "4 / 5" on mobile via the caller's own media query. */
+  ratio?: string | undefined;
+  class?: string | undefined;
+}
+
+const {
+  src,
+  alt,
+  width,
+  height,
+  priority = false,
+  ratio,
+  class: className = "",
+} = Astro.props;
+
+/**
+ * A mock media path is a path to a file that does not exist. Treat it as absent rather than
+ * emitting a broken <img>, which would produce a browser error glyph and a console 404 on
+ * every review page.
+ */
+const isPlaceholder = !src || src.startsWith("/mock-media/");
+const aspect = ratio ?? `${width} / ${height}`;
+---
+
+{
+  isPlaceholder ? (
+    <div
+      class:list={["frame", "frame--placeholder", className]}
+      style={`aspect-ratio: ${aspect};`}
+      role="img"
+      aria-label={alt}
+    />
+  ) : (
+    <img
+      class:list={["frame", className]}
+      src={src}
+      alt={alt}
+      width={width}
+      height={height}
+      style={`aspect-ratio: ${aspect};`}
+      loading={priority ? "eager" : "lazy"}
+      decoding={priority ? "sync" : "async"}
+      fetchpriority={priority ? "high" : "auto"}
+    />
+  )
+}
+
+<style>
+  .frame {
+    inline-size: 100%;
+    block-size: auto;
+    object-fit: cover;
+    /* Radius 0 everywhere. No frame, no border, no shadow. Images sit flush to the grid. */
+    border-radius: var(--radius-none);
+  }
+
+  .frame--placeholder {
+    background: var(--color-ground-raised);
+    /* No icon, no glyph, no label. An honest gap. */
+  }
+
+  /* Decode fade on lazy images only. Evidence images never move; a fade on load is a load
+     artefact, not motion, and it is retained under reduced motion for that reason. */
+  img.frame {
+    animation: decode var(--motion-duration-base) var(--motion-easing-standard);
+  }
+
+  @keyframes decode {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .frame--placeholder {
+      border: 1px solid CanvasText;
+    }
+  }
+</style>

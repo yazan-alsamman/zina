@@ -1,0 +1,133 @@
+---
+/**
+ * SIGNATURE DEVICE 5 — THE CONDITIONS WELL
+ *
+ * The most record-like element on the site and the most direct expression of the differentiator.
+ * "The section no competitor has."
+ *
+ * A REAL <table> with <th scope="row">, not a grid of divs: this is two-dimensional labelled
+ * data, and a div grid loses the label/value association entirely for assistive technology.
+ *
+ * ============================================================================
+ * THE 320px FIX — measured in Phase 3, mandatory (decision D3-2)
+ * ============================================================================
+ * With `white-space: nowrap` on the whole value cell, prose values such as
+ * "Mixed outdoor and air-conditioned indoor" cannot wrap. At 320px the ENGLISH table then needs
+ * 279px inside a 265px well and OVERFLOWS. (Arabic fit at 225px. It broke in English.)
+ *
+ *   value cell           white-space: normal   → prose wraps
+ *   numeric isolate only white-space: nowrap   → "34–38" never breaks mid-range
+ *
+ * Re-measured after the fix: 225px, fits, and numeral column alignment is preserved.
+ *
+ * ============================================================================
+ * THE BIDI FIX — measured in Phase 3, mandatory (decision D3-1)
+ * ============================================================================
+ * Values go through isolateValue(), which isolates the NUMERIC RUN ONLY with dir="ltr" and
+ * leaves an Arabic unit outside the isolate. Wrapping the whole run in a bare <bdi> reverses
+ * the range: "34–38 °م" renders as 38–34.
+ *
+ * FORBIDDEN: outer border, cell borders, zebra striping, sortable columns, filtering,
+ * thermometer or droplet icons, any chart. It must look like a printed table in a report,
+ * not like a data grid.
+ */
+import type { Locale } from "../../../content/schema/types";
+import { isolateValue } from "../../lib/bidi";
+
+interface Props {
+  locale: Locale;
+  caption: string;
+  conditions: Array<{ label: string; value: string }>;
+}
+
+const { caption, conditions } = Astro.props;
+---
+
+<div class="well">
+  <table class="conditions">
+    <caption class="visually-hidden">{caption}</caption>
+    <tbody>
+      {
+        conditions.map((row) => (
+          <tr>
+            <th scope="row">{row.label}</th>
+            <td set:html={isolateValue(row.value)} />
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .well {
+    background: var(--color-ground-inset);
+    padding: var(--space-3) var(--space-3);
+  }
+
+  .conditions {
+    inline-size: 100%;
+    border-collapse: collapse;
+    /* No outer border. No cell borders. No zebra striping. */
+  }
+
+  .conditions th,
+  .conditions td {
+    padding-block: var(--space-1);
+    border-block-end: var(--border-rule-hairline);
+    vertical-align: baseline;
+  }
+
+  .conditions tr:last-child th,
+  .conditions tr:last-child td {
+    border-block-end: none;
+  }
+
+  .conditions th {
+    inline-size: 40%;
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+    font-weight: var(--type-weight-regular);
+    color: var(--color-text-muted);
+    text-align: start;
+    padding-inline-end: var(--space-2);
+  }
+
+  .conditions td {
+    font-family: var(--type-family-record);
+    font-size: var(--type-record-md);
+    line-height: var(--type-leading-record);
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+    /* Values sit at the inline end so numerals form a column in both directions. */
+    text-align: end;
+    /* THE FIX. Prose wraps. */
+    white-space: normal;
+  }
+
+  /* Only genuinely indivisible tokens stay nowrap: the numeric run itself. */
+  .conditions td :global(bdi) {
+    white-space: nowrap;
+  }
+
+  /* An Arabic unit sitting outside the isolate uses the Arabic UI face, not mono. */
+  :global(html[lang="ar"]) .conditions td {
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+  }
+
+  :global(html[lang="ar"]) .conditions td :global(bdi) {
+    font-family: var(--type-family-record);
+    font-size: var(--type-record-md);
+  }
+
+  @media (min-width: 768px) {
+    .well {
+      padding: var(--space-4);
+    }
+
+    .conditions th {
+      inline-size: 45%;
+    }
+  }
+</style>

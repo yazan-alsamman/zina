@@ -1,0 +1,471 @@
+{
+  "__MOCK_DATA__": true,
+  "collection": "products",
+  "schemaVersion": "1.0.0",
+  "notice": "FICTIONAL MOCK CONTENT. Every product is INVENTED. Prices, shade counts and claims are placeholders. No real product is described. brandClaims holds marketing language SEPARATELY from anything Zina observed, so the UI can never present a claim as a finding. PHASE 1: products have NO standalone route. See docs/PRODUCT_ENTITY_STRATEGY.md. Product names stay in Latin script in both locales, because Arabic-speaking users search for product names in Latin script (documented in docs/SEO_KEYWORD_MAP.md section 8).",
+  "routingPolicy": {
+    "hasStandaloneRoute": false,
+    "_decision": "Products render inside reviews, on brand pages and in journal context. A product page is promoted to /{locale}/brands/{brand}/{product}/ ONLY when it accumulates 2+ published reviews in that locale, or 1 review plus a published comparison feature. No product currently qualifies. See docs/PRODUCT_ENTITY_STRATEGY.md section 3."
+  },
+  "items": [
+    {
+      "id": "mock-product-voile-lumiere-skin-tint",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "name": "Voile Lumiere Skin Tint",
+      "nameStylised": "Voile Lumière Skin Tint",
+      "slug": "voile-lumiere-skin-tint",
+      "brandId": "mock-brand-maison-eclat",
+      "category": "Foundation",
+      "shadeCount": 34,
+      "shadeTested": "22W Amber Warm",
+      "priceTier": "Luxury",
+      "priceIndicative": {
+        "value": 58,
+        "currency": "USD",
+        "_mock": true
+      },
+      "sizeMl": 30,
+      "testingStatus": "Tested",
+      "reviewStatus": "Published",
+      "reviewId": "mock-review-voile-lumiere-skin-tint",
+      "officialUrl": "https://maison-eclat.example.com/products/voile-lumiere-skin-tint",
+      "images": {
+        "hero": {
+          "src": "/mock-media/products/voile-lumiere-hero.jpg",
+          "alt": "Voile Lumiere Skin Tint bottle (placeholder)",
+          "width": 1600,
+          "height": 2000,
+          "_mock": true
+        },
+        "gallery": [
+          {
+            "src": "/mock-media/products/voile-lumiere-swatch.jpg",
+            "alt": "Swatch in shade 22W (placeholder)",
+            "width": 1600,
+            "height": 1067,
+            "_mock": true
+          },
+          {
+            "src": "/mock-media/products/voile-lumiere-texture.jpg",
+            "alt": "Texture close-up (placeholder)",
+            "width": 1600,
+            "height": 1067,
+            "_mock": true
+          }
+        ]
+      },
+      "locales": {
+        "en": {
+          "translationStatus": "original",
+          "productType": "Skin tint",
+          "subtype": "Sheer to medium buildable base",
+          "finish": "Natural satin",
+          "coverage": "Sheer to medium, buildable",
+          "description": "A fluid skin tint positioned as a second-skin base rather than a foundation. Thin consistency, satin finish, shade range organised by undertone family.",
+          "keyFeatures": [
+            "34 shades in four undertone families",
+            "Fluid, low-viscosity texture",
+            "Pump dispenser",
+            "Fragrance-free"
+          ],
+          "brandClaims": [
+            "Claimed by the brand as up to 12 hours of comfortable wear",
+            "Claimed by the brand as weightless and non-oxidising"
+          ]
+        },
+        "ar": {
+          "translationStatus": "adapted",
+          "productType": "كريم أساس خفيف",
+          "subtype": "قاعدة خفيفة إلى متوسطة قابلة للبناء",
+          "finish": "ساتان طبيعي",
+          "coverage": "خفيفة إلى متوسطة، قابلة للبناء",
+          "description": "كريم أساس سائل يُقدَّم كطبقة ثانية للبشرة أكثر منه كريم أساس تقليدي. قوام خفيف، ونهائية ساتانية، ومجموعة درجات منظمة بحسب عائلة التحت-لون.",
+          "keyFeatures": [
+            "أربع وثلاثون درجة ضمن أربع عائلات تحت-لون",
+            "قوام سائل خفيف",
+            "مضخة توزيع",
+            "خالٍ من العطور"
+          ],
+          "brandClaims": [
+            "تدّعي العلامة ثباتا مريحا يصل إلى اثنتي عشرة ساعة",
+            "تدّعي العلامة أنه خفيف الوزن ولا يتغير لونه"
+          ]
+        }
+      },
+      "_brandClaimsNote": "Brand marketing language. Quoted, never asserted. Must render visually distinct from observations."
+    },
+    {
+      "id": "mock-product-nuit-barrier-serum",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "name": "Nuit Barrier Serum",
+      "nameStylised": "Nuit Barrier Serum",
+      "slug": "nuit-barrier-serum",
+      "brandId": "mock-brand-lune-skin",
+      "category": "Serum",
+      "shadeCount": null,
+      "shadeTested": null,
+      "priceTier": "Premium",
+      "priceIndicative": {
+        "value": 46,
+        "currency": "USD",
+        "_mock": true
+      },
+      "sizeMl": 30,
+      "testingStatus": "Tested",
+      "reviewStatus": "Published",
+      "reviewId": "mock-review-nuit-barrier-serum",
+      "officialUrl": "https://lune-skin.example.com/products/nuit-barrier-serum",
+      "images": {
+        "hero": {
+          "src": "/mock-media/products/nuit-barrier-hero.jpg",
+          "alt": "Nuit Barrier Serum bottle (placeholder)",
+          "width": 1600,
+          "height": 2000,
+          "_mock": true
+        },
+        "gallery": [
+          {
+            "src": "/mock-media/products/nuit-barrier-texture.jpg",
+            "alt": "Texture on skin (placeholder)",
+            "width": 1600,
+            "height": 1067,
+            "_mock": true
+          }
+        ]
+      },
+      "locales": {
+        "en": {
+          "translationStatus": "original",
+          "productType": "Night serum",
+          "subtype": "Barrier-support serum",
+          "finish": "Cushioned, non-tacky",
+          "coverage": null,
+          "description": "A night-use serum with a short ingredient list, positioned around comfort and barrier support rather than around a headline active percentage.",
+          "keyFeatures": [
+            "Nine-ingredient formula",
+            "Fragrance-free and dye-free",
+            "Airless pump",
+            "No percentage-led actives marketing"
+          ],
+          "brandClaims": [
+            "Claimed by the brand as formulated to support the skin barrier overnight",
+            "Claimed by the brand as suitable for use alongside other routines"
+          ]
+        },
+        "ar": {
+          "translationStatus": "adapted",
+          "productType": "سيروم ليلي",
+          "subtype": "سيروم لدعم حاجز البشرة",
+          "finish": "مريح وغير لزج",
+          "coverage": null,
+          "description": "سيروم للاستخدام الليلي بقائمة مكونات قصيرة، يُقدَّم حول الراحة ودعم حاجز البشرة لا حول نسبة مكون فعال بارزة.",
+          "keyFeatures": [
+            "تركيبة من تسعة مكونات",
+            "خالٍ من العطور والأصباغ",
+            "مضخة مفرغة من الهواء",
+            "بلا تسويق بنسب المكونات الفعالة"
+          ],
+          "brandClaims": [
+            "تدّعي العلامة أنه مصمم لدعم حاجز البشرة أثناء الليل",
+            "تدّعي العلامة أنه مناسب للاستخدام مع روتينات أخرى"
+          ]
+        }
+      },
+      "_brandClaimsNote": "Brand marketing language. Quoted, never asserted. No medical, clinical or dermatological claim may be added here or in the review."
+    },
+    {
+      "id": "mock-product-velvet-hour-lip-cream",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "name": "Velvet Hour Lip Cream",
+      "nameStylised": "Velvet Hour Lip Cream",
+      "slug": "velvet-hour-lip-cream",
+      "brandId": "mock-brand-veloura-beauty",
+      "category": "Lip",
+      "shadeCount": 18,
+      "shadeTested": "Cardamom",
+      "priceTier": "Mid",
+      "priceIndicative": {
+        "value": 24,
+        "currency": "USD",
+        "_mock": true
+      },
+      "sizeMl": 4.5,
+      "testingStatus": "Tested",
+      "reviewStatus": "Published",
+      "reviewId": "mock-review-velvet-hour-lip-cream",
+      "officialUrl": "https://veloura-beauty.example.com/products/velvet-hour-lip-cream",
+      "images": {
+        "hero": {
+          "src": "/mock-media/products/velvet-hour-hero.jpg",
+          "alt": "Velvet Hour Lip Cream tube (placeholder)",
+          "width": 1600,
+          "height": 2000,
+          "_mock": true
+        },
+        "gallery": [
+          {
+            "src": "/mock-media/products/velvet-hour-swatches.jpg",
+            "alt": "Shade swatches (placeholder)",
+            "width": 1600,
+            "height": 1067,
+            "_mock": true
+          }
+        ]
+      },
+      "locales": {
+        "en": {
+          "translationStatus": "original",
+          "productType": "Liquid lipstick",
+          "subtype": "Transfer-resistant matte cream",
+          "finish": "Soft matte",
+          "coverage": "Opaque in one pass",
+          "description": "A liquid lip cream marketed on transfer resistance, with a flat doe-foot applicator and a soft matte dry-down.",
+          "keyFeatures": [
+            "18 shades",
+            "Flat doe-foot applicator",
+            "Soft matte finish",
+            "Light vanilla scent"
+          ],
+          "brandClaims": [
+            "Claimed by the brand as transfer-proof for 10 hours",
+            "Claimed by the brand as non-drying matte"
+          ]
+        }
+      },
+      "_localeNote": "English-only, matching its English-only review. A product carries locale content only where a review or brand page in that locale needs it.",
+      "_brandClaimsNote": "Brand marketing language. Quoted, never asserted."
+    },
+    {
+      "id": "mock-product-cils-infini-mascara",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "name": "Cils Infini Volumising Mascara",
+      "nameStylised": "Cils Infini Volumising Mascara",
+      "slug": "cils-infini-volumising-mascara",
+      "brandId": "mock-brand-veloura-beauty",
+      "category": "Mascara",
+      "shadeCount": 2,
+      "shadeTested": "Noir",
+      "priceTier": "Mid",
+      "priceIndicative": {
+        "value": 27,
+        "currency": "USD",
+        "_mock": true
+      },
+      "sizeMl": 9,
+      "testingStatus": "Tested",
+      "reviewStatus": "Published",
+      "reviewId": "mock-review-cils-infini-mascara",
+      "officialUrl": "https://veloura-beauty.example.com/products/cils-infini-volumising-mascara",
+      "images": {
+        "hero": {
+          "src": "/mock-media/products/cils-infini-hero.jpg",
+          "alt": "Cils Infini Mascara tube (placeholder)",
+          "width": 1600,
+          "height": 2000,
+          "_mock": true
+        },
+        "gallery": [
+          {
+            "src": "/mock-media/products/cils-infini-brush.jpg",
+            "alt": "Brush close-up (placeholder)",
+            "width": 1600,
+            "height": 1067,
+            "_mock": true
+          }
+        ]
+      },
+      "locales": {
+        "en": {
+          "translationStatus": "original",
+          "productType": "Volumising mascara",
+          "subtype": "Buildable volume, non-waterproof",
+          "finish": "Soft volume, low shine",
+          "coverage": null,
+          "description": "A volumising mascara with a moulded hourglass brush, positioned for buildable volume without a waterproof formula.",
+          "keyFeatures": [
+            "Moulded hourglass brush",
+            "Non-waterproof formula",
+            "Two shades",
+            "Removable with warm water and cleanser"
+          ],
+          "brandClaims": [
+            "Claimed by the brand as 5x volume from the first coat",
+            "Claimed by the brand as flake-free all day"
+          ]
+        },
+        "ar": {
+          "translationStatus": "adapted",
+          "productType": "ماسكارا للحجم",
+          "subtype": "حجم قابل للبناء، غير مقاومة للماء",
+          "finish": "حجم ناعم بلمعان منخفض",
+          "coverage": null,
+          "description": "ماسكارا للحجم بفرشاة مصبوبة على شكل ساعة رملية، مُقدَّمة لحجم قابل للبناء دون تركيبة مقاومة للماء.",
+          "keyFeatures": [
+            "فرشاة مصبوبة على شكل ساعة رملية",
+            "تركيبة غير مقاومة للماء",
+            "درجتان",
+            "تُزال بالماء الدافئ والغسول"
+          ],
+          "brandClaims": [
+            "تدّعي العلامة حجما خمسة أضعاف من الطبقة الأولى",
+            "تدّعي العلامة عدم التقصف طوال اليوم"
+          ]
+        }
+      },
+      "_brandClaimsNote": "Note the unfalsifiable 5x claim. The review must not repeat it as a measurement."
+    },
+    {
+      "id": "mock-product-verdure-cloud-balm",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "name": "Verdure Cloud Balm",
+      "nameStylised": "Verdure Cloud Balm",
+      "slug": "verdure-cloud-balm",
+      "brandId": "mock-brand-terra-sana",
+      "category": "Moisturizer",
+      "shadeCount": null,
+      "shadeTested": null,
+      "priceTier": "Accessible",
+      "priceIndicative": {
+        "value": 19,
+        "currency": "USD",
+        "_mock": true
+      },
+      "sizeMl": 50,
+      "testingStatus": "Tested",
+      "reviewStatus": "Published",
+      "reviewId": "mock-review-verdure-cloud-balm",
+      "officialUrl": "https://terra-sana.example.com/products/verdure-cloud-balm",
+      "images": {
+        "hero": {
+          "src": "/mock-media/products/verdure-cloud-balm-hero.jpg",
+          "alt": "Verdure Cloud Balm jar (placeholder)",
+          "width": 1600,
+          "height": 2000,
+          "_mock": true
+        },
+        "gallery": [
+          {
+            "src": "/mock-media/products/verdure-texture.jpg",
+            "alt": "Gel-to-balm texture (placeholder)",
+            "width": 1600,
+            "height": 1067,
+            "_mock": true
+          }
+        ]
+      },
+      "locales": {
+        "ar": {
+          "translationStatus": "original",
+          "productType": "مرطب",
+          "subtype": "هجين بين الجل والبالم",
+          "finish": "مائل للمطفأ وغير دهني",
+          "coverage": null,
+          "description": "مرطب بقوام جل-بالم يبدأ صلبا ويذوب عند الملامسة، مُقدَّم للمناخات الحارة حيث تبدو القوامات الكريمية ثقيلة.",
+          "keyFeatures": [
+            "قوام يتحول من جل إلى بالم",
+            "علبة مع ملعقة",
+            "معطر بخفة",
+            "مُقدَّم للاستخدام في المناخ الحار"
+          ],
+          "brandClaims": [
+            "تدّعي العلامة ترطيبا لاثنتين وسبعين ساعة",
+            "تدّعي العلامة أنه مناسب تحت المكياج"
+          ]
+        }
+      },
+      "_localeNote": "Arabic-only, matching its Arabic-original review. Demonstrates that a product entity does not require an English record to exist.",
+      "_brandClaimsNote": "A 72-hour hydration claim cannot be verified by wear testing and is flagged as untested in the review."
+    },
+    {
+      "id": "mock-product-sitara-luminous-concealer",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "name": "Sitara Luminous Concealer",
+      "nameStylised": "Sitara Luminous Concealer",
+      "slug": "sitara-luminous-concealer",
+      "brandId": "mock-brand-atelier-noor",
+      "category": "Concealer",
+      "shadeCount": 28,
+      "shadeTested": "14 Warm Sand",
+      "priceTier": "Premium",
+      "priceIndicative": {
+        "value": 34,
+        "currency": "USD",
+        "_mock": true
+      },
+      "sizeMl": 7,
+      "testingStatus": "Tested",
+      "reviewStatus": "Published",
+      "reviewId": "mock-review-sitara-luminous-concealer",
+      "officialUrl": "https://atelier-noor.example.com/products/sitara-luminous-concealer",
+      "images": {
+        "hero": {
+          "src": "/mock-media/products/sitara-hero.jpg",
+          "alt": "Sitara Luminous Concealer tube (placeholder)",
+          "width": 1600,
+          "height": 2000,
+          "_mock": true
+        },
+        "gallery": [
+          {
+            "src": "/mock-media/products/sitara-shade-range.jpg",
+            "alt": "Shade range (placeholder)",
+            "width": 1600,
+            "height": 1067,
+            "_mock": true
+          }
+        ]
+      },
+      "locales": {
+        "en": {
+          "translationStatus": "original",
+          "productType": "Concealer",
+          "subtype": "Radiant medium-coverage",
+          "finish": "Luminous",
+          "coverage": "Medium, buildable",
+          "description": "A radiant-finish concealer with a shade range that extends further into deep warm tones than is typical at its price tier.",
+          "keyFeatures": [
+            "28 shades, 11 of them medium-deep to deep",
+            "Sponge-tip applicator",
+            "Luminous finish",
+            "Fragrance-free"
+          ],
+          "brandClaims": [
+            "Claimed by the brand as crease-resistant for 16 hours",
+            "Claimed by the brand as developed for warm climates"
+          ]
+        },
+        "ar": {
+          "translationStatus": "adapted",
+          "productType": "كونسيلر",
+          "subtype": "مضيء بتغطية متوسطة",
+          "finish": "مضيء",
+          "coverage": "متوسطة، قابلة للبناء",
+          "description": "كونسيلر بنهائية مضيئة، بمجموعة درجات تمتد إلى درجات دافئة داكنة أبعد من المعتاد في فئته السعرية.",
+          "keyFeatures": [
+            "ثمان وعشرون درجة، إحدى عشرة منها متوسطة-داكنة إلى داكنة",
+            "أداة إسفنجية",
+            "نهائية مضيئة",
+            "خالٍ من العطور"
+          ],
+          "brandClaims": [
+            "تدّعي العلامة مقاومة للتجعد لست عشرة ساعة",
+            "تدّعي العلامة أنه مطور للمناخات الحارة"
+          ]
+        }
+      },
+      "_brandClaimsNote": "Brand marketing language. Quoted, never asserted."
+    }
+  ]
+}

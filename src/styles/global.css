@@ -1,0 +1,301 @@
+/**
+ * GLOBAL BASE — reset, document, typography primitives, layout primitives.
+ *
+ * Architecture (docs/COMPONENT_IMPLEMENTATION.md):
+ *   tokens.css   values only, no selectors beyond :root and the locale root
+ *   global.css   this file: reset, element defaults, four layout primitives, three type helpers
+ *   *.astro      component styles, scoped by Astro, using tokens
+ *
+ * There is no utility framework and no giant global stylesheet. Anything that appears once
+ * lives in its component.
+ *
+ * RTL: logical properties throughout. There is NO second stylesheet for Arabic.
+ */
+
+/* ==================================================================== reset */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+blockquote,
+dl,
+dd,
+ol,
+ul {
+  margin: 0;
+  padding: 0;
+}
+
+ol[role="list"],
+ul[role="list"],
+ol.plain,
+ul.plain {
+  list-style: none;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+/* Long product names — Latin or Arabic — wrap or scroll inside their container, never the page. */
+p,
+li,
+h1,
+h2,
+h3,
+dd,
+dt,
+figcaption,
+td,
+th {
+  overflow-wrap: break-word;
+}
+
+/* ==================================================================== document */
+
+html {
+  background: var(--color-ground-base);
+  color-scheme: dark;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--color-ground-base);
+  color: var(--color-text-primary);
+  font-family: var(--type-family-body);
+  font-size: calc(var(--type-body-md) * var(--type-arabic-size-factor));
+  line-height: calc(var(--type-leading-body-md) * var(--type-arabic-leading-factor));
+  font-weight: var(--type-weight-regular);
+  /* Tabular figures everywhere so numerals align in columns without per-component opt-in. */
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ==================================================================== links */
+
+a {
+  color: var(--color-accent-clay);
+  /* The underline is present by default and is NEVER removed on hover.
+     docs/ACCESSIBILITY_ART_DIRECTION.md decision 4. */
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+  transition: color var(--motion-duration-quick) var(--motion-easing-attend);
+}
+
+a:hover {
+  color: var(--color-accent-clay-hover);
+}
+
+/* ==================================================================== focus
+ * 2px clay at 7.37:1, 2px offset, appears instantly, never eased in.
+ * `outline: none` without a replacement is forbidden project-wide. */
+
+:focus-visible {
+  outline: var(--border-width-accent) solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Anchor targets must not sit under the sticky header when focused or linked. */
+:target,
+[id] {
+  scroll-margin-top: 6rem;
+}
+
+/* The skip-link target is programmatically focusable but must not paint a ring when focused
+   by script — the ring belongs to interactive elements the user moved to deliberately. */
+main:focus {
+  outline: none;
+}
+
+/* ==================================================================== selection */
+
+::selection {
+  background: var(--color-accent-clay);
+  color: var(--color-text-on-accent);
+}
+
+/* ==================================================================== layout primitives
+ * Four, and no more. Each earns its existence by appearing on every template. */
+
+/* 1. The page container. Content caps at 1180px; margins absorb the rest. */
+.container {
+  width: 100%;
+  max-width: var(--layout-max-content);
+  margin-inline: auto;
+  padding-inline: var(--layout-margin);
+}
+
+/* 2. The reading column. 62–68 characters, a MAXIMUM not a fixed width, so text reflows
+      rather than truncates at 200% zoom. */
+.text-column {
+  max-width: var(--type-measure-editorial);
+}
+
+/* 3. Full-bleed. Hero, disclosure band, plates, verdict — four breaks on a review page:
+      enough for rhythm, few enough that each one registers.
+
+      NOT a viewport breakout. The usual `width: 100vw; margin-inline-start: 50%;
+      transform: translateX(-50%)` recipe is WRONG here, and browser verification caught it:
+      100vw includes the scrollbar gutter, so on Windows it overflowed the document by ~15px
+      at EVERY width, in both directions.
+
+      These elements are already direct children of <article> inside <main>, which spans the
+      body's content box — the full width MINUS the scrollbar. So the correct width is simply
+      100%, and the breakout is not needed at all. The class stays as a semantic marker meaning
+      "this block spans the page, and is not constrained to the reading column".
+
+      A full-bleed element nested inside .container would still need a breakout; none is, and
+      tests/output.test.mjs asserts no page scrolls horizontally. */
+.full-bleed {
+  width: 100%;
+  max-width: 100%;
+  margin-inline: 0;
+}
+
+/* 4. Section rhythm. Steps 56 → 72 → 96 at the two real thresholds, via the token. */
+.section {
+  margin-block-start: var(--space-section);
+}
+
+/* ==================================================================== type helpers
+ * Three, used across components. Everything else is component-scoped. */
+
+.display-lg {
+  font-family: var(--type-family-display);
+  font-size: calc(var(--type-display-lg) * var(--type-arabic-size-factor));
+  line-height: calc(var(--type-leading-display-lg) * var(--type-arabic-leading-factor));
+  letter-spacing: var(--type-tracking-display);
+  font-weight: var(--type-weight-regular);
+  /* Never centred. Centred display type reads as a poster, not a publication. */
+  text-align: start;
+}
+
+.display-md {
+  font-family: var(--type-family-display);
+  font-size: calc(var(--type-display-md) * var(--type-arabic-size-factor));
+  line-height: calc(var(--type-leading-display-md) * var(--type-arabic-leading-factor));
+  letter-spacing: var(--type-tracking-display);
+  font-weight: var(--type-weight-regular);
+  text-align: start;
+}
+
+/*
+ * The label tier. THE HARDEST PIECE OF THE BILINGUAL SYSTEM.
+ *
+ * Latin: uppercase + tracked, the editorial default.
+ * Arabic: neither is available — no case, and tracking severs letterforms.
+ *   It reaches equivalent VOLUME by different MEANS: size up (×1.12), weight down (400 vs 500).
+ * docs/BILINGUAL_TYPE_TEST.md section 5. Verified in docs/PHASE_3_BILINGUAL_TYPE_PROOF.md.
+ */
+.label {
+  font-family: var(--type-family-ui);
+  font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
+  line-height: calc(var(--type-leading-label) * var(--type-arabic-leading-factor));
+  color: var(--color-text-muted);
+  letter-spacing: var(--type-tracking-label);
+  font-weight: var(--type-weight-medium);
+  text-transform: uppercase;
+}
+
+html[lang="ar"] .label {
+  text-transform: none;
+  font-weight: var(--type-weight-regular);
+}
+
+/* The record tier. Numerals, units and Latin identifiers only — never prose. */
+.record {
+  font-family: var(--type-family-record);
+  font-size: var(--type-record-md);
+  line-height: var(--type-leading-record);
+  font-variant-numeric: tabular-nums;
+}
+
+/* An Arabic word sitting beside a mono numeral uses the Arabic UI face, not mono. */
+html[lang="ar"] .record .word {
+  font-family: var(--type-family-ui);
+  font-size: calc(var(--type-record-md) * var(--type-arabic-size-factor));
+}
+
+/* ==================================================================== rules */
+
+.hairline {
+  border: 0;
+  border-block-start: var(--border-rule-hairline);
+  margin: 0;
+}
+
+/* ==================================================================== visually hidden
+ * Content available to assistive technology but not painted. Used sparingly — the evidence
+ * layer says everything out loud. */
+
+.visually-hidden:not(:focus):not(:active) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ==================================================================== forced colors
+ * Windows High Contrast. Nothing is lost, because no information lives in surface value
+ * or texture — meaning lives in type, rules and labels.
+ * The dotted-vs-solid rule distinction SURVIVES, which is why rule STYLE rather than rule
+ * COLOUR carries the claim / observation meaning. */
+
+@media (forced-colors: active) {
+  :focus-visible {
+    outline-color: Highlight;
+  }
+
+  .full-bleed,
+  .paper {
+    background: Canvas;
+  }
+}
+
+/* ==================================================================== print
+ * A review is a document. It should print like one. */
+
+@media print {
+  body {
+    background: #fff;
+    color: #000;
+  }
+
+  .full-bleed {
+    width: auto;
+    margin-inline-start: 0;
+    transform: none;
+  }
+}

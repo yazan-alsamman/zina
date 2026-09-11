@@ -1,0 +1,187 @@
+---
+/**
+ * THE REVIEWS INDEX — the library, and the reason the site is a destination.
+ *
+ * It is an EDITORIAL INDEX OF TESTING RECORDS, not a blog archive and not a product grid.
+ * The difference is carried by what each row shows: the disclosure first, the test in the
+ * subtitle, and the published conditions in record density. A product grid shows price and
+ * rating; this shows what was done and who paid for it.
+ *
+ * What the page must communicate (Phase 5 brief section 8):
+ *   1 what the archive is          the intro, one paragraph, no marketing
+ *   2 what evidence each record holds   the conditions on every row
+ *   3 how records can be discovered     crawlable facet routes, no JavaScript
+ *   4 what is available in THIS locale  locale-filtered, and the count is stated
+ *   5 what the Method means             a contextual link, in prose
+ *   6 how to move onward                index -> review -> Method
+ *
+ * NO SCORES, STARS, RANKS, "BEST" LABELS, AWARDS, POPULARITY OR ENGAGEMENT. The archive must not
+ * imply that reviews are scientifically equivalent measurements.
+ */
+import type { GetStaticPaths } from "astro";
+import type { Locale } from "../../../../content/schema/types";
+import { LOCALES, reviews as reviewsIn, IS_INDEXABLE_BUILD } from "../../../lib/content";
+import { brandFacets, categoryFacets } from "../../../lib/facets";
+import {
+  absoluteUrl,
+  path,
+  robotsContent,
+  sectionBreadcrumb,
+  otherLocale,
+} from "../../../lib/routing";
+import { breadcrumbSchema, jsonLd, templatedMeta } from "../../../lib/seo";
+import { t } from "../../../lib/ui-strings";
+import { formatCount } from "../../../lib/format";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
+import ReviewEntry from "../../../components/review/ReviewEntry.astro";
+import FacetNav from "../../../components/review/FacetNav.astro";
+
+export const getStaticPaths = (() =>
+  LOCALES.map((locale) => ({ params: { locale } }))) satisfies GetStaticPaths;
+
+const { locale } = Astro.params as { locale: Locale };
+
+/**
+ * LOCALE IS AN AUTHORING CONTRACT. Only records with content in THIS locale appear. There is no
+ * fallback to the other language, no machine translation and no placeholder.
+ */
+const records = reviewsIn(locale);
+const categories = categoryFacets(locale);
+const brands = brandFacets(locale);
+
+const selfPath = path.reviewsIndex(locale);
+const meta = templatedMeta(t(locale, "reviewsIndexTitle"), t(locale, "reviewsIndexIntro"), {
+  canonical: absoluteUrl(selfPath),
+  robots: robotsContent(IS_INDEXABLE_BUILD),
+  locale,
+});
+
+/**
+ * The index exists in both locales, so the hreflang pair is reciprocal by construction. This is
+ * one of the few surfaces where that is true without a per-record check.
+ */
+const alternates = [
+  ...LOCALES.map((l) => ({ hreflang: l, href: absoluteUrl(path.reviewsIndex(l)) })),
+  { hreflang: "x-default", href: absoluteUrl(path.reviewsIndex("en")) },
+];
+
+const crumbs = sectionBreadcrumb(locale, {
+  home: t(locale, "home"),
+  section: t(locale, "reviews"),
+});
+
+const schemas = [jsonLd(breadcrumbSchema(crumbs))];
+
+const target = otherLocale(locale);
+const switcherHref = reviewsIn(target).length > 0 ? path.reviewsIndex(target) : path.home(target);
+
+// Layout by count: the most recent record is given more room. Not a different component.
+const [featured, ...rest] = records;
+---
+
+<BaseLayout
+  locale={locale}
+  meta={meta}
+  alternates={alternates}
+  schemas={schemas}
+  switcherHref={switcherHref}
+>
+  <div class="container index">
+    <Breadcrumbs locale={locale} crumbs={crumbs} />
+
+    <h1 class="display-lg title">{t(locale, "reviewsIndexTitle")}</h1>
+
+    <p class="intro text-column">
+      {t(locale, "reviewsIndexIntro")}
+      {" "}
+      <a href={path.method(locale)}>{t(locale, "readTheMethod")}</a>.
+    </p>
+
+    <p class="count record">
+      <span class="count-value">{formatCount(records.length, locale)}</span>
+      <span class="count-label">{t(locale, "reviewCount")}</span>
+      <span class="count-label">·</span>
+      <span class="count-label">{t(locale, "inThisLocale")}</span>
+    </p>
+
+    {/* Crawlable facet routes. No client-side state, no JavaScript. */}
+    <FacetNav
+      locale={locale}
+      heading={t(locale, "browseByCategory")}
+      allHref={selfPath}
+      allLabel={t(locale, "allReviewsLabel")}
+      allCurrent={true}
+      links={categories.map((facet) => ({
+        label: facet.category,
+        href: path.reviewsByCategory(locale, facet.slug),
+        count: facet.count,
+      }))}
+    />
+
+    <FacetNav
+      locale={locale}
+      heading={t(locale, "browseByBrand")}
+      allHref={selfPath}
+      allLabel={t(locale, "allReviewsLabel")}
+      allCurrent={true}
+      links={brands.map((facet) => ({
+        label: facet.name,
+        href: path.reviewsByBrand(locale, facet.slug),
+        count: facet.count,
+      }))}
+    />
+
+    <div class="entries">
+      {featured && <ReviewEntry locale={locale} review={featured} featured={true} />}
+      {rest.map((review) => <ReviewEntry locale={locale} review={review} />)}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .index {
+    padding-block: var(--space-6) var(--space-10);
+  }
+
+  .title {
+    margin-block-start: var(--space-3);
+  }
+
+  .intro {
+    margin-block-start: var(--space-3);
+    font-size: calc(var(--type-body-lg) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-body-lg) * var(--type-arabic-leading-factor));
+    color: var(--color-text-secondary);
+  }
+
+  .count {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1);
+    margin-block-start: var(--space-4);
+    color: var(--color-text-muted);
+  }
+
+  .count-value {
+    color: var(--color-accent-mineral);
+  }
+
+  .count-label {
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
+  }
+
+  .entries {
+    display: grid;
+    gap: var(--space-5);
+    margin-block-start: var(--space-8);
+  }
+
+  @media (min-width: 768px) {
+    .entries {
+      gap: var(--space-6);
+    }
+  }
+</style>

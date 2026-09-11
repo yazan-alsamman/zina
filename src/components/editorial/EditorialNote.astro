@@ -1,0 +1,91 @@
+---
+/**
+ * EDITORIAL NOTE — an authored aside that is NOT part of the argument.
+ *
+ * WHY THIS IS A COMPONENT and not a blockquote: a blockquote means "someone else said this".
+ * An editorial note means "the author is stepping outside the argument to state a limit or a
+ * caveat". Those are different editorial acts, and the evidence language of this project depends
+ * on not blurring them.
+ *
+ * The `boundary` kind carries the medical boundary Phase 1 requires on any article touching
+ * routines or skin (docs/JOURNAL_ARCHITECTURE.md section 4). It uses the SAME surface treatment
+ * as the review disclosure band and the Method boundary, deliberately: all three are statements
+ * about the limits of authority, and a reader should recognise the third from having seen the
+ * first two.
+ *
+ * It is an <aside>, because it is tangentially related to the surrounding content — which is
+ * exactly what <aside> means. Not a div with a class.
+ *
+ * NEVER a "callout", a "tip box", an "info card" or an icon-led alert. No icon, no colour-coded
+ * severity, no exclamation mark.
+ */
+import type { Locale } from "../../../content/schema/types";
+import { t } from "../../lib/ui-strings";
+
+interface Props {
+  locale: Locale;
+  /** `boundary` = a limit of authority. `note` = an ordinary authorial aside. */
+  kind?: "boundary" | "note";
+}
+
+const { locale, kind = "note" } = Astro.props;
+const label = kind === "boundary" ? t(locale, "editorialBoundary") : t(locale, "editorialNote");
+---
+
+<aside class:list={["editorial-note", `editorial-note--${kind}`]} aria-label={label}>
+  <p class="label note-label">{label}</p>
+  <div class="note-body"><slot /></div>
+</aside>
+
+<style>
+  .editorial-note {
+    margin-block: var(--space-6);
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-ground-raised);
+    max-width: var(--type-measure-editorial);
+  }
+
+  .note-label {
+    color: var(--color-text-muted);
+  }
+
+  .note-body {
+    margin-block-start: var(--space-1);
+  }
+
+  .note-body :global(p) {
+    font-size: calc(var(--type-body-sm) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-body-sm) * var(--type-arabic-leading-factor));
+    color: var(--color-text-secondary);
+  }
+
+  .note-body :global(p + p) {
+    margin-block-start: var(--space-2);
+  }
+
+  /* The boundary kind borrows the disclosure band's language: clay rule and paper grain. */
+  .editorial-note--boundary {
+    border-block-start: var(--border-rule-verdict);
+    background-image: repeating-linear-gradient(
+        0deg,
+        rgb(255 255 255 / 1.5%) 0 1px,
+        transparent 1px 3px
+      ),
+      repeating-linear-gradient(90deg, rgb(255 255 255 / 1.5%) 0 1px, transparent 1px 4px);
+  }
+
+  .editorial-note--boundary .note-label {
+    color: var(--color-accent-clay);
+  }
+
+  .editorial-note--boundary .note-body :global(p) {
+    color: var(--color-text-primary);
+  }
+
+  @media (forced-colors: active) {
+    .editorial-note--boundary {
+      background-image: none;
+      border-block-start-width: 2px;
+    }
+  }
+</style>

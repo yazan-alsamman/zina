@@ -1,0 +1,185 @@
+#!/usr/bin/env node
+/**
+ * WCAG contrast verification for the Phase 2 colour specification.
+ *
+ * This is a SPECIFICATION CHECK, not an implementation. It exists so that
+ * docs/COLOR_SYSTEM.md can state measured contrast ratios instead of assumed ones,
+ * per the Phase 2 brief ("Do not assume contrast is acceptable").
+ *
+ * Zero dependencies.
+ *
+ * Usage:  node tools/check-contrast.mjs
+ * Exit:   0 = every required pair passes, 1 = at least one required pair fails
+ *
+ * Thresholds (WCAG 2.1):
+ *   AA  normal text   4.5:1
+ *   AA  large text    3.0:1   (>=24px, or >=18.66px bold)
+ *   AA  non-text      3.0:1   (UI components, focus indicators, meaningful graphics)
+ *   AAA normal text   7.0:1
+ */
+
+/* ------------------------------------------------------------------ palette */
+
+const C = {
+  // Ground. Warm near-black, never pure #000 and never blue-black.
+  "ground.base": "#12100D",
+  "ground.raised": "#1A1714",
+  "ground.inset": "#0B0A08",
+  "ground.overlay": "#211D18",
+
+  // Text
+  "text.primary": "#F2EDE3",
+  "text.secondary": "#C3BAAC",
+  "text.muted": "#9A9184",
+  "text.onAccent": "#12100D",
+
+  // Lines
+  // hairline is decorative only (structure you feel, not information)
+  "line.hairline": "#2C2823",
+  // strong carries meaning (input borders, active state, section boundaries that
+  // separate claim from observation), so it must clear 3:1 as a non-text element.
+  // First specified as #4A4238 and rejected by this check at 1.92:1.
+  "line.strong": "#75695C",
+
+  // Accents
+  "accent.clay": "#D9906A",       // interactive, CTA, verdict rule
+  "accent.mineral": "#A3BCAF",    // observation / evidence marker
+  "accent.clay.hover": "#E9A47E",
+
+  // Status
+  "status.success": "#93B189",
+  "status.warning": "#DCA95E",
+  "status.error": "#E08A80",
+
+  // Evidence semantics
+  "evidence.claim": "#9A9184",    // recessed, deliberately quieter
+  "evidence.observation": "#A3BCAF",
+  "evidence.verdict": "#F2EDE3",
+};
+
+/* Pairs to verify: [foreground, background, minimum ratio, label, required?] */
+const PAIRS = [
+  // Body and editorial text
+  ["text.primary", "ground.base", 4.5, "Body text on ground", true],
+  ["text.primary", "ground.raised", 4.5, "Body text on raised surface", true],
+  ["text.primary", "ground.inset", 4.5, "Body text on inset well", true],
+  ["text.secondary", "ground.base", 4.5, "Secondary text on ground", true],
+  ["text.secondary", "ground.raised", 4.5, "Secondary text on raised", true],
+  ["text.muted", "ground.base", 4.5, "Muted text on ground (metadata)", true],
+  ["text.muted", "ground.raised", 4.5, "Muted text on raised", true],
+
+  // Large display type only needs 3:1
+  ["text.secondary", "ground.base", 3.0, "Display subhead on ground (large)", true],
+
+  // Accents as text
+  ["accent.clay", "ground.base", 4.5, "Clay accent as text/link on ground", true],
+  ["accent.clay", "ground.raised", 4.5, "Clay accent as text on raised", true],
+  ["accent.mineral", "ground.base", 4.5, "Mineral accent as text on ground", true],
+  ["accent.mineral", "ground.raised", 4.5, "Mineral accent as text on raised", true],
+
+  // Accent as a surface with dark text on it (buttons)
+  ["text.onAccent", "accent.clay", 4.5, "Dark text on clay button", true],
+  ["text.onAccent", "accent.clay.hover", 4.5, "Dark text on clay button hover", true],
+
+  // Evidence semantics
+  ["evidence.claim", "ground.raised", 4.5, "Claim text (deliberately recessed)", true],
+  ["evidence.observation", "ground.base", 4.5, "Observation text", true],
+  ["evidence.verdict", "ground.raised", 4.5, "Verdict text", true],
+
+  // Status
+  ["status.success", "ground.base", 4.5, "Success text", true],
+  ["status.warning", "ground.base", 4.5, "Warning text (disclosure pending)", true],
+  ["status.error", "ground.base", 4.5, "Error text", true],
+
+  // Non-text: UI components, borders that carry meaning, focus rings
+  ["line.strong", "ground.base", 3.0, "Meaningful border on ground (non-text)", true],
+  ["accent.clay", "ground.base", 3.0, "Focus ring on ground (non-text)", true],
+  ["accent.mineral", "ground.base", 3.0, "Observation rule on ground (non-text)", true],
+  ["status.warning", "ground.raised", 3.0, "Disclosure band edge (non-text)", true],
+
+  // Decorative only: hairline rules carry no meaning, so no minimum applies.
+  ["line.hairline", "ground.base", 0, "Hairline rule (decorative, no minimum)", false],
+
+  // AAA aspiration for long-form reading
+  ["text.primary", "ground.base", 7.0, "AAA: long-form reading on ground", false],
+  ["text.secondary", "ground.base", 7.0, "AAA: secondary long-form", false],
+];
+
+/* --------------------------------------------------------------- maths */
+
+const srgb = (v) => {
+  const c = v / 255;
+  return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+};
+
+const luminance = (hex) => {
+  const h = hex.replace("#", "");
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return 0.2126 * srgb(r) + 0.7152 * srgb(g) + 0.0722 * srgb(b);
+};
+
+const contrast = (a, b) => {
+  const la = luminance(a);
+  const lb = luminance(b);
+  const [hi, lo] = la > lb ? [la, lb] : [lb, la];
+  return (hi + 0.05) / (lo + 0.05);
+};
+
+/* --------------------------------------------------------------- report */
+
+const failures = [];
+const notes = [];
+
+console.log("\nWCAG contrast verification  —  Zina Almokri Phase 2 palette");
+console.log("=".repeat(94));
+console.log(
+  "PAIR".padEnd(46) + "FG".padEnd(10) + "BG".padEnd(10) + "RATIO".padEnd(9) + "MIN".padEnd(7) + "RESULT"
+);
+console.log("-".repeat(94));
+
+for (const [fgKey, bgKey, min, label, required] of PAIRS) {
+  const fg = C[fgKey];
+  const bg = C[bgKey];
+  if (!fg || !bg) {
+    failures.push(`unknown token in pair: ${fgKey} / ${bgKey}`);
+    continue;
+  }
+  const ratio = contrast(fg, bg);
+  const pass = ratio >= min;
+  const mark = min === 0 ? "n/a" : pass ? "PASS" : required ? "FAIL" : "below";
+  if (!pass && required && min > 0) failures.push(`${label}: ${ratio.toFixed(2)}:1 < ${min}:1`);
+  if (!pass && !required && min > 0) notes.push(`${label}: ${ratio.toFixed(2)}:1 (aspiration ${min}:1)`);
+  console.log(
+    label.slice(0, 45).padEnd(46) +
+      fg.padEnd(10) +
+      bg.padEnd(10) +
+      `${ratio.toFixed(2)}:1`.padEnd(9) +
+      (min === 0 ? "—" : `${min}:1`).padEnd(7) +
+      mark
+  );
+}
+
+console.log("-".repeat(94));
+
+// Highest usable ratio for reference
+const maxRatio = contrast(C["text.primary"], C["ground.inset"]);
+console.log(`\nmaximum ratio in system: ${maxRatio.toFixed(2)}:1  (text.primary on ground.inset)`);
+console.log(
+  `pure-white-on-pure-black would be 21.00:1 — deliberately NOT used; see docs/COLOR_SYSTEM.md section 2`
+);
+
+if (notes.length) {
+  console.log(`\nAAA aspirations not met (acceptable, AA is the requirement):`);
+  notes.forEach((n) => console.log(`  ~ ${n}`));
+}
+
+if (failures.length) {
+  console.log(`\nFAILURES (${failures.length})`);
+  failures.forEach((f) => console.log(`  x ${f}`));
+  console.log("\nFAIL\n");
+  process.exit(1);
+}
+
+console.log(`\nPASS  all ${PAIRS.filter((p) => p[4]).length} required pairs meet their threshold\n`);

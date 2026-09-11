@@ -1,0 +1,167 @@
+---
+/**
+ * SIGNATURE DEVICE 4 — THE DISCLOSURE BAND
+ *
+ * The most important element on a review page.
+ *
+ * NON-NEGOTIABLES (docs/EVIDENCE_LANGUAGE.md section 4, docs/REVIEW_WIREFRAMES.md section 4.5):
+ *   - ABOVE THE HERO. Position is `above-content` and is not configurable.
+ *   - Carries the full STATEMENT, not just a label. A badge says "gifted"; a statement says what
+ *     that means for the reader's trust.
+ *   - NEVER truncated, collapsed, behind a toggle, or revealed by script. Present at first paint.
+ *   - Prominence scales with commercial entanglement: the more money involved, the louder.
+ *   - Six states distinguished by an explicit TEXT LABEL, never by rule colour alone.
+ *
+ * `additional[]` modifiers render as a SECOND LINE, never as a second badge.
+ *
+ * There is no empty state. Every review has a disclosure; `unknown-pending-verification` is a
+ * STATE with a warning treatment, and it can never reach published.
+ */
+import type { AdditionalDisclosure, DisclosureType, Locale } from "../../../content/schema/types";
+import { t } from "../../lib/ui-strings";
+
+interface Props {
+  locale: Locale;
+  type: DisclosureType;
+  label: string;
+  statement: string;
+  additional?: AdditionalDisclosure[];
+}
+
+const { locale, type, label, statement, additional = [] } = Astro.props;
+
+const modifierLabels: Record<AdditionalDisclosure, Record<Locale, string>> = {
+  "existing-paid-relationship": {
+    en: "An existing paid relationship with this brand also exists.",
+    ar: "توجد أيضا علاقة مدفوعة قائمة مع هذه العلامة.",
+  },
+  "affiliate-link": {
+    en: "This page contains an affiliate link.",
+    ar: "تحتوي هذه الصفحة على رابط تسويق بالعمولة.",
+  },
+  "event-hosted": {
+    en: "Travel or hosting for a related event was provided.",
+    ar: "قُدّمت استضافة أو سفر لفعالية ذات صلة.",
+  },
+};
+---
+
+<section class={`disclosure disclosure--${type} full-bleed`} aria-label={t(locale, "disclosure")}>
+  <div class="container inner">
+    <p class="label disclosure-label">{label}</p>
+    <p class="statement">{statement}</p>
+    {
+      additional.map((modifier) => (
+        <p class="modifier">{modifierLabels[modifier][locale]}</p>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .disclosure {
+    background: var(--color-ground-raised);
+    /* Paper grain at 3% — one of only three places texture appears on the entire site.
+       Generated, not an asset: a 4KB image for a 3% overlay is not worth a request. */
+    background-image: repeating-linear-gradient(
+        0deg,
+        rgb(255 255 255 / 1.5%) 0 1px,
+        transparent 1px 3px
+      ),
+      repeating-linear-gradient(90deg, rgb(255 255 255 / 1.5%) 0 1px, transparent 1px 4px);
+    border-block-start: var(--border-width-hairline) solid var(--color-line-hairline);
+    /* NO animation. Must be present at first paint. */
+  }
+
+  .inner {
+    padding-block: var(--space-3);
+  }
+
+  .disclosure-label {
+    color: var(--color-text-muted);
+  }
+
+  .statement {
+    margin-block-start: var(--space-1);
+    max-width: var(--type-measure-editorial);
+    font-size: calc(var(--type-body-sm) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-body-sm) * var(--type-arabic-leading-factor));
+    color: var(--color-text-primary);
+    /* Never truncated. No line-clamp, no max-height, at any width. */
+  }
+
+  .modifier {
+    margin-block-start: var(--space-1);
+    max-width: var(--type-measure-editorial);
+    font-size: calc(var(--type-body-sm) * var(--type-arabic-size-factor));
+    color: var(--color-text-secondary);
+  }
+
+  /* ---------------------------------------------------------------- severity
+     Prominence scales with commercial entanglement. Rule colour is the fastest cue and is
+     never the only one: the text label states the relationship in words. */
+
+  .disclosure--independently-purchased,
+  .disclosure--editorial {
+    border-block-start-color: var(--color-line-hairline);
+  }
+
+  .disclosure--gifted {
+    border-block-start-color: var(--color-disclosure-gifted);
+  }
+
+  .disclosure--gifted .disclosure-label {
+    color: var(--color-disclosure-gifted);
+  }
+
+  .disclosure--sponsored {
+    border-block-start-color: var(--color-disclosure-sponsored);
+  }
+
+  .disclosure--sponsored .disclosure-label {
+    color: var(--color-disclosure-sponsored);
+  }
+
+  .disclosure--sponsored .inner {
+    padding-block: calc(var(--space-3) + var(--space-1));
+  }
+
+  .disclosure--paid-collaboration {
+    border-block-start: var(--border-rule-verdict);
+  }
+
+  .disclosure--paid-collaboration .disclosure-label {
+    color: var(--color-disclosure-paid);
+  }
+
+  .disclosure--paid-collaboration .inner {
+    padding-block: calc(var(--space-3) + var(--space-2));
+  }
+
+  .disclosure--unknown-pending-verification {
+    border-block-start: var(--border-width-accent) solid var(--color-disclosure-pending);
+  }
+
+  .disclosure--unknown-pending-verification .disclosure-label {
+    color: var(--color-disclosure-pending);
+  }
+
+  @media (min-width: 768px) {
+    .inner {
+      padding-block: var(--space-4);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .inner {
+      padding-block: var(--space-5);
+    }
+  }
+
+  @media (forced-colors: active) {
+    .disclosure {
+      background-image: none;
+      border-block-start-width: 2px;
+    }
+  }
+</style>

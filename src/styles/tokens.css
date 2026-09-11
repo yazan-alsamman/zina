@@ -1,0 +1,255 @@
+/**
+ * DESIGN TOKENS — direct implementation of docs/DESIGN_TOKENS_SPEC.md (Phase 2).
+ *
+ * Every colour value here is verified by `node tools/check-contrast.mjs` (24 pairs, exit 0).
+ * Do not change a colour without re-running that tool.
+ *
+ * Naming follows the spec exactly: category.group.variant → --category-group-variant.
+ * Semantic names only. There is no `--black-900` in this system and there must not be.
+ *
+ * Three tokens encode a refusal and exist so the refusal cannot be quietly reversed:
+ *   --shadow-none          the only shadow token in the system
+ *   --radius-none          with no third radius value
+ *   --type-tracking-arabic fixed at 0, never overridable
+ */
+
+:root {
+  /* ---------------------------------------------------------------- colour: ground */
+  --color-ground-inset: #0b0a08; /* conditions well, evidence strip */
+  --color-ground-base: #12100d; /* the page — warm ink, NOT black */
+  --color-ground-raised: #1a1714; /* disclosure band, claim block, related content */
+  --color-ground-overlay: #211d18; /* mobile menu, dialogs */
+
+  /* ---------------------------------------------------------------- colour: text */
+  --color-text-primary: #f2ede3; /* 16.28:1 on base — ivory, NOT white */
+  --color-text-secondary: #c3bAac; /* 9.89:1 */
+  --color-text-muted: #9a9184; /* 6.11:1 */
+  --color-text-on-accent: #12100d; /* 7.37:1 on clay */
+
+  /* ---------------------------------------------------------------- colour: line */
+  --color-line-hairline: #2c2823; /* 1.30:1 — decorative only, carries no information */
+  --color-line-strong: #75695c; /* 3.56:1 — meaningful boundaries */
+
+  /* ---------------------------------------------------------------- colour: accent */
+  --color-accent-clay: #d9906a; /* 7.37:1 — editorial accent */
+  --color-accent-clay-hover: #e9a47e; /* 9.11:1 */
+  --color-accent-mineral: #a3bcaf; /* 9.38:1 — observed accent */
+
+  /* ---------------------------------------------------------------- colour: status */
+  --color-status-success: #93b189;
+  --color-status-warning: #dca95e;
+  --color-status-error: #e08a80;
+
+  /* ---------------------------------------------------------------- colour: evidence */
+  /* The three voices. Semantic aliases so the distinction cannot drift from the system. */
+  --color-evidence-claim: var(--color-text-muted); /* what the brand says — quietest */
+  --color-evidence-observation: var(--color-accent-mineral); /* what Zina saw */
+  --color-evidence-verdict: var(--color-text-primary); /* what Zina concluded — loudest */
+
+  /* ---------------------------------------------------------------- colour: disclosure */
+  --color-disclosure-independent: var(--color-text-muted);
+  --color-disclosure-editorial: var(--color-text-muted);
+  --color-disclosure-gifted: var(--color-accent-mineral);
+  --color-disclosure-sponsored: var(--color-accent-clay);
+  --color-disclosure-paid: var(--color-accent-clay);
+  --color-disclosure-pending: var(--color-status-warning);
+
+  /* ---------------------------------------------------------------- colour: focus */
+  --color-focus-ring: var(--color-accent-clay);
+  --color-focus-ring-on-accent: var(--color-text-primary);
+
+  /* ---------------------------------------------------------------- typography: family
+   *
+   * Zarid is NOT licensed (Phase 2 Q-2, Phase 3 Q3-1). These are the documented open-source
+   * FALLBACK TIER from docs/TYPOGRAPHY_SYSTEM.md section 6, self-hosted under SIL OFL 1.1.
+   *
+   * The families are declared once, here. Swapping in Zarid later is an edit to these four
+   * lines plus the @font-face declarations — no component changes.
+   */
+  --type-family-display: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+  --type-family-body: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+  --type-family-ui: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --type-family-record: "IBM Plex Mono", ui-monospace, "Cascadia Mono", monospace;
+
+  /* ---------------------------------------------------------------- typography: weight */
+  --type-weight-regular: 400;
+  --type-weight-medium: 500;
+  --type-weight-semibold: 600;
+  /* No weights below 400 or above 600 exist in this system. */
+
+  /* ---------------------------------------------------------------- typography: script adaptation
+   *
+   * Applied at the LOCALE ROOT only (see [lang="ar"] below), never per component.
+   * Getting these wrong is the most common reason Arabic pages feel cramped beside English.
+   */
+  --type-arabic-size-factor: 1;
+  --type-arabic-leading-factor: 1;
+  --type-tracking-label: 0.08em; /* Latin only */
+  --type-tracking-display: -0.01em; /* Latin only */
+
+  /* ---------------------------------------------------------------- typography: scale
+   *
+   * Fluid between 375 and 1440 (docs/RESPONSIVE_UX_SPEC.md section 4).
+   * clamp() uses a rem-based preferred value so browser text-size settings and zoom keep
+   * working. A vw-only formula breaks user font scaling and is a WCAG 1.4.4 failure.
+   *
+   * Floors hold at every width: body never below 16px, mono never below 13px, nothing below 12px.
+   */
+  --type-display-xl: clamp(2.125rem, 1.2rem + 3.95vw, 4.75rem); /* 34 → 76 */
+  --type-display-lg: clamp(1.875rem, 1.32rem + 2.37vw, 3.5rem); /* 30 → 56 */
+  --type-display-md: clamp(1.625rem, 1.32rem + 1.32vw, 2.5rem); /* 26 → 40 */
+  --type-display-sm: clamp(1.375rem, 1.24rem + 0.56vw, 1.875rem); /* 22 → 30 */
+  --type-body-lg: clamp(1.1875rem, 1.15rem + 0.19vw, 1.3125rem); /* 19 → 21 */
+  --type-body-md: clamp(1.0625rem, 1.05rem + 0.09vw, 1.125rem); /* 17 → 18 */
+  --type-body-sm: 1rem; /* 16, fixed */
+  --type-ui-md: 1rem; /* 16, fixed */
+  --type-ui-sm: 0.875rem; /* 14, fixed */
+  --type-record-md: clamp(0.875rem, 0.86rem + 0.09vw, 0.9375rem); /* 14 → 15 */
+  --type-record-sm: 0.8125rem; /* 13, fixed — the mono floor */
+  --type-label-sm: 0.75rem; /* 12, fixed — the system floor */
+
+  /* line-heights, multiplied by the Arabic leading factor at the locale root */
+  --type-leading-display-xl: 1.04;
+  --type-leading-display-lg: 1.08;
+  --type-leading-display-md: 1.14;
+  --type-leading-display-sm: 1.2;
+  --type-leading-body-lg: 1.62;
+  --type-leading-body-md: 1.68;
+  --type-leading-body-sm: 1.6;
+  --type-leading-ui: 1.4;
+  --type-leading-record: 1.5;
+  --type-leading-label: 1.35;
+
+  /* measure */
+  --type-measure-editorial: 66ch; /* 62–68 character target, a MAXIMUM not a fixed width */
+  --type-measure-narrow: 48ch;
+
+  /* ---------------------------------------------------------------- spacing — 8px baseline */
+  --space-0-5: 0.25rem; /* 4 */
+  --space-1: 0.5rem; /* 8 */
+  --space-2: 1rem; /* 16 */
+  --space-3: 1.5rem; /* 24 */
+  --space-4: 2rem; /* 32 */
+  --space-5: 2.5rem; /* 40 */
+  --space-6: 3rem; /* 48 */
+  --space-7: 3.5rem; /* 56 — mobile section rhythm */
+  --space-8: 4rem; /* 64 */
+  --space-9: 4.5rem; /* 72 — tablet section rhythm */
+  --space-10: 6rem; /* 96 — desktop section rhythm */
+  --space-12: 8rem; /* 128 — major separation */
+
+  /* semantic spacing — section rhythm steps at the two real thresholds */
+  --space-section: var(--space-7);
+  --space-subsection: var(--space-6);
+  --space-related-above: var(--space-9);
+
+  /* ---------------------------------------------------------------- layout */
+  --layout-max-content: 1180px;
+  --layout-max-text: 620px;
+  --layout-max-narrow: 640px;
+  --layout-gutter: 1.5rem; /* 24 */
+  --layout-margin: 1.25rem; /* 20 — mobile */
+  --layout-index-width: 160px; /* the margin index, the signature device */
+  --layout-index-gap: 2rem; /* 32 */
+
+  /* ---------------------------------------------------------------- radius
+   * Two values. There is no third, deliberately. */
+  --radius-none: 0;
+  --radius-control: 2px; /* buttons, inputs, filter chips — ONLY these */
+
+  /* ---------------------------------------------------------------- borders */
+  --border-width-hairline: 1px;
+  --border-width-accent: 2px;
+  --border-rule-hairline: 1px solid var(--color-line-hairline);
+  --border-rule-strong: 1px solid var(--color-line-strong);
+  --border-rule-observation: 1px solid var(--color-accent-mineral);
+  --border-rule-claim: 1px dotted var(--color-line-hairline);
+  --border-rule-verdict: 2px solid var(--color-accent-clay); /* once per review page, nowhere else */
+
+  /* ---------------------------------------------------------------- shadow
+   * The system has one shadow token and its value is none. Recorded so the absence is
+   * explicit rather than an omission someone later "fixes". */
+  --shadow-none: none;
+
+  /* ---------------------------------------------------------------- motion */
+  --motion-duration-instant: 100ms; /* focus rings — never eased in */
+  --motion-duration-quick: 150ms;
+  --motion-duration-base: 250ms;
+  --motion-duration-settle: 400ms;
+  --motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --motion-easing-exit: cubic-bezier(0.4, 0, 1, 1);
+  --motion-easing-attend: cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-stagger-sequence: 80ms;
+  --motion-stagger-compact: 60ms;
+  --motion-distance-settle: 12px;
+  --motion-distance-subtle: 8px;
+  --motion-scale-image: 1.02;
+  /* No spring, bounce or overshoot tokens exist. Nothing above 600ms. */
+
+  /* ---------------------------------------------------------------- z-index — named layers only */
+  --z-base: 0;
+  --z-raised: 10;
+  --z-header: 100;
+  --z-overlay: 200;
+  --z-dialog: 300;
+  --z-skip-link: 500; /* always on top */
+}
+
+/* ====================================================================
+   SCRIPT ADAPTATION — applied at the locale root, never per component.
+   docs/TYPOGRAPHY_SYSTEM.md section 1, docs/BILINGUAL_TYPE_TEST.md.
+   ==================================================================== */
+:root:lang(ar),
+[lang="ar"] {
+  --type-family-display: "Noto Naskh Arabic", "IBM Plex Sans Arabic", serif;
+  --type-family-body: "Noto Naskh Arabic", "IBM Plex Sans Arabic", serif;
+  --type-family-ui: "IBM Plex Sans Arabic", system-ui, sans-serif;
+  /* --type-family-record stays IBM Plex Mono: the record tier carries NUMERALS AND LATIN
+     IDENTIFIERS ONLY. Arabic labels beside them use the Arabic UI face. There is no Arabic
+     monospace tradition and forcing one would read as a technical artefact, not a record. */
+
+  --type-arabic-size-factor: 1.12;
+  --type-arabic-leading-factor: 1.18;
+
+  /* Letter-spacing severs Arabic letterforms. Fixed at 0 and not overridable. */
+  --type-tracking-label: 0;
+  --type-tracking-display: 0;
+}
+
+/* ====================================================================
+   REDUCED MOTION — a TOKEN-LEVEL override, so it cannot be forgotten per component.
+   Nothing is lost: no information, affordance or wayfinding depends on movement.
+   ==================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-duration-quick: 0ms;
+    --motion-duration-base: 0ms;
+    --motion-duration-settle: 0ms;
+    --motion-stagger-sequence: 0ms;
+    --motion-stagger-compact: 0ms;
+    --motion-distance-settle: 0px;
+    --motion-distance-subtle: 0px;
+    --motion-scale-image: 1;
+    /* --motion-duration-instant is deliberately NOT zeroed: a focus indicator must still
+       appear immediately, and it already does not animate. */
+  }
+}
+
+/* ====================================================================
+   RESPONSIVE RHYTHM — the two thresholds that carry real compositional change.
+   docs/RESPONSIVE_UX_SPEC.md section 1.
+   ==================================================================== */
+@media (min-width: 768px) {
+  :root {
+    --layout-margin: 3rem; /* 48 */
+    --space-section: var(--space-9); /* 72 */
+    --space-related-above: var(--space-10);
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --space-section: var(--space-10); /* 96 */
+    --space-related-above: var(--space-12); /* 128 — the largest gap on a review page */
+  }
+}

@@ -1,0 +1,196 @@
+---
+/**
+ * CATEGORY FACET — /{locale}/reviews/{category}/
+ *
+ * Phase 1's exact reserved URL shape (docs/SEO_URL_ARCHITECTURE.md section 5), implemented as a
+ * real statically generated route rather than a query string, because a query string is not a
+ * route in a static build and client-side filtering is forbidden (R-15). See src/lib/facets.ts
+ * and decision D5-1.
+ *
+ * IT SHARES A PATH LEVEL WITH THE REVIEW SLUG, and that is safe: the category segments are
+ * reserved in site.json `reservedSlugs.reviews`, the validator fails the build on a collision,
+ * and `tests/facets.test.mjs` asserts the two sets are disjoint. Astro generates both without
+ * ambiguity because the generated paths never overlap.
+ *
+ * THIN-PAGE PROTECTION: existence and indexability are separate questions.
+ *   >= 5 reviews in this category and locale   index, follow      + self-canonical
+ *   fewer                                      noindex, follow    + canonical -> /reviews/
+ *
+ * TODAY EVERY CATEGORY HOLDS EXACTLY ONE REVIEW PER LOCALE, so every one of these pages is
+ * navigation-only. That is the honest state, and it is stated on the page itself rather than
+ * hidden — a reader who lands here sees that this is a browse view, not a curated collection.
+ */
+import type { GetStaticPaths } from "astro";
+import type { Locale } from "../../../../content/schema/types";
+import { IS_INDEXABLE_BUILD, LOCALES } from "../../../lib/content";
+import { categoryFacet, categoryFacets, facetIndexing } from "../../../lib/facets";
+import {
+  absoluteUrl,
+  path,
+  robotsContent,
+  sectionBreadcrumb,
+  otherLocale,
+} from "../../../lib/routing";
+import { breadcrumbSchema, jsonLd, templatedMeta } from "../../../lib/seo";
+import { t } from "../../../lib/ui-strings";
+import { formatCount } from "../../../lib/format";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
+import ReviewEntry from "../../../components/review/ReviewEntry.astro";
+import FacetNav from "../../../components/review/FacetNav.astro";
+
+export const getStaticPaths = (() => {
+  const paths: Array<{ params: { locale: Locale; category: string } }> = [];
+  for (const locale of LOCALES) {
+    for (const facet of categoryFacets(locale)) {
+      paths.push({ params: { locale, category: facet.slug } });
+    }
+  }
+  return paths;
+}) satisfies GetStaticPaths;
+
+const { locale, category } = Astro.params as { locale: Locale; category: string };
+
+const facet = categoryFacet(locale, category);
+if (!facet) {
+  throw new Error(`category facet ${locale}/${category} was routed but has no records`);
+}
+
+const selfPath = path.reviewsByCategory(locale, facet.slug);
+const indexPath = path.reviewsIndex(locale);
+const indexing = facetIndexing(facet, selfPath, indexPath, "category");
+
+/**
+ * TWO INDEPENDENT GATES, and both must pass before this page is indexable:
+ *   1. the facet's own thin-page gate (>= 5 reviews in this category and locale)
+ *   2. the build-level gate — a preview build is noindex SITE-WIDE, without exception
+ *
+ * Using `indexing.robots` alone would let a facet claim `index, follow` inside a preview build
+ * that every other page correctly marks noindex. Composing the two closes that.
+ */
+const facetIsIndexable = indexing.robots.startsWith("index");
+const robots = robotsContent(IS_INDEXABLE_BUILD && facetIsIndexable);
+
+const meta = templatedMeta(facet.category, t(locale, "categoryIndexIntro"), {
+  canonical: absoluteUrl(indexing.canonicalPath),
+  robots,
+  locale,
+});
+
+/**
+ * hreflang is emitted ONLY where the counterpart facet actually has records. A category with
+ * English reviews and no Arabic ones has no Arabic equivalent, and claiming one would be a false
+ * equivalence — the same rule that governs review pages.
+ *
+ * A noindex facet emits no alternates at all: hreflang on a page excluded from the index is
+ * noise at best and a contradictory signal at worst.
+ */
+const alternates = robots.startsWith("index")
+  ? LOCALES.filter((l) => categoryFacet(l, facet.slug))
+      .map((l) => ({ hreflang: l, href: absoluteUrl(path.reviewsByCategory(l, facet.slug)) }))
+  : [];
+
+const crumbs = sectionBreadcrumb(
+  locale,
+  { home: t(locale, "home"), section: t(locale, "reviews") },
+  facet.category
+);
+
+const schemas = [jsonLd(breadcrumbSchema(crumbs))];
+
+const target = otherLocale(locale);
+const counterpart = categoryFacet(target, facet.slug);
+const switcherHref = counterpart
+  ? path.reviewsByCategory(target, facet.slug)
+  : path.reviewsIndex(target);
+
+const siblings = categoryFacets(locale);
+---
+
+<BaseLayout
+  locale={locale}
+  meta={meta}
+  alternates={alternates}
+  schemas={schemas}
+  switcherHref={switcherHref}
+>
+  <div class="container facet-page">
+    <Breadcrumbs locale={locale} crumbs={crumbs} />
+
+    <h1 class="display-lg title">{facet.category}</h1>
+
+    <p class="intro text-column">{t(locale, "categoryIndexIntro")}</p>
+
+    <p class="count record">
+      <span class="count-value">{formatCount(facet.count, locale)}</span>
+      <span class="count-label">{t(locale, "reviewCount")}</span>
+      <span class="count-label">·</span>
+      <span class="count-label">{t(locale, "inThisCategory")}</span>
+      {
+        /* Stated plainly rather than hidden in a meta tag: this is a browse view. */
+        !facet.indexable && <span class="count-label nav-only">{t(locale, "navigationOnly")}</span>
+      }
+    </p>
+
+    <FacetNav
+      locale={locale}
+      heading={t(locale, "browseByCategory")}
+      allHref={indexPath}
+      allLabel={t(locale, "allReviewsLabel")}
+      links={siblings.map((sibling) => ({
+        label: sibling.category,
+        href: path.reviewsByCategory(locale, sibling.slug),
+        count: sibling.count,
+        current: sibling.slug === facet.slug,
+      }))}
+    />
+
+    <div class="entries">
+      {facet.reviews.map((review) => <ReviewEntry locale={locale} review={review} />)}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .facet-page {
+    padding-block: var(--space-6) var(--space-10);
+  }
+
+  .title {
+    margin-block-start: var(--space-3);
+  }
+
+  .intro {
+    margin-block-start: var(--space-3);
+    font-size: calc(var(--type-body-lg) * var(--type-arabic-size-factor));
+    color: var(--color-text-secondary);
+  }
+
+  .count {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1);
+    margin-block-start: var(--space-4);
+    color: var(--color-text-muted);
+  }
+
+  .count-value {
+    color: var(--color-accent-mineral);
+  }
+
+  .count-label {
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
+  }
+
+  .nav-only {
+    color: var(--color-text-secondary);
+  }
+
+  .entries {
+    display: grid;
+    gap: var(--space-5);
+    margin-block-start: var(--space-8);
+  }
+</style>

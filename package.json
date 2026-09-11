@@ -1,0 +1,36 @@
+{
+  "name": "zina-almokri-website",
+  "version": "0.4.0",
+  "private": true,
+  "type": "module",
+  "description": "Zina Almokri premium personal beauty platform. Phase 4 foundation.",
+  "engines": {
+    "node": ">=20.3.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "test": "node --test \"tests/**/*.test.mjs\"",
+    "validate:content": "node tools/validate-content.mjs",
+    "validate:contrast": "node tools/check-contrast.mjs",
+    "validate:ux": "node tools/check-ux-coverage.mjs",
+    "validate:journal": "node tools/check-journal-bodies.mjs",
+    "guard:mock": "node tools/check-mock-guard.mjs dist",
+    "verify": "npm run validate:content && npm run validate:journal && npm run validate:contrast && npm run check && npm run build && npm run test && npm run guard:mock"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^4.3.14",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@fontsource/ibm-plex-sans": "^5.3.0",
+    "@fontsource/ibm-plex-sans-arabic": "^5.3.0",
+    "@fontsource/ibm-plex-serif": "^5.3.0",
+    "@fontsource/noto-naskh-arabic": "^5.3.0",
+    "astro": "^5.14.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "typescript": "^5.9.2"
+  }
+}

@@ -1,0 +1,102 @@
+---
+/**
+ * TESTING SUMMARY STRIP
+ *
+ * The first record-density block, and the moment the page announces it is a record.
+ * Four values, scannable in two seconds: wear window, times tested, shade, baseline.
+ *
+ * A <dl>, not a <table>: four labelled values are not tabular data. A table here would give a
+ * screen-reader user row and column navigation over something that has neither.
+ *
+ * NOT a KPI row. No tiles, no borders, no icons, no colour coding, no fifth "score" value.
+ * This component sits closest to the dashboard line of anything in the system, and it is held
+ * on the right side of it by exactly those prohibitions.
+ *
+ * PARTIAL STATE: shadeUsed is nullable. A null shade REMOVES THE CELL and the strip becomes
+ * three values — it never renders "unknown" as a fabricated string.
+ */
+import type { Locale, Review } from "../../../content/schema/types";
+import { t } from "../../lib/ui-strings";
+import { isolateValue } from "../../lib/bidi";
+
+interface Props {
+  locale: Locale;
+  testing: Review["testing"];
+}
+
+const { locale, testing } = Astro.props;
+
+const entries: Array<{ label: string; value: string; isRecord: boolean }> = [
+  { label: t(locale, "wearWindow"), value: testing.wearWindow, isRecord: true },
+  { label: t(locale, "timesTested"), value: String(testing.timesTested), isRecord: true },
+];
+
+// Absent rather than "unknown".
+if (testing.shadeUsed) {
+  entries.push({ label: t(locale, "shade"), value: testing.shadeUsed, isRecord: true });
+}
+
+entries.push({
+  label: t(locale, "baseline"),
+  value: testing.baselinePhotographed
+    ? t(locale, "baselinePhotographed")
+    : t(locale, "baselineNotPhotographed"),
+  isRecord: false,
+});
+---
+
+<dl class="summary">
+  {
+    entries.map((entry) => (
+      <div class="cell">
+        <dt class="label">{entry.label}</dt>
+        {entry.isRecord ? (
+          <dd class="value record" set:html={isolateValue(entry.value)} />
+        ) : (
+          <dd class="value value--prose">{entry.value}</dd>
+        )}
+      </div>
+    ))
+  }
+</dl>
+
+<style>
+  .summary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+    padding-block: var(--space-3);
+    border-block: var(--border-rule-hairline);
+  }
+
+  .cell {
+    display: grid;
+    gap: var(--space-0-5);
+    min-width: 0;
+  }
+
+  .value {
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .value--prose {
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+  }
+
+  /* Below 375 the strip stacks to a single column rather than squeezing four values. */
+  @media (max-width: 374px) {
+    .summary {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (min-width: 768px) {
+    .summary {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: var(--space-4);
+      padding-block: var(--space-4);
+    }
+  }
+</style>

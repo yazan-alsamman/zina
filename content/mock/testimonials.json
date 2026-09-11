@@ -1,0 +1,51 @@
+{
+  "__MOCK_DATA__": true,
+  "collection": "testimonials",
+  "schemaVersion": "1.0.0",
+  "notice": "FICTIONAL MOCK CONTENT. Every quotation, name and job title below is INVENTED. No real person said any of this. Attributed quotations are a defamation and misrepresentation risk if shipped, and a fabricated testimonial attributed to a named individual at a named company is the single worst thing this project could publish. Replace with written, signed approvals or delete the component entirely.",
+  "items": [
+    {
+      "id": "mock-testimonial-01",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "quote": "We asked for launch content and got a testing protocol instead. It performed better than the brief we wrote.",
+      "attributionName": "MOCK NAME",
+      "attributionRole": "Brand Director",
+      "attributionCompany": "Maison Eclat",
+      "brandId": "mock-brand-maison-eclat",
+      "workId": "mock-work-voile-lumiere-launch",
+      "date": "2026-07-20",
+      "approvalOnFile": false,
+      "_note": "attributionName is deliberately left as the literal string MOCK NAME rather than an invented human name. An invented name attached to a real-sounding role is the exact failure mode this file exists to prevent."
+    },
+    {
+      "id": "mock-testimonial-02",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "quote": "Two of the five episodes contradicted our own packaging. We published them anyway, and it was the best decision of the campaign.",
+      "attributionName": "MOCK NAME",
+      "attributionRole": "Head of Marketing",
+      "attributionCompany": "Veloura Beauty",
+      "brandId": "mock-brand-veloura-beauty",
+      "workId": "mock-work-velvet-hour-wear-series",
+      "date": "2026-05-08",
+      "approvalOnFile": false
+    },
+    {
+      "id": "mock-testimonial-03",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "quote": "The bilingual scripting was written twice from the brief rather than translated once. You can tell, and so could our audience.",
+      "attributionName": "MOCK NAME",
+      "attributionRole": "Campaign Lead",
+      "attributionCompany": "Atelier Noor",
+      "brandId": "mock-brand-atelier-noor",
+      "workId": "mock-work-layers-of-light-campaign",
+      "date": "2026-01-14",
+      "approvalOnFile": false
+    }
+  ]
+}

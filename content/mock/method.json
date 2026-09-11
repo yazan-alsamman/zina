@@ -1,0 +1,264 @@
+{
+  "__MOCK_DATA__": true,
+  "collection": "method",
+  "schemaVersion": "1.0.0",
+  "notice": "FICTIONAL MOCK CONTENT. This testing protocol was invented during Phase 0. It is a proposal for how Zina Almokri could structure her testing, NOT a description of how she actually works. If she already has her own method, hers replaces this entirely. LANGUAGE RULE: every stage describes structured personal testing by one person on one face. No stage may be described as clinical, dermatological, laboratory or scientifically validated. The doesNotProve field on each stage exists to make that boundary explicit and is a required field, not an optional caveat.",
+  "items": [
+    {
+      "id": "mock-method-six-stage",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "stageOrder": [
+        "baseline",
+        "application",
+        "wear-window",
+        "conditions",
+        "comparison",
+        "revisit"
+      ],
+      "locales": {
+        "en": {
+          "slug": "method",
+          "translationStatus": "original",
+          "name": "The Six-Stage Test",
+          "tagline": "Same six stages, every product, so that any two reviews can be read against each other.",
+          "introduction": "Most beauty reviews are written from memory. Someone uses a product for a while, forms an impression, and writes the impression down. That is not worthless, but it is not comparable: two reviews written that way cannot be placed side by side, because neither one tells you what was held constant.\n\nEverything reviewed on this site goes through the same six stages. The stages are not there to make the testing sound rigorous. They are there so that when I say one foundation lasted longer than another, you can check what I actually did.",
+          "boundaryStatement": "This is structured personal testing, not clinical testing. One person, one face, no control group, no laboratory. It can tell you how a product behaved on my skin under conditions I have written down. It cannot tell you what a product will do to your skin, and nothing on this site is medical, dermatological or scientific advice.",
+          "stages": [
+            {
+              "key": "baseline",
+              "name": "Baseline",
+              "purpose": "Establish a fixed reference point before any product touches the skin, so that every later observation is a comparison rather than a memory.",
+              "observes": [
+                "Bare skin in named, repeatable lighting",
+                "Current skin condition in plain descriptive language",
+                "Time of day and the products already worn, if any"
+              ],
+              "evidence": [
+                "Reference photograph at a fixed camera distance",
+                "Written note of lighting setup and time"
+              ],
+              "doesNotProve": "A baseline photograph does not establish a skin type, a skin condition, or anything about anyone else's skin. It is a starting frame for one test on one day."
+            },
+            {
+              "key": "application",
+              "name": "Application",
+              "purpose": "Record how the product was applied, because a large share of what looks like product failure is application difference.",
+              "observes": [
+                "Quantity used",
+                "Tool: fingers, brush, damp sponge, applicator supplied",
+                "Preparation steps and any waiting time before the next layer",
+                "How the texture behaves during application, including set time"
+              ],
+              "evidence": [
+                "Application photograph or short video",
+                "Written note of quantity, tool and wait time"
+              ],
+              "doesNotProve": "A good or bad application result does not establish that the formula is good or bad. It establishes how it behaved with this technique, which is why the technique is written down."
+            },
+            {
+              "key": "wear-window",
+              "name": "Wear window",
+              "purpose": "Observe the product across a fixed period with timed check-ins, rather than forming one impression at the end of the day.",
+              "observes": [
+                "Complexion products: eight hours, with check-ins at hours 0, 3, 6 and 8",
+                "Skincare: four weeks of consistent use, with weekly notes",
+                "Where and when any change first appears, not only that it appeared"
+              ],
+              "evidence": [
+                "Photographs at each timed check-in under the baseline lighting",
+                "Written notes recorded at the time, not reconstructed afterwards"
+              ],
+              "doesNotProve": "Eight hours of wear says nothing about how a product performs over months, and four weeks of skincare use cannot isolate a product from the season, sleep, diet or anything else changing at the same time."
+            },
+            {
+              "key": "conditions",
+              "name": "Conditions",
+              "purpose": "Publish the environment the test happened in, because a long-wear claim tested in air conditioning tells you almost nothing about a long-wear day outdoors.",
+              "observes": [
+                "Temperature and humidity range",
+                "Indoor, outdoor, or mixed",
+                "Activity level during the wear window",
+                "Anything unusual: a meal, a long drive, heavy air conditioning"
+              ],
+              "evidence": [
+                "Recorded temperature and humidity readings",
+                "Written activity log for the wear window"
+              ],
+              "doesNotProve": "Conditions describe one test. A product that broke down at 38 degrees has not been shown to break down at 22, and the reverse is equally true."
+            },
+            {
+              "key": "comparison",
+              "name": "Comparison",
+              "purpose": "Place the product against something already tested under the same protocol, so a verdict has a reference point instead of floating free.",
+              "observes": [
+                "Performance against at least one previously tested product in the same category",
+                "Split-face testing where the format allows it",
+                "The base layer underneath held constant across both products"
+              ],
+              "evidence": [
+                "Side-by-side photography under identical lighting",
+                "The comparison product named in the review, with a link to its own review"
+              ],
+              "doesNotProve": "A comparison ranks two products under one set of conditions on one face. It does not establish that one is better than the other in general, and it never establishes which will suit you."
+            },
+            {
+              "key": "revisit",
+              "name": "Revisit",
+              "purpose": "Re-test later, because formulas are reformulated, packaging changes, and opinions move.",
+              "observes": [
+                "Whether the product still performs as first recorded",
+                "Whether the formula, shade range, applicator or packaging has changed",
+                "Whether the original verdict still holds"
+              ],
+              "evidence": [
+                "A dated entry in the review's update log",
+                "New photography where the result changed"
+              ],
+              "doesNotProve": "A revisit confirms nothing about batches other than the ones tested. Formula variation between batches and markets is real and is not something one person can measure."
+            }
+          ],
+          "whatThisCannotTell": [
+            "Whether a product will suit your skin. One person cannot answer that, and any review that claims to is selling something.",
+            "Anything medical, dermatological or clinical. Persistent skin concerns belong with a qualified professional.",
+            "Long-term effects. The longest test on this site is four weeks.",
+            "Ingredient safety or efficacy. Reading an ingredient list is not testing it.",
+            "How a product performs in a climate it was not tested in."
+          ],
+          "seo": {
+            "title": "How I test beauty products: the six-stage method",
+            "description": "The six-stage testing method behind every review on this site. What each stage records, what evidence is collected, and what each stage cannot prove.",
+            "focusKeyword": "how beauty products are tested",
+            "secondaryKeywords": [
+              "beauty product testing method",
+              "how to test foundation wear time",
+              "beauty review methodology"
+            ],
+            "canonicalPath": "/en/method/"
+          }
+        },
+        "ar": {
+          "slug": "method",
+          "translationStatus": "adapted",
+          "name": "الاختبار في ست مراحل",
+          "tagline": "ست مراحل ثابتة لكل منتج، حتى تتمكني من مقارنة أي مراجعتين ببعضهما.",
+          "introduction": "معظم مراجعات التجميل تُكتب من الذاكرة. تستخدم إحداهن منتجا لفترة، وتتكون لديها انطباع، ثم تكتب الانطباع. هذا ليس بلا قيمة، لكنه غير قابل للمقارنة: مراجعتان مكتوبتان بهذه الطريقة لا يمكن وضعهما جنبا إلى جنب، لأن أيا منهما لا تخبرك بما ثُبّت وما تغيّر.\n\nكل منتج يُراجع على هذا الموقع يمر بالمراحل الست نفسها. هذه المراحل ليست موجودة لتجعل الاختبار يبدو دقيقا، بل لتتمكني من التحقق مما فعلته فعلا عندما أقول إن كريم أساس ثبت أطول من غيره.",
+          "boundaryStatement": "هذا اختبار شخصي منظم، وليس اختبارا سريريا. شخص واحد، وجه واحد، بلا مجموعة ضابطة وبلا مختبر. يمكنه أن يخبرك كيف تصرّف المنتج على بشرتي في ظروف كتبتها ونشرتها. لا يمكنه أن يخبرك ماذا سيفعل المنتج ببشرتك، ولا شيء على هذا الموقع يُعد استشارة طبية أو جلدية أو علمية.",
+          "stages": [
+            {
+              "key": "baseline",
+              "name": "الأساس المرجعي",
+              "purpose": "تثبيت نقطة مرجعية قبل أن يلمس أي منتج البشرة، حتى تكون كل ملاحظة لاحقة مقارنة لا ذكرى.",
+              "observes": [
+                "البشرة دون منتجات، في إضاءة محددة وقابلة للتكرار",
+                "حالة البشرة الحالية بلغة وصفية بسيطة",
+                "وقت اليوم وما استُخدم قبله، إن وجد"
+              ],
+              "evidence": [
+                "صورة مرجعية من مسافة تصوير ثابتة",
+                "ملاحظة مكتوبة عن الإضاءة والوقت"
+              ],
+              "doesNotProve": "الصورة المرجعية لا تثبت نوع بشرة ولا حالة جلدية، ولا تقول شيئا عن بشرة أي شخص آخر. هي إطار بداية لاختبار واحد في يوم واحد."
+            },
+            {
+              "key": "application",
+              "name": "التطبيق",
+              "purpose": "توثيق طريقة استخدام المنتج، لأن جزءا كبيرا مما يبدو فشلا في التركيبة هو في الحقيقة اختلاف في طريقة التطبيق.",
+              "observes": [
+                "الكمية المستخدمة",
+                "الأداة: الأصابع، فرشاة، إسفنجة مبللة، أو الأداة المرفقة",
+                "خطوات التحضير ومدة الانتظار قبل الطبقة التالية",
+                "سلوك الملمس أثناء التطبيق، ومدة الجفاف"
+              ],
+              "evidence": [
+                "صورة أو مقطع قصير أثناء التطبيق",
+                "ملاحظة مكتوبة بالكمية والأداة ومدة الانتظار"
+              ],
+              "doesNotProve": "نتيجة تطبيق جيدة أو سيئة لا تثبت أن التركيبة جيدة أو سيئة، بل تثبت كيف تصرفت مع هذه الطريقة تحديدا، ولهذا تُكتب الطريقة."
+            },
+            {
+              "key": "wear-window",
+              "name": "مدة الثبات",
+              "purpose": "مراقبة المنتج عبر فترة محددة بنقاط تحقق زمنية، بدلا من انطباع واحد في نهاية اليوم.",
+              "observes": [
+                "منتجات البشرة: ثماني ساعات، مع تحقق عند الساعات 0 و3 و6 و8",
+                "العناية بالبشرة: أربعة أسابيع من الاستخدام المنتظم، مع ملاحظات أسبوعية",
+                "أين ومتى يظهر أي تغير أولا، لا مجرد أنه ظهر"
+              ],
+              "evidence": [
+                "صور عند كل نقطة تحقق بالإضاءة المرجعية نفسها",
+                "ملاحظات تُكتب في حينها، لا تُستعاد لاحقا من الذاكرة"
+              ],
+              "doesNotProve": "ثماني ساعات لا تقول شيئا عن الأداء عبر أشهر، وأربعة أسابيع من العناية لا يمكنها فصل أثر المنتج عن الفصل والنوم والطعام وكل ما يتغير في الوقت نفسه."
+            },
+            {
+              "key": "conditions",
+              "name": "الظروف",
+              "purpose": "نشر الظروف التي جرى فيها الاختبار، لأن ادعاء ثبات طويل جُرّب في مكيف لا يخبرك شيئا عن يوم طويل في الخارج.",
+              "observes": [
+                "مدى الحرارة والرطوبة",
+                "داخلي أو خارجي أو مختلط",
+                "مستوى النشاط خلال مدة الثبات",
+                "أي أمر غير معتاد: وجبة، قيادة طويلة، تكييف قوي"
+              ],
+              "evidence": [
+                "قراءات مسجلة للحرارة والرطوبة",
+                "سجل مكتوب للنشاط خلال المدة"
+              ],
+              "doesNotProve": "الظروف تصف اختبارا واحدا. منتج تراجع عند 38 درجة لم يثبت أنه يتراجع عند 22، والعكس صحيح تماما."
+            },
+            {
+              "key": "comparison",
+              "name": "المقارنة",
+              "purpose": "وضع المنتج مقابل منتج سبق اختباره بالطريقة نفسها، ليكون للحكم مرجع بدل أن يكون معلقا في الفراغ.",
+              "observes": [
+                "الأداء مقابل منتج سابق في الفئة نفسها",
+                "اختبار نصف الوجه حيث يسمح شكل المنتج بذلك",
+                "تثبيت الطبقة الأساسية تحت المنتجين"
+              ],
+              "evidence": [
+                "تصوير جنبا إلى جنب بالإضاءة نفسها",
+                "ذكر منتج المقارنة في المراجعة مع رابط لمراجعته"
+              ],
+              "doesNotProve": "المقارنة ترتب منتجين في ظرف واحد وعلى وجه واحد. لا تثبت أن أحدهما أفضل بشكل عام، ولا تحدد أبدا أيهما يناسبك."
+            },
+            {
+              "key": "revisit",
+              "name": "إعادة الاختبار",
+              "purpose": "إعادة الاختبار لاحقا، لأن التركيبات تتغير والعبوات تتبدل والآراء تتحرك.",
+              "observes": [
+                "هل ما زال المنتج يؤدي كما سُجل أول مرة",
+                "هل تغيرت التركيبة أو مجموعة الدرجات أو الأداة أو العبوة",
+                "هل ما زال الحكم الأصلي قائما"
+              ],
+              "evidence": [
+                "إدخال مؤرخ في سجل تحديثات المراجعة",
+                "تصوير جديد عند تغير النتيجة"
+              ],
+              "doesNotProve": "إعادة الاختبار لا تؤكد شيئا عن دفعات إنتاج غير التي جُربت. اختلاف التركيبة بين الدفعات والأسواق أمر حقيقي ولا يستطيع شخص واحد قياسه."
+            }
+          ],
+          "whatThisCannotTell": [
+            "هل سيناسب المنتج بشرتك. شخص واحد لا يستطيع الإجابة، وأي مراجعة تدّعي ذلك تبيع لك شيئا.",
+            "أي شيء طبي أو جلدي أو سريري. مشكلات البشرة المستمرة مكانها عند مختص مؤهل.",
+            "الآثار طويلة المدى. أطول اختبار على هذا الموقع أربعة أسابيع.",
+            "أمان المكونات أو فعاليتها. قراءة قائمة المكونات ليست اختبارا لها.",
+            "أداء المنتج في مناخ لم يُختبر فيه."
+          ],
+          "seo": {
+            "title": "كيف أختبر منتجات التجميل: طريقة المراحل الست",
+            "description": "طريقة الاختبار في ست مراحل خلف كل مراجعة على هذا الموقع. ماذا تسجل كل مرحلة، وما الدليل الذي يُجمع، وما لا تستطيع كل مرحلة إثباته.",
+            "focusKeyword": "كيف تختبر منتجات التجميل",
+            "secondaryKeywords": [
+              "طريقة تجربة منتجات التجميل",
+              "كيف اختبر ثبات كريم الأساس",
+              "منهجية مراجعات التجميل"
+            ],
+            "canonicalPath": "/ar/method/"
+          }
+        }
+      }
+    }
+  ]
+}

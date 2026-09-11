@@ -1,0 +1,1031 @@
+{
+  "__MOCK_DATA__": true,
+  "collection": "reviews",
+  "schemaVersion": "1.0.0",
+  "notice": "FICTIONAL MOCK CONTENT. None of these tests happened. Every observation, condition, date and verdict is INVENTED to exercise the review template, the locale system, the disclosure states, the method-stage links and the internal-link graph. NO REAL PRODUCT IS REVIEWED. No medical, clinical or dermatological claim appears here and none may be added. PHASE 1 CHANGE: numeric ratings removed entirely; the verdict is editorial prose. Locale coverage is deliberately uneven so that missing-translation behaviour is a tested state rather than a surprise.",
+  "localeCoverage": {
+    "_note": "Deliberate fixture design. 4 reviews bilingual, 1 English-only, 1 Arabic-original with no English. See docs/MULTILINGUAL_SEO_ARCHITECTURE.md section 6.",
+    "en": 5,
+    "ar": 5,
+    "both": 4,
+    "enOnly": 1,
+    "arOnly": 1
+  },
+  "items": [
+    {
+      "id": "mock-review-voile-lumiere-skin-tint",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "featured": true,
+      "entity": {
+        "productId": "mock-product-voile-lumiere-skin-tint",
+        "brandId": "mock-brand-maison-eclat",
+        "category": "Foundation",
+        "productType": "Skin tint"
+      },
+      "disclosure": {
+        "primary": "paid-collaboration",
+        "additional": [],
+        "position": "above-content",
+        "_verification": "MOCK",
+        "_note": "The hardest disclosure case in the set, included deliberately. The template must carry a paid disclosure on a critical review without the page reading as advertising."
+      },
+      "testing": {
+        "wearWindow": "8 hours",
+        "durationKnown": true,
+        "timesTested": 4,
+        "shadeUsed": "22W Amber Warm",
+        "baselinePhotographed": true,
+        "methodStageKeys": ["baseline", "application", "wear-window", "conditions", "comparison", "revisit"],
+        "comparedAgainstProductIds": ["mock-product-sitara-luminous-concealer"]
+      },
+      "dates": {
+        "testedFrom": "2026-06-14",
+        "testedTo": "2026-07-02",
+        "publishedAt": "2026-07-09",
+        "updatedAt": "2026-08-21"
+      },
+      "updateLog": [
+        { "date": "2026-08-21", "note": "Added a fourth wear test with a gripping primer. Result unchanged. Verdict unchanged." }
+      ],
+      "media": {
+        "hero": {
+          "type": "image",
+          "src": "/mock-media/reviews/voile-lumiere-hero.jpg",
+          "alt": "Voile Lumiere Skin Tint applied on one side of the face, bare skin on the other (placeholder)",
+          "width": 2000,
+          "height": 1250,
+          "priority": true,
+          "_mock": true
+        },
+        "gallery": [
+          { "type": "image", "src": "/mock-media/reviews/voile-lumiere-swatch.jpg", "alt": "Swatch in shade 22W (placeholder)", "width": 1600, "height": 1067, "_mock": true },
+          { "type": "image", "src": "/mock-media/reviews/voile-lumiere-texture.jpg", "alt": "Texture close-up (placeholder)", "width": 1600, "height": 1067, "_mock": true }
+        ],
+        "video": null,
+        "evidence": [
+          { "type": "image", "src": "/mock-media/reviews/voile-lumiere-hour-0.jpg", "alt": "Hour 0 reference photograph (placeholder)", "width": 1400, "height": 1400, "stageKey": "baseline", "observationIndex": 0, "_mock": true },
+          { "type": "image", "src": "/mock-media/reviews/voile-lumiere-hour-6.jpg", "alt": "Hour 6, lifting at the nose (placeholder)", "width": 1400, "height": 1400, "stageKey": "wear-window", "observationIndex": 3, "_mock": true },
+          { "type": "image", "src": "/mock-media/reviews/voile-lumiere-hour-8.jpg", "alt": "Hour 8, patchiness through the centre of the face (placeholder)", "width": 1400, "height": 1400, "stageKey": "wear-window", "observationIndex": 4, "_mock": true }
+        ]
+      },
+      "related": {
+        "reviewIds": ["mock-review-sitara-luminous-concealer", "mock-review-verdure-cloud-balm"],
+        "journalIds": ["mock-journal-how-to-evaluate-foundation-performance", "mock-journal-understanding-finish-and-texture"],
+        "workIds": ["mock-work-voile-lumiere-launch"]
+      },
+      "locales": {
+        "en": {
+          "slug": "maison-eclat-voile-lumiere-skin-tint",
+          "translationStatus": "original",
+          "title": "Maison Eclat Voile Lumiere Skin Tint",
+          "subtitle": "Eight hours in 38 degree heat, tested four times",
+          "excerpt": "A skin tint that behaves beautifully for six hours and then decides it is finished. Here is exactly where it broke down, and who it still makes sense for.",
+          "introduction": "Maison Eclat paid for the launch campaign this product appeared in, and I tested it four separate times before writing anything down. Those two facts sit next to each other at the top of this page on purpose. The brand claims up to twelve hours of comfortable wear. In 34 to 38 degree heat I could not reproduce that on any of the four tests, and the pattern of failure was identical every time.",
+          "disclosureLabel": "Paid partnership",
+          "disclosureStatement": "Maison Eclat paid for a launch campaign that included this product. The brand had no approval over this review, did not see it before publication, and the verdict was not agreed in advance.",
+          "testingContext": "Four full-day wear tests across three weeks, in mixed outdoor and air-conditioned conditions, in shade 22W Amber Warm. Two tests with no primer and two with a gripping primer, to check whether preparation changed the outcome.",
+          "applicationContext": "Two pumps applied with a damp sponge. The formula sets in roughly 90 seconds, so it has to be moved quickly.",
+          "conditions": [
+            { "label": "Temperature", "value": "34 to 38 degrees Celsius" },
+            { "label": "Humidity", "value": "58 to 71 percent" },
+            { "label": "Environment", "value": "Mixed outdoor and air-conditioned indoor" },
+            { "label": "Activity", "value": "Moderate, including 40 minutes walking outdoors" }
+          ],
+          "observations": [
+            { "at": "Hour 0", "aspect": "Application", "note": "Very thin consistency. Two pumps covered the full face with product left over. The satin finish sets within about 90 seconds, which leaves a narrow blending window." },
+            { "at": "Hour 0", "aspect": "Shade", "note": "22W ran roughly half a shade light on first application and settled by hour one. The undertone-family system worked: the warm group matched without the usual pink pull." },
+            { "at": "Hour 3", "aspect": "Wear", "note": "No visible separation. Slight shine through the centre of the face, consistent with the finish rather than with breakdown." },
+            { "at": "Hour 6", "aspect": "Wear", "note": "First visible change. Product began to lift around the nose and the chin on all four tests, primer or not." },
+            { "at": "Hour 8", "aspect": "Wear", "note": "Noticeable patchiness across the centre of the face. Colour itself stayed stable across all four tests, with no darkening I could detect against the hour-zero reference photographs." },
+            { "at": "Hour 8", "aspect": "Removal", "note": "Removed completely with a single cleanse. No residue on the second cleanse pad." }
+          ],
+          "evidenceNotes": "Reference photographs at hours 0, 3, 6 and 8 under the same window light on all four test days. The hour-6 and hour-8 frames are the ones worth looking at.",
+          "strengths": [
+            "Colour stayed stable across all four tests in high heat",
+            "Genuinely undetectable finish at conversational distance",
+            "Undertone-family shade system made matching straightforward",
+            "One cleanse removes it completely"
+          ],
+          "limitations": [
+            "Breaks down between hours six and eight in heat and humidity",
+            "Roughly 90 second blending window is unforgiving",
+            "Coverage will not satisfy anyone wanting medium or full",
+            "Price is difficult to justify against the wear result"
+          ],
+          "suitability": {
+            "suitsWell": [
+              "Anyone who wants their own skin visible and only lightly evened out",
+              "Air-conditioned days and shorter wear windows",
+              "People matching warm undertones who struggle with pink-pulling bases"
+            ],
+            "mayNotSuit": [
+              "Full days outdoors in heat without touch-ups",
+              "Anyone who needs medium or full coverage",
+              "Anyone who applies base slowly or in sections"
+            ],
+            "_note": "Never phrase suitability as suitable for all skin types. Every entry must be a specific situation or preference, not a skin classification."
+          },
+          "verdict": {
+            "summary": "A beautiful six-hour product being sold as a twelve-hour one. If your day is air-conditioned and you want skin that looks like skin, it is excellent. If you are outdoors past lunch, it is not the base for that day.",
+            "bestFor": "Sheer, skin-like coverage in controlled conditions",
+            "wouldRepurchase": "Yes, for short days only"
+          },
+          "conclusion": "I would keep this in rotation and I would not reach for it in August. The six-hour mark is reliable enough that you can plan around it, which is more than most bases give you. What I cannot do is repeat the twelve-hour claim, and the paid relationship behind the campaign is exactly why I tested it four times instead of once.",
+          "seo": {
+            "title": "Maison Eclat Voile Lumiere Skin Tint: 8-hour heat test",
+            "description": "Four eight-hour wear tests of Maison Eclat Voile Lumiere Skin Tint in 34 to 38 degree heat. Where it held, where it broke down, and who it suits.",
+            "focusKeyword": "voile lumiere skin tint review",
+            "secondaryKeywords": ["maison eclat skin tint", "skin tint hot weather", "long wear foundation humidity"],
+            "canonicalPath": "/en/reviews/maison-eclat-voile-lumiere-skin-tint/"
+          }
+        },
+        "ar": {
+          "slug": "maison-eclat-voile-lumiere-skin-tint",
+          "translationStatus": "adapted",
+          "title": "ميزون إيكلا فوال لوميير سكِن تنت",
+          "subtitle": "ثماني ساعات في حرارة 38 درجة، أربع مرات",
+          "excerpt": "كريم أساس خفيف يقدم أداء ممتازا لست ساعات ثم يتوقف. إليك أين تحديدا تراجع، ولمن يبقى مناسبا.",
+          "introduction": "دفعت ميزون إيكلا مقابل حملة الإطلاق التي ظهر فيها هذا المنتج، واختبرته أربع مرات منفصلة قبل أن أكتب أي شيء. الحقيقتان موضوعتان جنبا إلى جنب في أعلى هذه الصفحة عن قصد. تدّعي العلامة ثباتا مريحا يصل إلى اثنتي عشرة ساعة. في حرارة تتراوح بين 34 و38 درجة لم أتمكن من تكرار ذلك في أي من الاختبارات الأربعة، وكان نمط التراجع متطابقا في كل مرة.",
+          "disclosureLabel": "شراكة مدفوعة",
+          "disclosureStatement": "دفعت ميزون إيكلا مقابل حملة إطلاق تضمنت هذا المنتج. لم يكن للعلامة أي حق موافقة على هذه المراجعة، ولم تطلع عليها قبل النشر، ولم يُتفق على الحكم مسبقا.",
+          "testingContext": "أربعة اختبارات ثبات ليوم كامل عبر ثلاثة أسابيع، في ظروف مختلطة بين الخارج والتكييف، بالدرجة 22W. اختباران دون برايمر واثنان مع برايمر مثبت، للتحقق مما إذا كان التحضير يغير النتيجة.",
+          "applicationContext": "ضغطتان تُوزعان بإسفنجة مبللة. تجف التركيبة خلال تسعين ثانية تقريبا، لذا يجب العمل بسرعة.",
+          "conditions": [
+            { "label": "الحرارة", "value": "من 34 إلى 38 درجة مئوية" },
+            { "label": "الرطوبة", "value": "من 58 إلى 71 بالمئة" },
+            { "label": "البيئة", "value": "مختلطة بين الخارج والداخل المكيف" },
+            { "label": "النشاط", "value": "متوسط، يشمل أربعين دقيقة مشيا في الخارج" }
+          ],
+          "observations": [
+            { "at": "الساعة 0", "aspect": "التطبيق", "note": "قوام سائل جدا. غطت ضغطتان الوجه كاملا مع بقاء فائض. تجف النهائية الساتانية خلال تسعين ثانية تقريبا، ما يترك مجالا ضيقا للدمج." },
+            { "at": "الساعة 0", "aspect": "الدرجة", "note": "جاءت 22W أفتح بنصف درجة تقريبا عند التطبيق الأول واستقرت بعد ساعة. نظام عائلات التحت-لون نجح: تطابقت المجموعة الدافئة دون الميل الوردي المعتاد." },
+            { "at": "الساعة 3", "aspect": "الثبات", "note": "لا انفصال ظاهر. لمعان خفيف في وسط الوجه، متسق مع طبيعة النهائية لا مع تراجع الأداء." },
+            { "at": "الساعة 6", "aspect": "الثبات", "note": "أول تغير ظاهر. بدأ المنتج بالانحسار حول الأنف والذقن في الاختبارات الأربعة جميعها، مع برايمر أو دونه." },
+            { "at": "الساعة 8", "aspect": "الثبات", "note": "تفاوت واضح في وسط الوجه. بقي اللون نفسه ثابتا في الاختبارات الأربعة، دون أي اغمقاق تمكنت من رصده مقابل صور الساعة صفر." },
+            { "at": "الساعة 8", "aspect": "الإزالة", "note": "أُزيل بالكامل بغسول واحد. لا أثر على قطنة الغسل الثانية." }
+          ],
+          "evidenceNotes": "صور مرجعية عند الساعات 0 و3 و6 و8 بضوء النافذة نفسه في أيام الاختبار الأربعة. صورتا الساعة السادسة والثامنة هما ما يستحق النظر.",
+          "strengths": [
+            "بقي اللون ثابتا في الاختبارات الأربعة رغم الحرارة العالية",
+            "نهائية غير ملحوظة فعلا من مسافة الحديث",
+            "نظام عائلات التحت-لون جعل تحديد الدرجة مباشرا",
+            "غسول واحد يزيله تماما"
+          ],
+          "limitations": [
+            "يتراجع بين الساعة السادسة والثامنة في الحر والرطوبة",
+            "مجال دمج لا يتجاوز تسعين ثانية تقريبا",
+            "التغطية لن تُرضي من تريد تغطية متوسطة أو كاملة",
+            "السعر يصعب تبريره مقابل نتيجة الثبات"
+          ],
+          "suitability": {
+            "suitsWell": [
+              "من تريد أن تبقى بشرتها ظاهرة مع توحيد خفيف فقط",
+              "الأيام المكيفة والمدد الأقصر",
+              "أصحاب التحت-لون الدافئ الذين تميل عليهم كريمات الأساس للوردي"
+            ],
+            "mayNotSuit": [
+              "الأيام الكاملة في الخارج تحت الحر دون إعادة تطبيق",
+              "من تحتاج تغطية متوسطة أو كاملة",
+              "من تضع كريم الأساس ببطء أو على أجزاء"
+            ]
+          },
+          "verdict": {
+            "summary": "منتج ممتاز لست ساعات يُباع على أنه منتج لاثنتي عشرة ساعة. إذا كان يومك مكيفا وتريدين بشرة تبدو بشرة، فهو رائع. أما إذا كنت في الخارج بعد الظهر، فهو ليس الأساس المناسب لذلك اليوم.",
+            "bestFor": "تغطية خفيفة قريبة من البشرة في ظروف محكومة",
+            "wouldRepurchase": "نعم، للأيام القصيرة فقط"
+          },
+          "conclusion": "سأبقيه ضمن خياراتي، ولن ألجأ إليه في أغسطس. حد الساعات الست ثابت بما يكفي للتخطيط حوله، وهذا أكثر مما تمنحه أغلب كريمات الأساس. ما لا أستطيع فعله هو تكرار ادعاء الاثنتي عشرة ساعة، والعلاقة المدفوعة خلف الحملة هي بالضبط سبب اختباري له أربع مرات بدل مرة واحدة.",
+          "seo": {
+            "title": "مراجعة ميزون إيكلا فوال لوميير: اختبار ثمان ساعات",
+            "description": "أربعة اختبارات ثبات لثماني ساعات لكريم ميزون إيكلا فوال لوميير في حرارة 34 إلى 38 درجة. أين ثبت، وأين تراجع، ولمن يناسب.",
+            "focusKeyword": "مراجعة فوال لوميير",
+            "secondaryKeywords": ["ميزون إيكلا كريم أساس", "كريم أساس يثبت بالحر", "أفضل كريم أساس للرطوبة"],
+            "canonicalPath": "/ar/reviews/maison-eclat-voile-lumiere-skin-tint/"
+          }
+        }
+      }
+    },
+    {
+      "id": "mock-review-nuit-barrier-serum",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "featured": true,
+      "entity": {
+        "productId": "mock-product-nuit-barrier-serum",
+        "brandId": "mock-brand-lune-skin",
+        "category": "Serum",
+        "productType": "Night serum"
+      },
+      "disclosure": {
+        "primary": "gifted",
+        "additional": [],
+        "position": "above-content",
+        "_verification": "MOCK"
+      },
+      "testing": {
+        "wearWindow": "4 weeks, nightly",
+        "durationKnown": true,
+        "timesTested": 28,
+        "shadeUsed": null,
+        "baselinePhotographed": true,
+        "methodStageKeys": ["baseline", "application", "wear-window", "conditions", "comparison"],
+        "comparedAgainstProductIds": ["mock-product-verdure-cloud-balm"]
+      },
+      "dates": {
+        "testedFrom": "2026-05-04",
+        "testedTo": "2026-06-01",
+        "publishedAt": "2026-06-11",
+        "updatedAt": "2026-06-11"
+      },
+      "updateLog": [],
+      "media": {
+        "hero": {
+          "type": "image",
+          "src": "/mock-media/reviews/nuit-barrier-hero.jpg",
+          "alt": "Nuit Barrier Serum beside a four-week testing log (placeholder)",
+          "width": 2000,
+          "height": 1250,
+          "priority": true,
+          "_mock": true
+        },
+        "gallery": [
+          { "type": "image", "src": "/mock-media/reviews/nuit-barrier-texture.jpg", "alt": "Texture on skin (placeholder)", "width": 1600, "height": 1067, "_mock": true }
+        ],
+        "video": null,
+        "evidence": [
+          { "type": "image", "src": "/mock-media/reviews/nuit-barrier-week-0.jpg", "alt": "Baseline week reference photograph (placeholder)", "width": 1400, "height": 1400, "stageKey": "baseline", "observationIndex": 0, "_mock": true },
+          { "type": "image", "src": "/mock-media/reviews/nuit-barrier-week-4.jpg", "alt": "Week four photograph under identical lighting (placeholder)", "width": 1400, "height": 1400, "stageKey": "wear-window", "observationIndex": 4, "_mock": true }
+        ]
+      },
+      "related": {
+        "reviewIds": ["mock-review-verdure-cloud-balm", "mock-review-voile-lumiere-skin-tint"],
+        "journalIds": ["mock-journal-building-a-practical-routine", "mock-journal-what-makes-a-beauty-review-useful"],
+        "workIds": ["mock-work-barrier-season-campaign"]
+      },
+      "locales": {
+        "en": {
+          "slug": "lune-skin-nuit-barrier-serum",
+          "translationStatus": "original",
+          "title": "Lune Skin Nuit Barrier Serum",
+          "subtitle": "Four weeks, nine ingredients, no percentages",
+          "excerpt": "A serum that refuses to tell you a percentage. After 28 nights I can tell you how it felt, how it layered, and what I could not assess.",
+          "introduction": "Lune Skin sent this at no cost and asked for nothing. The brand publishes no active percentages, which removes the usual way of judging a serum on paper and leaves only the thing I can actually test: how it behaves in a routine, night after night, with everything else held still.",
+          "disclosureLabel": "Gifted, unpaid",
+          "disclosureStatement": "This product was sent to me by Lune Skin at no cost. No payment was made, no coverage was agreed, and the brand has no approval over this review.",
+          "testingContext": "Twenty-eight consecutive nights with every other product in the routine held constant, so that anything I noticed could at least be narrowed down.",
+          "applicationContext": "Two pumps to damp skin, followed by the same moisturiser throughout. No other routine changes during the four weeks.",
+          "conditions": [
+            { "label": "Frequency", "value": "Nightly, 28 consecutive nights" },
+            { "label": "Routine control", "value": "All other products held constant" },
+            { "label": "Environment", "value": "Air-conditioned indoors overnight" },
+            { "label": "Season", "value": "Summer" }
+          ],
+          "observations": [
+            { "at": "Night 1", "aspect": "Texture", "note": "Thin and slightly slippery. Absorbs in around 40 seconds on damp skin, noticeably longer on dry skin." },
+            { "at": "Night 1", "aspect": "Comfort", "note": "No sting, no scent, no tack after absorption." },
+            { "at": "Week 1", "aspect": "Layering", "note": "Layered under a gel-balm moisturiser without pilling on any night. This is the single thing I would highlight to anyone with a multi-step routine." },
+            { "at": "Week 2", "aspect": "Feel", "note": "Skin felt less tight on waking than in my baseline week. This is a subjective comfort observation, not a measurement, and I cannot separate it from the weather changing." },
+            { "at": "Week 4", "aspect": "Appearance", "note": "Comparing week-four photographs against the baseline set under identical lighting, I can see no difference I would be willing to attribute to this product." },
+            { "at": "Week 4", "aspect": "Practicality", "note": "The airless pump dispensed consistently for the full four weeks. Roughly one third of the bottle remained." }
+          ],
+          "evidenceNotes": "Baseline and week-four photographs under the same lighting. They look the same, and I am publishing them anyway, because that is the result.",
+          "strengths": [
+            "Never pilled under any product across 28 nights",
+            "No scent, no dyes, no sting",
+            "Airless pump dispensed consistently",
+            "Short ingredient list is easy to cross-check against an existing routine"
+          ],
+          "limitations": [
+            "Absorbs slowly onto dry skin, which makes it a damp-skin product in practice",
+            "No published percentages means you cannot compare it against anything on paper",
+            "Price is high for the volume",
+            "Nothing about the result is dramatic, which may frustrate anyone expecting change"
+          ],
+          "suitability": {
+            "suitsWell": [
+              "People building a routine who need a step that will not fight the other steps",
+              "Anyone avoiding fragrance in night products",
+              "People who prefer a thin texture over a rich one"
+            ],
+            "mayNotSuit": [
+              "Anyone shopping by active percentage",
+              "Anyone wanting a visible short-term change",
+              "Anyone who applies serum to fully dry skin"
+            ]
+          },
+          "verdict": {
+            "summary": "A quiet, well-made product that does the unglamorous thing well: it fits into a routine without causing problems. Whether that is worth the price depends entirely on how much trouble your current routine gives you.",
+            "bestFor": "Routine compatibility rather than transformation",
+            "wouldRepurchase": "Yes"
+          },
+          "conclusion": "What I can report is texture, comfort, layering behaviour and consumption rate. What I cannot report is any effect on skin condition: a four-week single-person test with a season changing around it cannot isolate that, and I am not going to pretend otherwise.",
+          "seo": {
+            "title": "Lune Skin Nuit Barrier Serum: four weeks of nightly use",
+            "description": "A 28-night test of Lune Skin Nuit Barrier Serum. Texture, layering behaviour, comfort, and an honest account of what a four-week test cannot tell you.",
+            "focusKeyword": "nuit barrier serum review",
+            "secondaryKeywords": ["lune skin serum", "barrier serum review", "serum that does not pill"],
+            "canonicalPath": "/en/reviews/lune-skin-nuit-barrier-serum/"
+          }
+        },
+        "ar": {
+          "slug": "lune-skin-nuit-barrier-serum",
+          "translationStatus": "adapted",
+          "title": "لونيه سكِن نوي باريير سيروم",
+          "subtitle": "أربعة أسابيع، تسعة مكونات، بلا نسب",
+          "excerpt": "سيروم يرفض أن يخبرك بأي نسبة. بعد ثمان وعشرين ليلة، إليك كيف كان ملمسه وكيف تعامل مع الروتين، وما لم أستطع تقييمه.",
+          "introduction": "أرسلت لونيه سكِن هذا المنتج دون مقابل ودون أي طلب. لا تنشر العلامة نسب المكونات الفعالة، ما يلغي الطريقة المعتادة للحكم على السيروم نظريا، ولا يترك سوى ما يمكنني اختباره فعلا: كيف يتصرف داخل روتين، ليلة بعد ليلة، مع تثبيت كل شيء آخر.",
+          "disclosureLabel": "مُهدى، غير مدفوع",
+          "disclosureStatement": "أُرسل هذا المنتج من لونيه سكِن دون مقابل. لم يُدفع أي مبلغ، ولم يُتفق على تغطية، وليس للعلامة أي حق موافقة على هذه المراجعة.",
+          "testingContext": "ثمان وعشرون ليلة متتالية مع تثبيت كل منتج آخر في الروتين، حتى يمكن على الأقل تضييق سبب أي ملاحظة.",
+          "applicationContext": "ضغطتان على بشرة رطبة، يتبعهما المرطب نفسه طوال المدة. دون أي تغيير آخر في الروتين خلال الأسابيع الأربعة.",
+          "conditions": [
+            { "label": "التكرار", "value": "ليليا، ثمان وعشرون ليلة متتالية" },
+            { "label": "ضبط الروتين", "value": "تثبيت جميع المنتجات الأخرى" },
+            { "label": "البيئة", "value": "داخل مكيف طوال الليل" },
+            { "label": "الموسم", "value": "الصيف" }
+          ],
+          "observations": [
+            { "at": "الليلة 1", "aspect": "الملمس", "note": "خفيف وانزلاقي قليلا. يمتص خلال أربعين ثانية تقريبا على البشرة الرطبة، وأبطأ بوضوح على البشرة الجافة." },
+            { "at": "الليلة 1", "aspect": "الراحة", "note": "بلا وخز، بلا رائحة، وبلا لزوجة بعد الامتصاص." },
+            { "at": "الأسبوع 1", "aspect": "الطبقات", "note": "وُضع تحت مرطب جل-بالم دون أي تكتل في أي ليلة. هذه النقطة تحديدا ما سأبرزه لصاحبات الروتين متعدد الخطوات." },
+            { "at": "الأسبوع 2", "aspect": "الإحساس", "note": "شعرت بالبشرة أقل شدا عند الاستيقاظ مقارنة بأسبوع الأساس. هذه ملاحظة راحة ذاتية لا قياس، ولا أستطيع فصلها عن تغير الطقس." },
+            { "at": "الأسبوع 4", "aspect": "المظهر", "note": "بمقارنة صور الأسبوع الرابع بصور الأساس تحت الإضاءة نفسها، لا أرى فرقا أكون مستعدة لنسبه إلى هذا المنتج." },
+            { "at": "الأسبوع 4", "aspect": "العملية", "note": "وزّعت المضخة المفرغة بانتظام طوال الأسابيع الأربعة. بقي نحو ثلث العبوة." }
+          ],
+          "evidenceNotes": "صور الأساس وصور الأسبوع الرابع بالإضاءة نفسها. تبدوان متطابقتين، وأنشرهما رغم ذلك، لأن هذه هي النتيجة.",
+          "strengths": [
+            "لم يتكتل تحت أي منتج خلال ثمان وعشرين ليلة",
+            "بلا رائحة وبلا أصباغ وبلا وخز",
+            "مضخة مفرغة توزع بانتظام",
+            "قائمة مكونات قصيرة يسهل مقارنتها بروتين قائم"
+          ],
+          "limitations": [
+            "يمتص ببطء على البشرة الجافة، ما يجعله عمليا منتجا للبشرة الرطبة",
+            "غياب النسب المنشورة يمنع مقارنته بأي منتج نظريا",
+            "السعر مرتفع مقابل الحجم",
+            "لا شيء في النتيجة مثير، وقد يحبط من تتوقع تغيرا"
+          ],
+          "suitability": {
+            "suitsWell": [
+              "من تبني روتينا وتحتاج خطوة لا تتعارض مع بقية الخطوات",
+              "من تتجنب العطور في منتجات الليل",
+              "من تفضل القوام الخفيف على الغني"
+            ],
+            "mayNotSuit": [
+              "من تشتري بناء على نسب المكونات الفعالة",
+              "من تريد تغيرا ظاهرا على المدى القصير",
+              "من تضع السيروم على بشرة جافة تماما"
+            ]
+          },
+          "verdict": {
+            "summary": "منتج هادئ ومصنوع جيدا يتقن الأمر غير اللامع: يندمج في الروتين دون أن يسبب مشكلات. وهل يستحق سعره؟ هذا يعتمد كليا على مقدار المتاعب التي يسببها لك روتينك الحالي.",
+            "bestFor": "الانسجام مع الروتين لا التحول",
+            "wouldRepurchase": "نعم"
+          },
+          "conclusion": "ما أستطيع نقله هو الملمس والراحة وسلوك الطبقات ومعدل الاستهلاك. وما لا أستطيع نقله هو أي أثر على حالة البشرة: اختبار لأربعة أسابيع على شخص واحد وفصل يتغير من حوله لا يمكنه عزل ذلك، ولن أدّعي غير هذا.",
+          "seo": {
+            "title": "مراجعة لونيه سكِن نوي: أربعة أسابيع استخدام ليلي",
+            "description": "اختبار لثمان وعشرين ليلة لسيروم لونيه سكِن نوي باريير. الملمس وسلوك الطبقات والراحة، ورواية صادقة لما لا يستطيع اختبار أربعة أسابيع إخبارك به.",
+            "focusKeyword": "مراجعة سيروم نوي باريير",
+            "secondaryKeywords": ["لونيه سكِن سيروم", "سيروم لحاجز البشرة", "سيروم لا يتكتل"],
+            "canonicalPath": "/ar/reviews/lune-skin-nuit-barrier-serum/"
+          }
+        }
+      }
+    },
+    {
+      "id": "mock-review-velvet-hour-lip-cream",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "featured": false,
+      "entity": {
+        "productId": "mock-product-velvet-hour-lip-cream",
+        "brandId": "mock-brand-veloura-beauty",
+        "category": "Lip",
+        "productType": "Liquid lipstick"
+      },
+      "disclosure": {
+        "primary": "independently-purchased",
+        "additional": [],
+        "position": "above-content",
+        "_verification": "MOCK"
+      },
+      "testing": {
+        "wearWindow": "10 hours",
+        "durationKnown": true,
+        "timesTested": 3,
+        "shadeUsed": "Cardamom",
+        "baselinePhotographed": true,
+        "methodStageKeys": ["baseline", "application", "wear-window", "conditions"],
+        "comparedAgainstProductIds": []
+      },
+      "dates": {
+        "testedFrom": "2026-04-02",
+        "testedTo": "2026-04-19",
+        "publishedAt": "2026-04-26",
+        "updatedAt": "2026-04-26"
+      },
+      "updateLog": [],
+      "media": {
+        "hero": {
+          "type": "image",
+          "src": "/mock-media/reviews/velvet-hour-hero.jpg",
+          "alt": "Velvet Hour Lip Cream in shade Cardamom beside a white napkin after a meal (placeholder)",
+          "width": 2000,
+          "height": 1250,
+          "priority": true,
+          "_mock": true
+        },
+        "gallery": [
+          { "type": "image", "src": "/mock-media/reviews/velvet-hour-swatches.jpg", "alt": "Shade swatches (placeholder)", "width": 1600, "height": 1067, "_mock": true }
+        ],
+        "video": null,
+        "evidence": [
+          { "type": "image", "src": "/mock-media/reviews/velvet-hour-napkin-h2.jpg", "alt": "Napkin test at hour 2, no visible transfer (placeholder)", "width": 1400, "height": 1400, "stageKey": "wear-window", "observationIndex": 1, "_mock": true },
+          { "type": "image", "src": "/mock-media/reviews/velvet-hour-napkin-h5.jpg", "alt": "Napkin test at hour 5 after a meal (placeholder)", "width": 1400, "height": 1400, "stageKey": "wear-window", "observationIndex": 2, "_mock": true }
+        ]
+      },
+      "related": {
+        "reviewIds": ["mock-review-cils-infini-mascara", "mock-review-voile-lumiere-skin-tint"],
+        "journalIds": ["mock-journal-how-to-compare-beauty-products", "mock-journal-what-makes-a-beauty-review-useful"],
+        "workIds": ["mock-work-velvet-hour-wear-series"]
+      },
+      "locales": {
+        "en": {
+          "slug": "veloura-velvet-hour-lip-cream",
+          "translationStatus": "original",
+          "_localeNote": "DELIBERATELY ENGLISH-ONLY. No Arabic version exists. This record exists to test missing-translation behaviour: the Arabic language switcher must not link to a 404, and hreflang must not claim an Arabic alternate.",
+          "title": "Veloura Velvet Hour Lip Cream",
+          "subtitle": "I tested the transfer-proof claim against a full meal",
+          "excerpt": "Ten hours transfer-proof is a specific claim, so I tested it in a specific way: coffee, a full meal, and a white napkin.",
+          "introduction": "I bought this myself. Veloura publishes wear-time numbers on its own packaging, which is unusual and makes the brand unusually interesting to test, because there is a stated claim to check rather than a vague impression to agree or disagree with.",
+          "disclosureLabel": "Bought independently",
+          "disclosureStatement": "I bought this product myself at full price. There is no commercial relationship with Veloura Beauty.",
+          "testingContext": "Three ten-hour days, each including two hot drinks and one full meal, with a white napkin pressed to the lips and photographed at hours 2, 5 and 10.",
+          "applicationContext": "One pass with the supplied applicator, no lip liner, no blotting. One test on exfoliated and balm-prepped lips, two on untreated lips.",
+          "conditions": [
+            { "label": "Test events", "value": "Two hot drinks and one full meal per test day" },
+            { "label": "Environment", "value": "Indoor, air-conditioned" },
+            { "label": "Verification", "value": "White napkin pressed to lips at hours 2, 5 and 10 and photographed" }
+          ],
+          "observations": [
+            { "at": "Hour 0", "aspect": "Application", "note": "Opaque in one pass on all three tests. Dry-down took about four minutes and the product is unforgiving once set." },
+            { "at": "Hour 2", "aspect": "Transfer", "note": "Napkin test after two coffees: no visible colour on the napkin. The claim holds at this stage." },
+            { "at": "Hour 5", "aspect": "Transfer", "note": "After a full meal, faint colour on the napkin on two of three tests, and a visible loss of pigment at the inner lip on all three." },
+            { "at": "Hour 5", "aspect": "Comfort", "note": "Tightness became noticeable around hour four on the two untreated-lip tests. The balm-prepped test was more comfortable and wore slightly less evenly." },
+            { "at": "Hour 10", "aspect": "Wear", "note": "Colour remained on the outer lip on all three tests with a clearly defined bare patch in the centre. Reads as worn-in rather than as failed, but it is not the hour-zero finish." },
+            { "at": "Hour 10", "aspect": "Removal", "note": "Needed an oil cleanser. Water and a face wash would not shift it." }
+          ],
+          "evidenceNotes": "Three napkin photographs per test day, at hours 2, 5 and 10. The hour-5 frames are where the claim stops holding.",
+          "strengths": [
+            "Full opacity in one pass",
+            "Genuinely resistant to hot drinks",
+            "Colour still present at hour ten on every test",
+            "Shade range covers warm browns properly"
+          ],
+          "limitations": [
+            "Transfers after a meal, contrary to the claim",
+            "Tightness from around hour four on unprepped lips",
+            "Four minute dry-down with no room to correct",
+            "Requires an oil cleanser to remove"
+          ],
+          "suitability": {
+            "suitsWell": [
+              "Long events where you are drinking more than eating",
+              "Anyone who wants one-pass opacity",
+              "People comfortable prepping lips beforehand"
+            ],
+            "mayNotSuit": [
+              "Anyone who reapplies through the day and wants a clean edge",
+              "People who find matte formulas uncomfortable",
+              "Anyone wanting to remove it quickly"
+            ]
+          },
+          "verdict": {
+            "summary": "Strong on colour and on drinks, weaker on comfort and on meals. Buy it for the pigment, not for the ten-hour claim.",
+            "bestFor": "One-pass colour for drink-heavy long days",
+            "wouldRepurchase": "Yes, in this shade"
+          },
+          "conclusion": "The transfer claim is accurate against drinks and inaccurate against a meal, which is a meaningful distinction the packaging does not make. That is not a scandal, but it is the difference between planning your day around a product and being surprised by it.",
+          "seo": {
+            "title": "Velvet Hour Lip Cream: transfer-proof claim tested",
+            "description": "Three ten-hour tests of Veloura Velvet Hour Lip Cream against coffee and a full meal, with napkin checks at hours 2, 5 and 10.",
+            "focusKeyword": "velvet hour lip cream review",
+            "secondaryKeywords": ["veloura liquid lipstick", "transfer proof lipstick test", "long wear lip cream"],
+            "canonicalPath": "/en/reviews/veloura-velvet-hour-lip-cream/"
+          }
+        }
+      }
+    },
+    {
+      "id": "mock-review-cils-infini-mascara",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "featured": false,
+      "entity": {
+        "productId": "mock-product-cils-infini-mascara",
+        "brandId": "mock-brand-veloura-beauty",
+        "category": "Mascara",
+        "productType": "Volumising mascara"
+      },
+      "disclosure": {
+        "primary": "independently-purchased",
+        "additional": [],
+        "position": "above-content",
+        "_verification": "MOCK"
+      },
+      "testing": {
+        "wearWindow": "9 hours",
+        "durationKnown": true,
+        "timesTested": 5,
+        "shadeUsed": "Noir",
+        "baselinePhotographed": true,
+        "methodStageKeys": ["baseline", "application", "wear-window", "conditions", "revisit"],
+        "comparedAgainstProductIds": []
+      },
+      "dates": {
+        "testedFrom": "2026-03-10",
+        "testedTo": "2026-03-28",
+        "publishedAt": "2026-04-04",
+        "updatedAt": "2026-07-15"
+      },
+      "updateLog": [
+        { "date": "2026-07-15", "note": "Added two further tests on curled lashes after reader questions. Under-eye transfer observation added. Verdict unchanged." }
+      ],
+      "media": {
+        "hero": {
+          "type": "image",
+          "src": "/mock-media/reviews/cils-infini-hero.jpg",
+          "alt": "One coat versus three coats of Cils Infini mascara (placeholder)",
+          "width": 2000,
+          "height": 1250,
+          "priority": true,
+          "_mock": true
+        },
+        "gallery": [
+          { "type": "image", "src": "/mock-media/reviews/cils-infini-brush.jpg", "alt": "Close-up of the brush (placeholder)", "width": 1600, "height": 1067, "_mock": true }
+        ],
+        "video": null,
+        "evidence": [
+          { "type": "image", "src": "/mock-media/reviews/cils-infini-coat-1.jpg", "alt": "One coat at fixed camera distance (placeholder)", "width": 1400, "height": 1400, "stageKey": "application", "observationIndex": 0, "_mock": true },
+          { "type": "image", "src": "/mock-media/reviews/cils-infini-coat-3.jpg", "alt": "Three coats at fixed camera distance (placeholder)", "width": 1400, "height": 1400, "stageKey": "application", "observationIndex": 1, "_mock": true }
+        ]
+      },
+      "related": {
+        "reviewIds": ["mock-review-velvet-hour-lip-cream", "mock-review-sitara-luminous-concealer"],
+        "journalIds": ["mock-journal-what-makes-a-beauty-review-useful", "mock-journal-how-to-compare-beauty-products"],
+        "workIds": ["mock-work-velvet-hour-wear-series"]
+      },
+      "locales": {
+        "en": {
+          "slug": "veloura-cils-infini-mascara",
+          "translationStatus": "original",
+          "title": "Veloura Cils Infini Volumising Mascara",
+          "subtitle": "What a 5x volume claim actually looks like",
+          "excerpt": "A 5x volume claim cannot be checked, so I checked the things that can be: coats, flaking, smudging and removal.",
+          "introduction": "Some claims can be tested and some cannot. Five times the volume is not a measurement anyone outside a lab can verify, and repeating it would be pretending. So this review sets it aside and reports the four things that are genuinely observable across five nine-hour days.",
+          "disclosureLabel": "Bought independently",
+          "disclosureStatement": "I bought this product myself at full price. There is no commercial relationship with Veloura Beauty.",
+          "testingContext": "Five nine-hour days, with one, two and three coats photographed separately at a fixed camera distance and fixed lighting. Three tests on uncurled lashes, two on curled.",
+          "applicationContext": "Coats applied and photographed at each stage. Under-eye photographed at hours 3, 6 and 9.",
+          "conditions": [
+            { "label": "Temperature", "value": "24 to 27 degrees Celsius indoors" },
+            { "label": "Humidity", "value": "45 to 55 percent" },
+            { "label": "Checks", "value": "Under-eye photographed at hours 3, 6 and 9" }
+          ],
+          "observations": [
+            { "at": "Coat 1", "aspect": "Volume", "note": "Separated and defined rather than voluminous. This is a lengthening result at one coat, whatever the packaging says." },
+            { "at": "Coat 3", "aspect": "Volume", "note": "Volume arrives at coat three, along with slight clumping at the inner lashes on four of five tests. The brush is too wide for the inner corner." },
+            { "at": "Hour 3", "aspect": "Wear", "note": "No transfer to the under-eye on any test." },
+            { "at": "Hour 6", "aspect": "Wear", "note": "Faint under-eye shadow on two of five tests, both on days with a curled lash." },
+            { "at": "Hour 9", "aspect": "Flaking", "note": "No flaking on any of the five tests. This is the strongest result of the review and it matches the brand claim." },
+            { "at": "Hour 9", "aspect": "Removal", "note": "Warm water and a cream cleanser removed it fully, as stated." }
+          ],
+          "evidenceNotes": "Coat-by-coat photography at fixed distance, plus under-eye frames at three check-ins on each of the five days.",
+          "strengths": [
+            "No flaking across five nine-hour tests",
+            "Removes with warm water and a cream cleanser",
+            "Excellent separation at one coat",
+            "Formula stays workable for the full three coats"
+          ],
+          "limitations": [
+            "The brush is too wide for inner lashes",
+            "Volume only appears at coat three",
+            "Faint under-eye transfer on curled lashes",
+            "Two shades only"
+          ],
+          "suitability": {
+            "suitsWell": [
+              "Anyone who prefers definition over drama at one coat",
+              "People who want to avoid oil cleansers",
+              "Long days where flaking is the main worry"
+            ],
+            "mayNotSuit": [
+              "Anyone who wants volume from a single coat",
+              "People with short or fine inner lashes",
+              "Anyone needing waterproof performance"
+            ]
+          },
+          "verdict": {
+            "summary": "Ignore the 5x. This is a well-behaved, genuinely flake-free mascara with a brush that is one size too big. At three coats it delivers.",
+            "bestFor": "Flake-free long days and buildable definition",
+            "wouldRepurchase": "Yes"
+          },
+          "conclusion": "The flake-free claim held on all five tests, which is uncommon in a non-waterproof formula worn for nine hours, and it is the claim worth buying this for. The volume claim is not something I or anyone else outside a laboratory can confirm, and I would rather say that than fill the gap with an adjective.",
+          "seo": {
+            "title": "Veloura Cils Infini Mascara: five 9-hour wear tests",
+            "description": "Five nine-hour tests of Veloura Cils Infini Volumising Mascara, with coat-by-coat photography and under-eye checks at hours 3, 6 and 9.",
+            "focusKeyword": "cils infini mascara review",
+            "secondaryKeywords": ["veloura mascara", "volumising mascara test", "mascara that does not flake"],
+            "canonicalPath": "/en/reviews/veloura-cils-infini-mascara/"
+          }
+        },
+        "ar": {
+          "slug": "veloura-cils-infini-mascara",
+          "translationStatus": "adapted",
+          "title": "فيلورا سيل إنفيني ماسكارا",
+          "subtitle": "كيف يبدو ادعاء الحجم خمسة أضعاف فعليا",
+          "excerpt": "ادعاء خمسة أضعاف الحجم لا يمكن التحقق منه، لذلك تحققت مما يمكن قياسه: عدد الطبقات، والتقصف، واللطخ، والإزالة.",
+          "introduction": "بعض الادعاءات يمكن اختبارها وبعضها لا. خمسة أضعاف الحجم ليس قياسا يستطيع أحد خارج المختبر التحقق منه، وتكراره سيكون تظاهرا. لذا تضع هذه المراجعة الادعاء جانبا وتنقل الأمور الأربعة القابلة للملاحظة فعلا عبر خمسة أيام من تسع ساعات.",
+          "disclosureLabel": "شراء مستقل",
+          "disclosureStatement": "اشتريت هذا المنتج بنفسي بالسعر الكامل. لا توجد أي علاقة تجارية مع فيلورا.",
+          "testingContext": "خمسة أيام من تسع ساعات، مع تصوير طبقة وطبقتين وثلاث طبقات على حدة من مسافة تصوير وإضاءة ثابتتين. ثلاثة اختبارات على رموش غير مجعدة واثنان على رموش مجعدة.",
+          "applicationContext": "تُطبق الطبقات وتُصوَّر عند كل مرحلة. تُصوَّر منطقة تحت العين عند الساعات 3 و6 و9.",
+          "conditions": [
+            { "label": "الحرارة", "value": "من 24 إلى 27 درجة مئوية داخل المنزل" },
+            { "label": "الرطوبة", "value": "من 45 إلى 55 بالمئة" },
+            { "label": "نقاط التحقق", "value": "تصوير تحت العين عند الساعات 3 و6 و9" }
+          ],
+          "observations": [
+            { "at": "الطبقة 1", "aspect": "الحجم", "note": "فصل وتحديد أكثر من حجم. هذه نتيجة إطالة عند الطبقة الأولى، مهما قالت العبوة." },
+            { "at": "الطبقة 3", "aspect": "الحجم", "note": "يظهر الحجم عند الطبقة الثالثة، مع تكتل خفيف عند الرموش الداخلية في أربعة من خمسة اختبارات. الفرشاة أعرض من زاوية العين الداخلية." },
+            { "at": "الساعة 3", "aspect": "الثبات", "note": "لا انتقال إلى تحت العين في أي اختبار." },
+            { "at": "الساعة 6", "aspect": "الثبات", "note": "ظل خفيف تحت العين في اختبارين من خمسة، كلاهما في يومين برموش مجعدة." },
+            { "at": "الساعة 9", "aspect": "التقصف", "note": "لا تقصف في أي من الاختبارات الخمسة. هذه أقوى نتيجة في المراجعة وتتطابق مع ادعاء العلامة." },
+            { "at": "الساعة 9", "aspect": "الإزالة", "note": "أزالها الماء الدافئ وغسول كريمي بالكامل، كما هو مذكور." }
+          ],
+          "evidenceNotes": "تصوير طبقة بطبقة من مسافة ثابتة، مع صور تحت العين عند ثلاث نقاط تحقق في كل يوم من الأيام الخمسة.",
+          "strengths": [
+            "لا تقصف عبر خمسة اختبارات من تسع ساعات",
+            "تُزال بالماء الدافئ وغسول كريمي",
+            "فصل ممتاز عند الطبقة الأولى",
+            "تبقى التركيبة قابلة للعمل حتى الطبقة الثالثة"
+          ],
+          "limitations": [
+            "الفرشاة أعرض من اللازم للرموش الداخلية",
+            "لا يظهر الحجم إلا عند الطبقة الثالثة",
+            "انتقال خفيف تحت العين مع الرموش المجعدة",
+            "درجتان فقط"
+          ],
+          "suitability": {
+            "suitsWell": [
+              "من تفضل التحديد على المبالغة عند طبقة واحدة",
+              "من تريد تجنب الغسولات الزيتية",
+              "الأيام الطويلة حيث التقصف هو الهاجس الأساسي"
+            ],
+            "mayNotSuit": [
+              "من تريد حجما من طبقة واحدة",
+              "أصحاب الرموش الداخلية القصيرة أو الرفيعة",
+              "من تحتاج أداء مقاوما للماء"
+            ]
+          },
+          "verdict": {
+            "summary": "تجاهلي ادعاء الأضعاف الخمسة. هذه ماسكارا منضبطة ولا تتقصف فعلا، بفرشاة أكبر بمقاس واحد مما ينبغي. عند ثلاث طبقات تؤدي ما وعدت به.",
+            "bestFor": "أيام طويلة بلا تقصف مع تحديد قابل للبناء",
+            "wouldRepurchase": "نعم"
+          },
+          "conclusion": "صمد ادعاء عدم التقصف في الاختبارات الخمسة جميعها، وهو أمر غير شائع في تركيبة غير مقاومة للماء تُستخدم تسع ساعات، وهو الادعاء الذي يستحق الشراء لأجله. أما ادعاء الحجم فليس شيئا أستطيع أنا أو غيري تأكيده خارج المختبر، وأفضّل قول ذلك على ملء الفراغ بصفة.",
+          "seo": {
+            "title": "مراجعة فيلورا سيل إنفيني: خمسة اختبارات ثبات",
+            "description": "خمسة اختبارات من تسع ساعات لماسكارا فيلورا سيل إنفيني، مع تصوير طبقة بطبقة وفحص تحت العين عند الساعات 3 و6 و9.",
+            "focusKeyword": "مراجعة ماسكارا سيل إنفيني",
+            "secondaryKeywords": ["ماسكارا فيلورا", "اختبار ماسكارا الحجم", "ماسكارا لا تتقصف"],
+            "canonicalPath": "/ar/reviews/veloura-cils-infini-mascara/"
+          }
+        }
+      }
+    },
+    {
+      "id": "mock-review-verdure-cloud-balm",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "featured": false,
+      "entity": {
+        "productId": "mock-product-verdure-cloud-balm",
+        "brandId": "mock-brand-terra-sana",
+        "category": "Moisturizer",
+        "productType": "Moisturiser"
+      },
+      "disclosure": {
+        "primary": "gifted",
+        "additional": ["existing-paid-relationship"],
+        "position": "above-content",
+        "_verification": "MOCK",
+        "_note": "The most complex disclosure case in the set: a gifted product from a brand with which a separate paid project exists. The template must support a two-part disclosure rather than a single badge."
+      },
+      "testing": {
+        "wearWindow": "3 weeks",
+        "durationKnown": true,
+        "timesTested": 21,
+        "shadeUsed": null,
+        "baselinePhotographed": true,
+        "methodStageKeys": ["baseline", "application", "wear-window", "conditions", "comparison"],
+        "comparedAgainstProductIds": ["mock-product-nuit-barrier-serum"]
+      },
+      "dates": {
+        "testedFrom": "2026-07-05",
+        "testedTo": "2026-07-26",
+        "publishedAt": "2026-08-03",
+        "updatedAt": "2026-08-03"
+      },
+      "updateLog": [],
+      "media": {
+        "hero": {
+          "type": "image",
+          "src": "/mock-media/reviews/verdure-cloud-balm-hero.jpg",
+          "alt": "Verdure Cloud Balm jar with the gel-to-balm texture on a spatula (placeholder)",
+          "width": 2000,
+          "height": 1250,
+          "priority": true,
+          "_mock": true
+        },
+        "gallery": [
+          { "type": "image", "src": "/mock-media/reviews/verdure-texture.jpg", "alt": "Gel-to-balm texture (placeholder)", "width": 1600, "height": 1067, "_mock": true }
+        ],
+        "video": null,
+        "evidence": [
+          { "type": "image", "src": "/mock-media/reviews/verdure-hour-6-day-4.jpg", "alt": "Base makeup at hour six over Verdure Cloud Balm (placeholder)", "width": 1400, "height": 1400, "stageKey": "wear-window", "observationIndex": 3, "_mock": true }
+        ]
+      },
+      "related": {
+        "reviewIds": ["mock-review-nuit-barrier-serum", "mock-review-voile-lumiere-skin-tint"],
+        "journalIds": ["mock-journal-building-a-practical-routine", "mock-journal-arabic-shade-vocabulary"],
+        "workIds": []
+      },
+      "locales": {
+        "ar": {
+          "slug": "terra-sana-verdure-cloud-balm",
+          "translationStatus": "original",
+          "_localeNote": "DELIBERATELY ARABIC-ORIGINAL WITH NO ENGLISH VERSION. Written in Arabic first, not translated from English. This record proves that Arabic is a first-class authoring language and tests the reverse missing-translation case.",
+          "title": "تيرا سانا فيردور كلاود بالم",
+          "subtitle": "اختبار المرطب الذي يهم فعلا في الحر",
+          "excerpt": "ادعاء ترطيب لاثنتين وسبعين ساعة لا أستطيع اختباره، وادعاء الاستخدام تحت المكياج أستطيع اختباره تماما. ثلاثة أسابيع، بطريقتين.",
+          "introduction": "أُرسل هذا المنتج دون مقابل. وبشكل منفصل، أنجزت مشروع محتوى مدفوعا لتيرا سانا لم يتناول هذا المنتج ولم يتضمن أي اتفاق حول هذه المراجعة. الحقيقتان مذكورتان هنا لتزنيهما بنفسك.\n\nاخترت أن أكتب هذه المراجعة بالعربية أولا لأن السؤال الذي تجيب عنه سؤال إقليمي: كيف يتصرف مرطب تحت المكياج في حرارة تتجاوز 35 درجة ورطوبة عالية. هذا ليس سؤالا تُختبر إجابته في مناخ معتدل.",
+          "disclosureLabel": "عينة مُهداة، مع وجود تعاون مدفوع منفصل مع العلامة",
+          "disclosureStatement": "أُرسل هذا المنتج دون مقابل. وبشكل منفصل، أنجزت مشروع محتوى مدفوعا لتيرا سانا. لم يشمل ذلك المشروع هذا المنتج ولم يتضمن أي اتفاق بشأن هذه المراجعة. كلتا الحقيقتين مذكورتان هنا لتزنيهما بنفسك.",
+          "testingContext": "واحد وعشرون يوما من الاستخدام الصباحي تحت المكياج، مع تسع ليال من الاستخدام المسائي، في حرارة خارجية بين 31 و39 درجة.",
+          "applicationContext": "غرفة واحدة بالملعقة المرفقة. يُطبق كريم الأساس بعد خمس دقائق من المرطب في كل اختبار.",
+          "conditions": [
+            { "label": "الحرارة", "value": "من 31 إلى 39 درجة مئوية في الخارج" },
+            { "label": "الرطوبة", "value": "من 50 إلى 74 بالمئة" },
+            { "label": "الاختبار تحت المكياج", "value": "واحد وعشرون يوما، مع تصوير عند الساعة السادسة" },
+            { "label": "مدة الانتظار", "value": "خمس دقائق بين المرطب وكريم الأساس في كل مرة" }
+          ],
+          "observations": [
+            { "at": "اليوم 1", "aspect": "الملمس", "note": "صلب داخل العلبة، يذوب عند ملامسة الإصبع. يمتص خلال دقيقتين تقريبا دون طبقة متبقية." },
+            { "at": "اليوم 1", "aspect": "الرائحة", "note": "رائحة خضراء خفيفة تختفي خلال دقائق. حاضرة بما يكفي لتكون عاملا لمن تتجنب العطور." },
+            { "at": "الأسبوع 1", "aspect": "تحت المكياج", "note": "لا تكتل مع انتظار خمس دقائق. تكتل مرتين حين اختصرت الانتظار إلى أقل من دقيقتين، وهذا يستحق الذكر." },
+            { "at": "الأسبوع 2", "aspect": "تحت المكياج", "note": "استقر كريم الأساس فوقه أفضل من استقراره فوق الكريم الأغنى الذي استخدمته في فترة الأساس. تراجع أقل عند الأنف عند الساعة السادسة في الصور." },
+            { "at": "الأسبوع 3", "aspect": "الراحة", "note": "مريح في الحر دون إحساس بالثقل. لكنه غير كاف وحده في اليومين المكيفين اللذين شعرت فيهما بشد مسائي." },
+            { "at": "الأسبوع 3", "aspect": "فحص الادعاء", "note": "ادعاء الترطيب لاثنتين وسبعين ساعة ليس شيئا يستطيع اختبار الاستخدام تقييمه. لا أستطيع تأكيده ولا نفيه، ولن أوحي بغير ذلك." }
+          ],
+          "evidenceNotes": "صور عند الساعة السادسة في كل يوم من الأيام الواحد والعشرين، بالإضاءة نفسها، مقابل فترة أساس بكريم أغنى.",
+          "strengths": [
+            "لا تكتل تحت كريم الأساس مع انتظار خمس دقائق",
+            "استقر كريم الأساس فوقه عند الساعة السادسة أفضل من كريم أغنى",
+            "يختفي الملمس تماما في الحر",
+            "سعر في المتناول"
+          ],
+          "limitations": [
+            "يتكتل إذا استعجلت التطبيق",
+            "معطر، ما يستبعده من بعض الروتينات",
+            "غير كاف وحده في الأيام الباردة أو شديدة التكييف",
+            "علبة بملعقة، وهي غير عملية للسفر"
+          ],
+          "suitability": {
+            "suitsWell": [
+              "الأيام الحارة والرطبة تحت كريم الأساس",
+              "من تجد الكريمات الغنية ثقيلة",
+              "الروتينات التي تسمح بفاصل خمس دقائق قبل المكياج"
+            ],
+            "mayNotSuit": [
+              "من تتجنب العطور",
+              "البيئات الباردة أو شديدة التكييف كمرطب وحيد",
+              "الروتينات الصباحية السريعة"
+            ]
+          },
+          "verdict": {
+            "summary": "أفضل سلوك تحت المكياج صورته في هذه الفئة السعرية. احكمي عليه كمرطب نهاري لطقس حار وستجدينه قيمة ممتازة. أما الحكم عليه مقابل ادعاء الاثنتين والسبعين ساعة فلا أستطيعه أنا ولا أنت.",
+            "bestFor": "أيام المناخ الحار تحت كريم الأساس",
+            "wouldRepurchase": "نعم، للصيف"
+          },
+          "conclusion": "كتبت هذه المراجعة بالعربية أولا لأن المناخ الذي جُرّبت فيه هو المناخ الذي تعيشه معظم قارئاتي. النتيجة واضحة في نطاقها: مرطب نهاري ممتاز تحت المكياج في الحر، وغير كاف وحده في التكييف، وادعاء مدة الترطيب يبقى خارج ما يستطيع الاختبار قوله.",
+          "seo": {
+            "title": "مراجعة تيرا سانا فيردور كلاود بالم تحت المكياج",
+            "description": "واحد وعشرون يوما موثقا لمرطب تيرا سانا فيردور كلاود بالم تحت كريم الأساس في حرارة 31 إلى 39 درجة، مع ملاحظة صريحة عن ادعاء لا يمكن اختباره.",
+            "focusKeyword": "مراجعة فيردور كلاود بالم",
+            "secondaryKeywords": ["مرطب تيرا سانا", "مرطب تحت المكياج للحر", "مرطب جل بالم"],
+            "canonicalPath": "/ar/reviews/terra-sana-verdure-cloud-balm/"
+          }
+        }
+      }
+    },
+    {
+      "id": "mock-review-sitara-luminous-concealer",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "featured": true,
+      "entity": {
+        "productId": "mock-product-sitara-luminous-concealer",
+        "brandId": "mock-brand-atelier-noor",
+        "category": "Concealer",
+        "productType": "Concealer"
+      },
+      "disclosure": {
+        "primary": "gifted",
+        "additional": [],
+        "position": "above-content",
+        "_verification": "MOCK"
+      },
+      "testing": {
+        "wearWindow": "8 hours",
+        "durationKnown": true,
+        "timesTested": 6,
+        "shadeUsed": "14 Warm Sand",
+        "baselinePhotographed": true,
+        "methodStageKeys": ["baseline", "application", "wear-window", "conditions", "comparison", "revisit"],
+        "comparedAgainstProductIds": ["mock-product-voile-lumiere-skin-tint"]
+      },
+      "dates": {
+        "testedFrom": "2026-02-08",
+        "testedTo": "2026-03-01",
+        "publishedAt": "2026-03-12",
+        "updatedAt": "2026-08-29"
+      },
+      "updateLog": [
+        { "date": "2026-08-29", "note": "Retested after the brand changed the applicator. Formula unchanged, creasing result unchanged. Applicator criticism retained because the original sponge tip remains in circulation." }
+      ],
+      "media": {
+        "hero": {
+          "type": "image",
+          "src": "/mock-media/reviews/sitara-hero.jpg",
+          "alt": "Sitara Luminous Concealer shade range swatched on an arm (placeholder)",
+          "width": 2000,
+          "height": 1250,
+          "priority": true,
+          "_mock": true
+        },
+        "gallery": [
+          { "type": "image", "src": "/mock-media/reviews/sitara-shade-range.jpg", "alt": "Full shade range (placeholder)", "width": 1600, "height": 1067, "_mock": true }
+        ],
+        "video": null,
+        "evidence": [
+          { "type": "image", "src": "/mock-media/reviews/sitara-hour-4-set.jpg", "alt": "Hour four, set with powder (placeholder)", "width": 1400, "height": 1400, "stageKey": "wear-window", "observationIndex": 2, "_mock": true },
+          { "type": "image", "src": "/mock-media/reviews/sitara-hour-8.jpg", "alt": "Hour eight, creasing visible on set and unset tests (placeholder)", "width": 1400, "height": 1400, "stageKey": "wear-window", "observationIndex": 3, "_mock": true }
+        ]
+      },
+      "related": {
+        "reviewIds": ["mock-review-voile-lumiere-skin-tint", "mock-review-cils-infini-mascara"],
+        "journalIds": ["mock-journal-how-to-evaluate-foundation-performance", "mock-journal-arabic-shade-vocabulary"],
+        "workIds": ["mock-work-layers-of-light-campaign"]
+      },
+      "locales": {
+        "en": {
+          "slug": "atelier-noor-sitara-luminous-concealer",
+          "translationStatus": "original",
+          "title": "Atelier Noor Sitara Luminous Concealer",
+          "subtitle": "28 shades and one real problem",
+          "excerpt": "The shade range is the best I have tested at this price. The crease-resistance claim is the part that did not survive eight hours.",
+          "introduction": "Atelier Noor sent this at no cost. It is one of very few complexion products I have tested where the shade range is the headline rather than the footnote, and eleven of its 28 shades sit in medium-deep to deep. That distribution is unusual at this price, and it is the reason this review exists.",
+          "disclosureLabel": "Gifted, unpaid",
+          "disclosureStatement": "Atelier Noor sent this product at no cost. No payment was made and no coverage was agreed.",
+          "testingContext": "Six eight-hour days in shade 14 Warm Sand, three set with powder and three left unset, photographed at hours 0, 4 and 8 in fixed lighting.",
+          "applicationContext": "Applied with a small brush after the first test. The supplied sponge tip picks up too much product to control.",
+          "conditions": [
+            { "label": "Temperature", "value": "29 to 37 degrees Celsius" },
+            { "label": "Humidity", "value": "55 to 70 percent" },
+            { "label": "Setting", "value": "Three tests set with powder, three unset" },
+            { "label": "Comparison", "value": "Worn alongside a previously tested skin tint on the same face" }
+          ],
+          "observations": [
+            { "at": "Shade range", "aspect": "Matching", "note": "Eleven of the 28 shades sit in medium-deep to deep. That distribution is unusual at this price and it is the strongest thing about the product." },
+            { "at": "Hour 0", "aspect": "Finish", "note": "Genuinely luminous rather than shimmery. Medium coverage in one layer, buildable to two without thickness." },
+            { "at": "Hour 4", "aspect": "Wear", "note": "Fine creasing under the eye on all three unset tests. Set tests were clean at hour four." },
+            { "at": "Hour 8", "aspect": "Wear", "note": "Creasing visible on all six tests, set or not. Powder delayed it by roughly three hours but did not prevent it. The 16 hour crease-resistant claim did not hold in any test." },
+            { "at": "Hour 8", "aspect": "Colour", "note": "No colour shift against the hour-zero photographs on any of the six tests." },
+            { "at": "General", "aspect": "Applicator", "note": "The sponge tip picks up too much product. I used a brush for every test after the first." }
+          ],
+          "evidenceNotes": "Hour 0, 4 and 8 frames on all six days, with set and unset tests photographed under identical lighting so the three-hour difference is visible rather than asserted.",
+          "strengths": [
+            "Shade range is genuinely inclusive at medium-deep and deep",
+            "No colour shift across all six tests",
+            "Luminous finish without shimmer",
+            "Buildable to two layers without thickness"
+          ],
+          "limitations": [
+            "Creases by hour eight even when set",
+            "The 16 hour claim is not reproducible",
+            "Sponge applicator dispenses too much",
+            "Requires powder to reach even four clean hours"
+          ],
+          "suitability": {
+            "suitsWell": [
+              "Anyone whose shade is under-served by imported ranges",
+              "Days up to about six hours with powder",
+              "People who want luminosity rather than a matte under-eye"
+            ],
+            "mayNotSuit": [
+              "Full working days without touch-ups",
+              "Anyone who dislikes setting powder under the eye",
+              "Anyone wanting to use the supplied applicator"
+            ]
+          },
+          "verdict": {
+            "summary": "Buy it for the shade range, which is the best I have tested at this price, and plan for a touch-up. The formula is good for six hours and is being sold for sixteen.",
+            "bestFor": "Accurate deep warm shades with a luminous finish",
+            "wouldRepurchase": "Yes"
+          },
+          "conclusion": "Six tests produced one consistent result: excellent shade matching, excellent colour stability, and creasing by hour eight regardless of powder. If your shade is one the big ranges skip, that trade is probably worth making. If it is not, there are longer-wearing concealers.",
+          "seo": {
+            "title": "Sitara Luminous Concealer: six 8-hour wear tests",
+            "description": "Six eight-hour tests of Atelier Noor Sitara Luminous Concealer, set and unset, with shade-range analysis across 28 shades.",
+            "focusKeyword": "sitara luminous concealer review",
+            "secondaryKeywords": ["atelier noor concealer", "concealer for deep warm skin tones", "luminous concealer test"],
+            "canonicalPath": "/en/reviews/atelier-noor-sitara-luminous-concealer/"
+          }
+        },
+        "ar": {
+          "slug": "atelier-noor-sitara-luminous-concealer",
+          "translationStatus": "adapted",
+          "title": "أتيليه نور سيتارا كونسيلر",
+          "subtitle": "ثمان وعشرون درجة ومشكلة واحدة حقيقية",
+          "excerpt": "مجموعة الدرجات هي الأفضل التي اختبرتها في هذه الفئة السعرية. أما ادعاء مقاومة التجعد فهو ما لم يصمد ثماني ساعات.",
+          "introduction": "أرسلت أتيليه نور هذا المنتج دون مقابل. وهو من المنتجات القليلة جدا التي اختبرتها وكانت مجموعة الدرجات فيها العنوان لا الهامش: إحدى عشرة درجة من أصل ثمان وعشرين تقع في النطاق المتوسط-الداكن والداكن. هذا التوزيع غير معتاد في هذه الفئة السعرية، وهو سبب وجود هذه المراجعة.",
+          "disclosureLabel": "مُهدى، غير مدفوع",
+          "disclosureStatement": "أرسلت أتيليه نور هذا المنتج دون مقابل. لم يُدفع أي مبلغ ولم يُتفق على تغطية.",
+          "testingContext": "ستة أيام من ثماني ساعات بالدرجة 14، ثلاثة مثبتة بالبودرة وثلاثة دون تثبيت، مع تصوير عند الساعات 0 و4 و8 بإضاءة ثابتة.",
+          "applicationContext": "طُبق بفرشاة صغيرة بعد الاختبار الأول. الأداة الإسفنجية المرفقة تسحب كمية أكبر مما يمكن التحكم به.",
+          "conditions": [
+            { "label": "الحرارة", "value": "من 29 إلى 37 درجة مئوية" },
+            { "label": "الرطوبة", "value": "من 55 إلى 70 بالمئة" },
+            { "label": "التثبيت", "value": "ثلاثة اختبارات بالبودرة وثلاثة دونها" },
+            { "label": "المقارنة", "value": "استُخدم مع كريم أساس سبق اختباره على الوجه نفسه" }
+          ],
+          "observations": [
+            { "at": "مجموعة الدرجات", "aspect": "التطابق", "note": "إحدى عشرة درجة من أصل ثمان وعشرين في النطاق المتوسط-الداكن والداكن. توزيع غير معتاد في هذه الفئة السعرية، وهو أقوى ما في المنتج." },
+            { "at": "الساعة 0", "aspect": "النهائية", "note": "مضيء فعلا لا لامع بالشيمر. تغطية متوسطة بطبقة واحدة، قابلة للبناء إلى طبقتين دون ثقل." },
+            { "at": "الساعة 4", "aspect": "الثبات", "note": "تجعد دقيق تحت العين في الاختبارات الثلاثة غير المثبتة. الاختبارات المثبتة كانت نظيفة عند الساعة الرابعة." },
+            { "at": "الساعة 8", "aspect": "الثبات", "note": "تجعد ظاهر في الاختبارات الستة جميعها، بالبودرة أو دونها. أخّرته البودرة نحو ثلاث ساعات دون أن تمنعه. ادعاء مقاومة التجعد لست عشرة ساعة لم يصمد في أي اختبار." },
+            { "at": "الساعة 8", "aspect": "اللون", "note": "لا تغير في اللون مقابل صور الساعة صفر في أي من الاختبارات الستة." },
+            { "at": "عام", "aspect": "الأداة", "note": "الأداة الإسفنجية تسحب كمية كبيرة. استخدمت فرشاة في كل اختبار بعد الأول." }
+          ],
+          "evidenceNotes": "صور عند الساعات 0 و4 و8 في الأيام الستة، مع تصوير الاختبارات المثبتة وغير المثبتة بالإضاءة نفسها ليكون فارق الساعات الثلاث مرئيا لا مُدّعى.",
+          "strengths": [
+            "مجموعة درجات شاملة فعلا في النطاق المتوسط-الداكن والداكن",
+            "لا تغير في اللون عبر الاختبارات الستة",
+            "نهائية مضيئة دون شيمر",
+            "قابل للبناء إلى طبقتين دون ثقل"
+          ],
+          "limitations": [
+            "يتجعد عند الساعة الثامنة حتى مع التثبيت",
+            "ادعاء الست عشرة ساعة غير قابل للتكرار",
+            "الأداة الإسفنجية توزع كمية زائدة",
+            "يحتاج بودرة ليصل إلى أربع ساعات نظيفة"
+          ],
+          "suitability": {
+            "suitsWell": [
+              "من لا تجد درجتها في المجموعات المستوردة",
+              "الأيام حتى نحو ست ساعات مع البودرة",
+              "من تريد إضاءة لا نهائية مطفأة تحت العين"
+            ],
+            "mayNotSuit": [
+              "أيام العمل الكاملة دون إعادة تطبيق",
+              "من لا تحب البودرة المثبتة تحت العين",
+              "من تريد استخدام الأداة المرفقة"
+            ]
+          },
+          "verdict": {
+            "summary": "اشتريه من أجل مجموعة الدرجات، وهي الأفضل التي اختبرتها في هذه الفئة، وخططي لإعادة تطبيق. التركيبة جيدة لست ساعات وتُباع على أنها لست عشرة.",
+            "bestFor": "درجات دافئة داكنة دقيقة بنهائية مضيئة",
+            "wouldRepurchase": "نعم"
+          },
+          "conclusion": "أعطت الاختبارات الستة نتيجة واحدة متسقة: تطابق ممتاز في الدرجة، وثبات ممتاز في اللون، وتجعد عند الساعة الثامنة بغض النظر عن البودرة. إذا كانت درجتك من الدرجات التي تتخطاها المجموعات الكبرى، فالمقايضة تستحق على الأرجح. وإن لم تكن، فهناك كونسيلر أطول ثباتا.",
+          "seo": {
+            "title": "مراجعة أتيليه نور سيتارا: ستة اختبارات ثبات",
+            "description": "ستة اختبارات من ثماني ساعات لكونسيلر أتيليه نور سيتارا، مثبتا وغير مثبت، مع تحليل مجموعة الدرجات الثمان والعشرين.",
+            "focusKeyword": "مراجعة كونسيلر سيتارا",
+            "secondaryKeywords": ["كونسيلر أتيليه نور", "كونسيلر للبشرة الداكنة الدافئة", "كونسيلر مضيء"],
+            "canonicalPath": "/ar/reviews/atelier-noor-sitara-luminous-concealer/"
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+---
+/**
+ * SIGNATURE DEVICES 1 + 3b — THE MARGIN INDEX and THE OBSERVATION VOICE
+ *
+ * The core of the review page. The site exists to present this.
+ *
+ * THE MARGIN INDEX is the device a reader will remember. Marginalia, not a sidebar:
+ *   >=1024  a 160px column at the inline start carrying "Hour 6 / Wear"
+ *   <1024   COLLAPSES TO AN INLINE MARKER ROW above each note. NEVER HIDDEN — hour markers are
+ *           part of the record, and hiding them removes evidence from most readers.
+ *   RTL     moves to the right, via logical properties.
+ *
+ * Both presentations render the SAME markup. The marker is one element that changes position,
+ * not two elements that show and hide — so it is announced exactly once and keeps its
+ * relationship to the note it labels at every width.
+ *
+ * THE OBSERVATION is the primary voice of the three: solid mineral rule, mineral square marker,
+ * timestamped, factual, sitting on the page ground rather than inside anything.
+ *
+ * An ORDERED LIST, because they happened in sequence and the sequence is meaning.
+ *
+ * FORBIDDEN: accordion, tabs, tooltip, "show more", coloured pass/fail markers, any motion that
+ * gates the content. The observations are the article.
+ */
+import type { Locale, ReviewObservation } from "../../../content/schema/types";
+import { recordMarker } from "../../lib/bidi";
+
+interface Props {
+  locale: Locale;
+  observations: ReviewObservation[];
+  headingId: string;
+}
+
+const { observations, headingId } = Astro.props;
+---
+
+<ol class="timeline plain" aria-labelledby={headingId}>
+  {
+    observations.map((observation) => (
+      <li class="entry">
+        <div class="marker record">
+          <span class="at" set:html={recordMarker(observation.at)} />
+          <span class="aspect">{observation.aspect}</span>
+        </div>
+        <p class="note">{observation.note}</p>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .timeline {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .entry {
+    display: grid;
+    gap: var(--space-1);
+    position: relative;
+  }
+
+  /* ---------------------------------------------------------------- below 1024
+     The index is INLINE, above the note. Collapsed, not hidden. */
+
+  .marker {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    color: var(--color-accent-mineral);
+  }
+
+  .aspect {
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
+    letter-spacing: var(--type-tracking-label);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  :global(html[lang="ar"]) .aspect {
+    text-transform: none;
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+  }
+
+  .note {
+    /* The solid mineral rule running the sequence — the single most recognisable element on
+       the page. A timeline without being a chart. */
+    border-inline-start: var(--border-rule-observation);
+    padding-inline-start: var(--space-2);
+    max-width: var(--type-measure-editorial);
+    font-size: calc(var(--type-body-md) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-body-md) * var(--type-arabic-leading-factor));
+    color: var(--color-text-primary);
+  }
+
+  /* ---------------------------------------------------------------- 1024 and up
+     The index becomes a column. Same element, different position. */
+
+  @media (min-width: 1024px) {
+    .entry {
+      grid-template-columns: var(--layout-index-width) minmax(0, 1fr);
+      gap: var(--layout-index-gap);
+      align-items: start;
+    }
+
+    .marker {
+      flex-direction: column;
+      gap: var(--space-0-5);
+      padding-block-start: 0.15em;
+    }
+
+    .note {
+      padding-inline-start: var(--space-3);
+    }
+  }
+
+  @media (forced-colors: active) {
+    .note {
+      border-inline-start-color: CanvasText;
+    }
+  }
+</style>

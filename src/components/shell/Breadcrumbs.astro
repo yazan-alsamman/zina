@@ -1,0 +1,78 @@
+---
+/**
+ * BREADCRUMBS — mirror the URL path exactly.
+ *
+ * THE CONSTRAINT: a breadcrumb must NEVER name a page that does not exist. A review's crumb is
+ * "Home / Reviews / {title}", not "Home / Reviews / Foundation / {title}" — the category routes
+ * are gated at 5 reviews per locale and none qualifies.
+ *
+ * The current page is the last item and is NOT a link.
+ * On mobile the middle segment truncates; it never wraps to two lines.
+ */
+import type { Locale } from "../../../content/schema/types";
+import type { Crumb } from "../../lib/routing";
+import { t } from "../../lib/ui-strings";
+
+interface Props { locale: Locale; crumbs: Crumb[] }
+const { locale, crumbs } = Astro.props;
+---
+
+<nav class="breadcrumb" aria-label={t(locale, "breadcrumb")}>
+  <ol class="plain">
+    {
+      crumbs.map((crumb, index) => (
+        <li>
+          {crumb.href ? (
+            <a href={crumb.href}>{crumb.label}</a>
+          ) : (
+            <span aria-current="page">{crumb.label}</span>
+          )}
+          {index < crumbs.length - 1 && <span class="sep" aria-hidden="true">/</span>}
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<style>
+  .breadcrumb ol {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-1);
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+    color: var(--color-text-muted);
+    /* Never wraps to two lines. */
+    flex-wrap: nowrap;
+    overflow: hidden;
+  }
+
+  .breadcrumb li {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-1);
+    min-width: 0;
+  }
+
+  /* The middle segment truncates on narrow viewports. */
+  .breadcrumb li:last-child > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .breadcrumb a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .breadcrumb a:hover {
+    color: var(--color-accent-clay-hover);
+    text-decoration: underline;
+  }
+
+  .sep {
+    color: var(--color-line-strong);
+  }
+</style>

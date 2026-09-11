@@ -1,0 +1,369 @@
+{
+  "__MOCK_DATA__": true,
+  "collection": "journal",
+  "schemaVersion": "1.0.0",
+  "notice": "FICTIONAL MOCK CONTENT. These articles were not written by Zina Almokri. Bodies are abbreviated to section-level outlines with representative opening prose, which is enough to build and test the article template, the table of contents, reading-time, the category system and the internal-link graph. PHASE 1 CHANGE: the how-i-test article was promoted out of the journal into the Method pillar entity (content/mock/method.json) and no longer exists here. One Arabic-original article was added in its place.",
+  "categories": [
+    { "key": "testing-notes", "en": "Testing notes", "ar": "ملاحظات الاختبار", "purpose": "How testing works, and what testing can and cannot establish. Feeds the Method pillar." },
+    { "key": "guides", "en": "Guides", "ar": "أدلة", "purpose": "Practical how-to content that answers a specific reader problem." },
+    { "key": "comparisons", "en": "Comparisons", "ar": "مقارنات", "purpose": "Method and results for placing two or more products against each other." },
+    { "key": "essays", "en": "Essays", "ar": "مقالات", "purpose": "Editorial positions on the beauty industry and on review culture." }
+  ],
+  "_categoryNote": "Journal categories are EDITORIAL FORMATS, not product categories. Makeup, skincare, foundation and so on are review facets and must never also be journal categories: two taxonomies over the same subject compete for the same queries and split internal-link equity. See docs/JOURNAL_ARCHITECTURE.md section 2.",
+  "items": [
+    {
+      "id": "mock-journal-how-to-evaluate-foundation-performance",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "category": "testing-notes",
+      "type": "Pillar",
+      "featured": true,
+      "authorId": "mock-person-zina-almokri",
+      "dates": { "publishedAt": "2026-02-22", "updatedAt": "2026-02-22" },
+      "readingTimeMinutes": 7,
+      "heroImage": { "src": "/mock-media/journal/foundation-performance-hero.jpg", "alt": "Eight-hour comparison photographs of a foundation (placeholder)", "width": 2400, "height": 1350, "priority": true, "_mock": true },
+      "related": {
+        "reviewIds": ["mock-review-voile-lumiere-skin-tint", "mock-review-sitara-luminous-concealer"],
+        "journalIds": ["mock-journal-understanding-finish-and-texture", "mock-journal-how-to-compare-beauty-products"],
+        "brandIds": ["mock-brand-maison-eclat"],
+        "methodStageKeys": ["wear-window", "conditions"]
+      },
+      "locales": {
+        "en": {
+          "slug": "how-to-evaluate-foundation-performance",
+          "translationStatus": "original",
+          "title": "How to evaluate foundation performance",
+          "subtitle": "Four different failures wearing one name",
+          "excerpt": "Wear time is four separate things wearing one name. Here is how to tell them apart before you blame the wrong one.",
+          "openingParagraph": "When a foundation fails, almost everyone reaches the same conclusion: it does not last. But four completely different things get described that way, and they have different causes and different fixes. Separating them is the single most useful skill in complexion testing, because three of the four are solvable and one is not.",
+          "sections": [
+            { "heading": "Breakdown is not the same as transfer", "summary": "Product leaving the face versus product moving on the face. Different causes, different fixes." },
+            { "heading": "Colour shift, and how to actually check for it", "summary": "Photograph at hour zero in fixed lighting or you cannot make this claim at all." },
+            { "heading": "Separation and where it starts", "summary": "It nearly always begins in the same three places, and where it begins tells you what caused it." },
+            { "heading": "Finish change over time", "summary": "A satin base going shiny at hour four may be doing exactly what it should. Know the difference." },
+            { "heading": "Why conditions matter more than the formula", "summary": "The same base can pass at 22 degrees and fail at 36. A review that omits conditions is not reporting a result." },
+            { "heading": "A test you can run at home", "summary": "Three photographs, one napkin, fixed lighting, four check-ins." }
+          ],
+          "seo": {
+            "title": "How to evaluate foundation performance",
+            "description": "Breakdown, transfer, colour shift and finish change are four different failures. How to tell them apart and run a fair wear test at home.",
+            "focusKeyword": "how to evaluate foundation performance",
+            "secondaryKeywords": ["foundation wear test", "why foundation breaks down", "foundation oxidation check"],
+            "canonicalPath": "/en/journal/how-to-evaluate-foundation-performance/"
+          }
+        },
+        "ar": {
+          "slug": "how-to-evaluate-foundation-performance",
+          "translationStatus": "adapted",
+          "title": "كيف تقيّمين أداء كريم الأساس",
+          "subtitle": "أربعة أعطال مختلفة تحمل اسما واحدا",
+          "excerpt": "الثبات أربعة أشياء مختلفة تحمل اسما واحدا. إليك كيف تفرقين بينها قبل أن تلومي السبب الخطأ.",
+          "openingParagraph": "حين يفشل كريم الأساس، تصل معظمنا إلى النتيجة نفسها: إنه لا يثبت. لكن أربعة أمور مختلفة تماما تُوصف بهذه الطريقة، ولكل منها سبب مختلف وحل مختلف. الفصل بينها هو أنفع مهارة في اختبار منتجات البشرة، لأن ثلاثة من الأربعة قابلة للحل وواحدا ليس كذلك.",
+          "sections": [
+            { "heading": "التراجع ليس هو الانتقال", "summary": "خروج المنتج من الوجه مقابل تحركه على الوجه. أسباب مختلفة وحلول مختلفة." },
+            { "heading": "تغير اللون، وكيف تتحققين منه فعلا", "summary": "صوّري عند الساعة صفر بإضاءة ثابتة، وإلا فلا يمكنك ادعاء ذلك أصلا." },
+            { "heading": "الانفصال وأين يبدأ", "summary": "يبدأ غالبا في المواضع الثلاثة نفسها، وموضع البداية يخبرك بالسبب." },
+            { "heading": "تغير النهائية مع الوقت", "summary": "كريم ساتاني يلمع عند الساعة الرابعة قد يفعل بالضبط ما يُفترض به. اعرفي الفرق." },
+            { "heading": "لماذا الظروف أهم من التركيبة", "summary": "الكريم نفسه قد ينجح عند 22 درجة ويفشل عند 36. مراجعة تُغفل الظروف لا تنقل نتيجة." },
+            { "heading": "اختبار يمكنك إجراؤه في البيت", "summary": "ثلاث صور، ومنديل، وإضاءة ثابتة، وأربع نقاط تحقق." }
+          ],
+          "seo": {
+            "title": "كيف تقيّمين أداء كريم الأساس",
+            "description": "التراجع والانتقال وتغير اللون وتغير النهائية أربعة أعطال مختلفة. كيف تفرقين بينها وكيف تجرين اختبار ثبات عادلا في البيت.",
+            "focusKeyword": "كيف اقيم اداء كريم الاساس",
+            "secondaryKeywords": ["اختبار ثبات كريم الاساس", "ليش كريم الاساس ما يثبت", "تغير لون كريم الاساس"],
+            "canonicalPath": "/ar/journal/how-to-evaluate-foundation-performance/"
+          }
+        }
+      }
+    },
+    {
+      "id": "mock-journal-what-makes-a-beauty-review-useful",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "category": "essays",
+      "type": "Pillar",
+      "featured": true,
+      "authorId": "mock-person-zina-almokri",
+      "dates": { "publishedAt": "2026-03-30", "updatedAt": "2026-07-11" },
+      "readingTimeMinutes": 8,
+      "heroImage": { "src": "/mock-media/journal/useful-review-hero.jpg", "alt": "A marked-up printed review with notes (placeholder)", "width": 2400, "height": 1350, "priority": true, "_mock": true },
+      "related": {
+        "reviewIds": ["mock-review-velvet-hour-lip-cream", "mock-review-nuit-barrier-serum"],
+        "journalIds": ["mock-journal-how-to-compare-beauty-products", "mock-journal-how-to-evaluate-foundation-performance"],
+        "brandIds": [],
+        "methodStageKeys": ["conditions", "revisit"]
+      },
+      "locales": {
+        "en": {
+          "slug": "what-makes-a-beauty-review-useful",
+          "translationStatus": "original",
+          "title": "What makes a beauty review useful",
+          "subtitle": "You should be able to disagree with it",
+          "excerpt": "A review is useful when you can reconstruct the reasoning and decide it was wrong. Most reviews make that impossible.",
+          "openingParagraph": "The test of a good review is not whether you agree with the verdict. It is whether you can see how the verdict was reached clearly enough to disagree with it. If a review tells you a foundation is amazing and nothing else, there is nothing to argue with, and nothing to use.",
+          "sections": [
+            { "heading": "The three things a review must separate", "summary": "What the brand claims, what the reviewer observed, what the reviewer concluded. Blur these and the review becomes advertising." },
+            { "heading": "Conditions are not a detail", "summary": "The environment a product was tested in is part of the result, not context around it." },
+            { "heading": "Why suits everyone is a warning sign", "summary": "A review that cannot name who a product does not suit has not finished testing it." },
+            { "heading": "Disclosure at the top, not the bottom", "summary": "Where the disclosure sits tells you what the reviewer thinks disclosure is for." },
+            { "heading": "The update is part of the review", "summary": "An undated review of a reformulated product is misinformation with good intentions." },
+            { "heading": "What a score hides", "summary": "A number makes comparison easy and flattens the reason. Why this site does not publish one." }
+          ],
+          "seo": {
+            "title": "What makes a beauty review useful",
+            "description": "How to read a beauty review critically: separating claims from observations, why conditions matter, and what disclosure placement tells you.",
+            "focusKeyword": "what makes a good beauty review",
+            "secondaryKeywords": ["how to read beauty reviews", "honest beauty reviews", "beauty review disclosure"],
+            "canonicalPath": "/en/journal/what-makes-a-beauty-review-useful/"
+          }
+        },
+        "ar": {
+          "slug": "what-makes-a-beauty-review-useful",
+          "translationStatus": "adapted",
+          "title": "ما الذي يجعل مراجعة التجميل مفيدة",
+          "subtitle": "يجب أن تتمكني من الاختلاف معها",
+          "excerpt": "المراجعة مفيدة عندما تستطيعين إعادة بناء منطقها وأن تقرري أنها مخطئة. معظم المراجعات تجعل ذلك مستحيلا.",
+          "openingParagraph": "معيار المراجعة الجيدة ليس اتفاقك مع الحكم، بل قدرتك على رؤية كيف وُصل إلى الحكم بوضوح يكفي للاختلاف معه. إذا أخبرتك مراجعة أن كريم الأساس رائع ولا شيء غير ذلك، فلا يوجد ما يمكن مناقشته، ولا ما يمكن استخدامه.",
+          "sections": [
+            { "heading": "ثلاثة أمور يجب أن تفصلها المراجعة", "summary": "ما تدعيه العلامة، وما لاحظته الكاتبة، وما استنتجته. اخلطيها وتتحول المراجعة إلى إعلان." },
+            { "heading": "الظروف ليست تفصيلا", "summary": "البيئة التي جُرب فيها المنتج جزء من النتيجة، لا سياق حولها." },
+            { "heading": "لماذا عبارة يناسب الجميع إشارة تحذير", "summary": "مراجعة لا تستطيع تسمية من لا يناسبه المنتج لم تكمل اختبارها له." },
+            { "heading": "الإفصاح في الأعلى لا في الأسفل", "summary": "موضع الإفصاح يخبرك بما تظنه الكاتبة عن غاية الإفصاح." },
+            { "heading": "التحديث جزء من المراجعة", "summary": "مراجعة غير مؤرخة لمنتج أُعيدت تركيبته هي معلومة مضللة بنية حسنة." },
+            { "heading": "ما الذي يخفيه التقييم الرقمي", "summary": "الرقم يسهّل المقارنة ويطمس السبب. ولهذا لا ينشر هذا الموقع أرقاما." }
+          ],
+          "seo": {
+            "title": "ما الذي يجعل مراجعة التجميل مفيدة",
+            "description": "كيف تقرئين مراجعة تجميل بعين ناقدة: الفصل بين الادعاءات والملاحظات، ولماذا تهم الظروف، وماذا يخبرك موضع الإفصاح.",
+            "focusKeyword": "مراجعات تجميل صادقة",
+            "secondaryKeywords": ["كيف اقرا مراجعات التجميل", "الافصاح في مراجعات التجميل", "مراجعة تجميل موثوقة"],
+            "canonicalPath": "/ar/journal/what-makes-a-beauty-review-useful/"
+          }
+        }
+      }
+    },
+    {
+      "id": "mock-journal-understanding-finish-and-texture",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "category": "guides",
+      "type": "Supporting",
+      "featured": false,
+      "authorId": "mock-person-zina-almokri",
+      "dates": { "publishedAt": "2026-05-15", "updatedAt": "2026-05-15" },
+      "readingTimeMinutes": 6,
+      "heroImage": { "src": "/mock-media/journal/finish-texture-hero.jpg", "alt": "Six finishes photographed under identical lighting (placeholder)", "width": 2400, "height": 1350, "priority": true, "_mock": true },
+      "related": {
+        "reviewIds": ["mock-review-voile-lumiere-skin-tint", "mock-review-verdure-cloud-balm"],
+        "journalIds": ["mock-journal-how-to-evaluate-foundation-performance", "mock-journal-how-to-compare-beauty-products"],
+        "brandIds": [],
+        "methodStageKeys": ["application"]
+      },
+      "locales": {
+        "en": {
+          "slug": "understanding-finish-and-texture",
+          "translationStatus": "original",
+          "_localeNote": "DELIBERATELY ENGLISH-ONLY. Tests missing-translation behaviour on the journal template, which differs from the review template because journal index pages must filter by available locale.",
+          "title": "Understanding finish and texture",
+          "subtitle": "Six words, no shared definitions",
+          "excerpt": "Matte, satin, natural, luminous, radiant, dewy. Six words, no shared definitions, and one reason you keep buying the wrong base.",
+          "openingParagraph": "There is no industry standard for what a finish name means. One brand's natural is another brand's matte, and radiant and luminous are used interchangeably by companies that mean very different things by them. This is not a conspiracy; it is just an unregulated vocabulary. But it means you cannot shop by finish name alone, and it explains a surprising share of disappointing purchases.",
+          "sections": [
+            { "heading": "Finish is what light does, texture is what the product does", "summary": "Two independent properties routinely described with the same words." },
+            { "heading": "The six finish names and what they usually mean", "summary": "A working glossary, offered as a description of common usage rather than a standard." },
+            { "heading": "How finish changes over a wear window", "summary": "Most bases end the day one step shinier than they started. Plan for the hour-six finish." },
+            { "heading": "Why texture decides whether you like it", "summary": "Slip, set time and buildability determine whether a product suits how you actually apply makeup." },
+            { "heading": "Reading a product page against a swatch", "summary": "Why an arm swatch tells you almost nothing about finish." }
+          ],
+          "seo": {
+            "title": "Understanding finish and texture in makeup",
+            "description": "Matte, satin, natural, luminous, radiant and dewy have no standard definitions. A working glossary and how finish changes across a wear window.",
+            "focusKeyword": "makeup finish types explained",
+            "secondaryKeywords": ["difference between satin and natural finish", "dewy vs radiant finish", "foundation texture explained"],
+            "canonicalPath": "/en/journal/understanding-finish-and-texture/"
+          }
+        }
+      }
+    },
+    {
+      "id": "mock-journal-building-a-practical-routine",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "category": "guides",
+      "type": "Supporting",
+      "featured": false,
+      "authorId": "mock-person-zina-almokri",
+      "dates": { "publishedAt": "2026-06-27", "updatedAt": "2026-06-27" },
+      "readingTimeMinutes": 7,
+      "heroImage": { "src": "/mock-media/journal/practical-routine-hero.jpg", "alt": "A four-step routine laid out on a shelf (placeholder)", "width": 2400, "height": 1350, "priority": true, "_mock": true },
+      "related": {
+        "reviewIds": ["mock-review-nuit-barrier-serum", "mock-review-verdure-cloud-balm"],
+        "journalIds": ["mock-journal-what-makes-a-beauty-review-useful", "mock-journal-understanding-finish-and-texture"],
+        "brandIds": ["mock-brand-lune-skin"],
+        "methodStageKeys": ["wear-window"]
+      },
+      "locales": {
+        "en": {
+          "slug": "building-a-practical-routine",
+          "translationStatus": "original",
+          "title": "Building a practical routine",
+          "subtitle": "Design it for your worst morning",
+          "excerpt": "The best routine is the one you can repeat on a bad day. A method for building one, and for finding which step is causing the problem.",
+          "openingParagraph": "Routines fail for boring reasons. They take too long on the mornings that matter, they contain a step nobody enjoys, or they change so often that nothing can be attributed to anything. A routine you can repeat for four weeks without thinking about it is worth more than a better routine you abandon in nine days.",
+          "sections": [
+            { "heading": "Change one thing at a time, or learn nothing", "summary": "The reason most people cannot say which product caused the problem." },
+            { "heading": "The four-week rule", "summary": "Why a shorter window produces confident conclusions that are mostly noise." },
+            { "heading": "Order, waiting time and pilling", "summary": "Most pilling is a timing problem, not an incompatibility. How to test which one you have." },
+            { "heading": "Building for your worst morning", "summary": "Design around the five-minute version and treat the full version as a bonus." },
+            { "heading": "When to stop and see a professional", "summary": "The line this site does not cross. Nothing here is medical advice, and persistent skin concerns belong with a qualified professional." }
+          ],
+          "seo": {
+            "title": "Building a practical beauty routine",
+            "description": "A method for building a repeatable routine, isolating which product is causing a problem, and understanding why pilling is usually a timing issue.",
+            "focusKeyword": "how to build a skincare routine",
+            "secondaryKeywords": ["why does my skincare pill", "simple skincare routine method", "how long to test a new product"],
+            "canonicalPath": "/en/journal/building-a-practical-routine/",
+            "_note": "Contains a deliberate scope boundary section. Any routine or skincare content must carry a no-medical-advice boundary; this is both an editorial standard and a YMYL risk control."
+          }
+        },
+        "ar": {
+          "slug": "building-a-practical-routine",
+          "translationStatus": "adapted",
+          "title": "بناء روتين عملي",
+          "subtitle": "صمّميه لأسوأ صباح لديك",
+          "excerpt": "أفضل روتين هو الذي تستطيعين تكراره في يوم سيئ. طريقة لبنائه، ولمعرفة أي خطوة تسبب المشكلة.",
+          "openingParagraph": "تفشل الروتينات لأسباب مملة. تستغرق وقتا طويلا في الصباحات التي تهم، أو تحتوي خطوة لا تحبها أحد، أو تتغير كثيرا حتى لا يمكن نسب أي نتيجة إلى أي سبب. روتين تستطيعين تكراره أربعة أسابيع دون تفكير أثمن من روتين أفضل تتركينه بعد تسعة أيام.",
+          "sections": [
+            { "heading": "غيّري شيئا واحدا في كل مرة، وإلا لن تتعلمي شيئا", "summary": "السبب الذي يمنع معظمنا من معرفة أي منتج سبب المشكلة." },
+            { "heading": "قاعدة الأسابيع الأربعة", "summary": "لماذا تنتج المدة الأقصر استنتاجات واثقة معظمها ضجيج." },
+            { "heading": "الترتيب ومدة الانتظار والتكتل", "summary": "معظم التكتل مشكلة توقيت لا تعارض. كيف تعرفين أيهما لديك." },
+            { "heading": "ابني للصباح الأسوأ", "summary": "صمّمي حول نسخة الخمس دقائق واعتبري النسخة الكاملة مكافأة." },
+            { "heading": "متى تتوقفين وتراجعين مختصا", "summary": "الحد الذي لا يتجاوزه هذا الموقع. لا شيء هنا استشارة طبية، ومشكلات البشرة المستمرة مكانها عند مختص مؤهل." }
+          ],
+          "seo": {
+            "title": "بناء روتين عناية عملي",
+            "description": "طريقة لبناء روتين قابل للتكرار، ولعزل المنتج الذي يسبب المشكلة، ولفهم لماذا يكون التكتل غالبا مسألة توقيت.",
+            "focusKeyword": "كيف ابني روتين العناية بالبشرة",
+            "secondaryKeywords": ["ليش تتكتل منتجات العناية", "روتين عناية بسيط", "كم مدة تجربة منتج جديد"],
+            "canonicalPath": "/ar/journal/building-a-practical-routine/"
+          }
+        }
+      }
+    },
+    {
+      "id": "mock-journal-how-to-compare-beauty-products",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "category": "comparisons",
+      "type": "Supporting",
+      "featured": false,
+      "authorId": "mock-person-zina-almokri",
+      "dates": { "publishedAt": "2026-08-16", "updatedAt": "2026-08-16" },
+      "readingTimeMinutes": 6,
+      "heroImage": { "src": "/mock-media/journal/comparison-hero.jpg", "alt": "Split-face comparison test setup (placeholder)", "width": 2400, "height": 1350, "priority": true, "_mock": true },
+      "related": {
+        "reviewIds": ["mock-review-cils-infini-mascara", "mock-review-velvet-hour-lip-cream"],
+        "journalIds": ["mock-journal-what-makes-a-beauty-review-useful", "mock-journal-how-to-evaluate-foundation-performance"],
+        "brandIds": [],
+        "methodStageKeys": ["comparison"]
+      },
+      "locales": {
+        "en": {
+          "slug": "how-to-compare-beauty-products",
+          "translationStatus": "original",
+          "title": "How to compare beauty products fairly",
+          "subtitle": "Two products, one face, one day",
+          "excerpt": "Almost every comparison you have read broke at least one of these rules.",
+          "openingParagraph": "A comparison is only a comparison if one variable changed. Two foundations tested on different days, in different weather, over different skincare, applied with different tools, are not being compared. They are being described in sequence and then ranked, which is a different and much less useful thing.",
+          "sections": [
+            { "heading": "The split-face test and its limits", "summary": "The best available method, and the three ways it still misleads you." },
+            { "heading": "Hold the base layer constant", "summary": "Skincare underneath is the most commonly ignored variable in complexion comparison." },
+            { "heading": "Same tool, same quantity, same day", "summary": "Application differences produce bigger swings than formula differences." },
+            { "heading": "Price is a fifth variable, not a tiebreaker", "summary": "How to fold cost in without letting it decide the result before testing starts." },
+            { "heading": "Writing a comparison that survives disagreement", "summary": "Publish the protocol alongside the result so a reader can weigh the finding themselves." }
+          ],
+          "seo": {
+            "title": "How to compare beauty products fairly",
+            "description": "Split-face testing, controlling the base layer, and the variables that make most product comparisons unreliable.",
+            "focusKeyword": "how to compare beauty products",
+            "secondaryKeywords": ["split face foundation test", "fair product comparison method", "foundation comparison test"],
+            "canonicalPath": "/en/journal/how-to-compare-beauty-products/"
+          }
+        },
+        "ar": {
+          "slug": "how-to-compare-beauty-products",
+          "translationStatus": "adapted",
+          "title": "كيف تقارنين بين منتجات التجميل بإنصاف",
+          "subtitle": "منتجان، وجه واحد، يوم واحد",
+          "excerpt": "تقريبا كل مقارنة قرأتها خالفت واحدة من هذه القواعد على الأقل.",
+          "openingParagraph": "المقارنة ليست مقارنة إلا إذا تغير متغير واحد فقط. كريما أساس جُربا في يومين مختلفين، وطقسين مختلفين، فوق عناية مختلفة، وبأدوات مختلفة، ليسا قيد المقارنة. إنهما يُوصفان بالتتابع ثم يُرتبان، وهذا أمر مختلف وأقل نفعا بكثير.",
+          "sections": [
+            { "heading": "اختبار نصف الوجه وحدوده", "summary": "أفضل طريقة متاحة، والطرق الثلاث التي ما زالت تضللك بها." },
+            { "heading": "ثبّتي الطبقة الأساسية", "summary": "العناية تحت المكياج هي المتغير الأكثر إهمالا في مقارنة منتجات البشرة." },
+            { "heading": "الأداة نفسها، الكمية نفسها، اليوم نفسه", "summary": "اختلاف التطبيق ينتج فروقا أكبر من اختلاف التركيبة." },
+            { "heading": "السعر متغير خامس لا مرجّح نهائي", "summary": "كيف تدخلين التكلفة دون أن تحسم النتيجة قبل بدء الاختبار." },
+            { "heading": "كتابة مقارنة تصمد أمام الاختلاف", "summary": "انشري الطريقة مع النتيجة ليتمكن القارئ من وزن الاستنتاج بنفسه." }
+          ],
+          "seo": {
+            "title": "كيف تقارنين بين منتجات التجميل بإنصاف",
+            "description": "اختبار نصف الوجه، وتثبيت الطبقة الأساسية، والمتغيرات التي تجعل معظم المقارنات غير موثوقة.",
+            "focusKeyword": "مقارنة منتجات التجميل",
+            "secondaryKeywords": ["اختبار نصف الوجه", "مقارنة كريمات الاساس", "طريقة مقارنة عادلة"],
+            "canonicalPath": "/ar/journal/how-to-compare-beauty-products/"
+          }
+        }
+      }
+    },
+    {
+      "id": "mock-journal-arabic-shade-vocabulary",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "category": "guides",
+      "type": "Supporting",
+      "featured": true,
+      "authorId": "mock-person-zina-almokri",
+      "dates": { "publishedAt": "2026-08-30", "updatedAt": "2026-08-30" },
+      "readingTimeMinutes": 7,
+      "heroImage": { "src": "/mock-media/journal/shade-vocabulary-hero.jpg", "alt": "Shade swatches labelled in Arabic and English (placeholder)", "width": 2400, "height": 1350, "priority": true, "_mock": true },
+      "related": {
+        "reviewIds": ["mock-review-sitara-luminous-concealer", "mock-review-voile-lumiere-skin-tint"],
+        "journalIds": ["mock-journal-how-to-evaluate-foundation-performance"],
+        "brandIds": ["mock-brand-atelier-noor"],
+        "methodStageKeys": ["baseline", "comparison"]
+      },
+      "locales": {
+        "ar": {
+          "slug": "mufradat-darajat-albashara",
+          "translationStatus": "original",
+          "_localeNote": "DELIBERATELY ARABIC-ORIGINAL WITH NO ENGLISH VERSION. The subject exists because Arabic shade vocabulary does not map onto English shade vocabulary, so an English version would be a different article rather than a translation. This is the clearest demonstration in the dataset that Arabic is an authoring language and not a translation target.",
+          "title": "مفردات درجات البشرة: لماذا لا تُترجم",
+          "subtitle": "الدرجة التي تشترينها ليست الدرجة التي تصفينها",
+          "excerpt": "مصطلحات الدرجات في العربية لا تقابل مصطلحات العلامات الأجنبية. هذا الدليل يفكك المسافة بينهما.",
+          "openingParagraph": "حين تصف إحدانا بشرتها بأنها قمحية، لا يوجد رقم يقابل ذلك على أي عبوة. وحين تكتب علامة أجنبية warm sand أو golden beige، فهي تصف نظاما داخليا لا يشبه بالضرورة ما نعنيه. هذه ليست مشكلة لغة، بل مشكلة نظامين للتصنيف نشآ في مكانين مختلفين ولأغراض مختلفة، ونحن نتسوق في المسافة بينهما.",
+          "sections": [
+            { "heading": "قمحية وحنطية وبيضاء: ماذا تعني عمليا", "summary": "المصطلحات الشائعة في المنطقة وما تصفه فعلا من حيث العمق والتحت-لون." },
+            { "heading": "التحت-لون هو المتغير الحقيقي", "summary": "لماذا درجتان بالعمق نفسه قد تبدوان مختلفتين تماما، ولماذا يصعب وصف ذلك بالعربية والإنجليزية معا." },
+            { "heading": "أنظمة الترقيم الأجنبية وكيف تُقرأ", "summary": "الحروف والأرقام على العبوات وما تحاول قوله." },
+            { "heading": "الزيتوني: الفئة التي تسقط من الجانبين", "summary": "المصطلح الأكثر إهمالا في المجموعتين، والأكثر شيوعا في المنطقة." },
+            { "heading": "كيف تختبرين الدرجة قبل الشراء", "summary": "طريقة عملية بثلاث خطوات تعتمد على الإضاءة الطبيعية ومقارنة مرجعية." },
+            { "heading": "لماذا أكتب الدرجة بالنظامين في كل مراجعة", "summary": "كل مراجعة على هذا الموقع تذكر اسم الدرجة كما كتبته العلامة، ووصفها بالعربية." }
+          ],
+          "seo": {
+            "title": "مفردات درجات البشرة بالعربية: دليل عملي",
+            "description": "لماذا لا تقابل مصطلحات درجات البشرة العربية أنظمة العلامات الأجنبية، وكيف تقرئين النظامين قبل شراء كريم أساس أو كونسيلر.",
+            "focusKeyword": "درجات البشرة بالعربي",
+            "secondaryKeywords": ["البشرة القمحية اي درجة", "تحت لون البشرة", "كيف اختار درجة كريم الاساس"],
+            "canonicalPath": "/ar/journal/mufradat-darajat-albashara/"
+          }
+        }
+      }
+    }
+  ]
+}

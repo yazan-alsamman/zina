@@ -1,0 +1,186 @@
+---
+/**
+ * JOURNAL ENTRY — the index treatment, again. Still no Card.
+ *
+ * Hairline, type, and nothing else. The same editorial index vocabulary as ReviewEntry, so the
+ * archive and the journal read as one system rather than two products.
+ *
+ * WHAT IT EXPOSES, all derived from the canonical record:
+ *   format label     the editorial FORMAT (guides, essays…) — never a product category
+ *   type             Pillar / Supporting, as a quiet label; the hierarchy is real IA, not a badge
+ *   title            the article
+ *   subtitle         the deck
+ *   excerpt          one sentence
+ *   dates            published, and updated when it differs
+ *   reading time     ONLY when the record carries one. Never computed and passed off as authored
+ *
+ * WHAT IT NEVER EXPOSES: views, likes, shares, popularity, "trending", "featured by", rankings,
+ * awards, or any social proof. Emphasis is layout weight, never a badge.
+ */
+import type { JournalArticle, Locale } from "../../../content/schema/types";
+import { path } from "../../lib/routing";
+import { t } from "../../lib/ui-strings";
+import { formatDate } from "../../lib/format";
+import { readingTime } from "../../lib/journal";
+import { isolateValue } from "../../lib/bidi";
+import { categoryLabel } from "../../lib/journal-labels";
+
+interface Props {
+  locale: Locale;
+  article: JournalArticle;
+  /** Editorial emphasis — MORE SPACE, not a different component and not a badge. */
+  featured?: boolean;
+  /** The caller declares the level, because it is a property of the document outline. */
+  headingLevel?: 2 | 3;
+}
+
+const { locale, article, featured = false, headingLevel = 2 } = Astro.props;
+const Heading: "h2" | "h3" = headingLevel === 3 ? "h3" : "h2";
+
+const content = article.locales[locale]!;
+const minutes = readingTime(article);
+const updated = article.dates?.updatedAt && article.dates.updatedAt !== article.dates.publishedAt;
+---
+
+<article class:list={["entry", featured && "entry--featured"]}>
+  <a class="entry-link" href={path.journal(locale, content.slug!)}>
+    <p class="meta">
+      <span class="format label">{categoryLabel(locale, article.category)}</span>
+      {
+        article.type && (
+          <>
+            <span class="sep" aria-hidden="true">·</span>
+            <span class="type label">
+              {article.type === "Pillar"
+                ? t(locale, "articleCategoryPillar")
+                : t(locale, "articleCategorySupporting")}
+            </span>
+          </>
+        )
+      }
+    </p>
+
+    <Heading class="title">{content.title}</Heading>
+    {content.subtitle && <p class="subtitle">{content.subtitle}</p>}
+    {content.excerpt && <p class="excerpt">{content.excerpt}</p>}
+  </a>
+
+  <p class="dates">
+    <time datetime={article.dates.publishedAt} set:html={isolateValue(formatDate(article.dates.publishedAt, locale))} />
+    {
+      updated && (
+        <>
+          <span class="sep" aria-hidden="true">·</span>
+          <span>{t(locale, "updatedOn")}</span>
+          <time datetime={article.dates.updatedAt} set:html={isolateValue(formatDate(article.dates.updatedAt, locale))} />
+        </>
+      )
+    }
+    {
+      minutes !== undefined && (
+        <>
+          <span class="sep" aria-hidden="true">·</span>
+          <span class="reading">
+            <Fragment set:html={isolateValue(String(minutes))} /> {t(locale, "readingTime")}
+          </span>
+        </>
+      )
+    }
+  </p>
+</article>
+
+<style>
+  .entry {
+    padding-block-start: var(--space-3);
+    border-block-start: var(--border-rule-hairline);
+  }
+
+  .entry-link {
+    display: grid;
+    gap: var(--space-1);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1);
+  }
+
+  .format {
+    color: var(--color-accent-mineral);
+  }
+
+  .type {
+    color: var(--color-text-muted);
+  }
+
+  .sep {
+    color: var(--color-line-strong);
+  }
+
+  .title {
+    font-family: var(--type-family-display);
+    font-size: calc(var(--type-display-sm) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-display-sm) * var(--type-arabic-leading-factor));
+    font-weight: var(--type-weight-regular);
+    color: var(--color-text-primary);
+  }
+
+  .entry-link:hover .title {
+    color: var(--color-accent-clay-hover);
+    text-decoration: underline;
+  }
+
+  .subtitle {
+    max-width: 52ch;
+    font-size: calc(var(--type-body-sm) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-body-sm) * var(--type-arabic-leading-factor));
+    color: var(--color-text-secondary);
+  }
+
+  .excerpt {
+    margin-block-start: var(--space-1);
+    max-width: var(--type-measure-editorial);
+    font-size: calc(var(--type-body-sm) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-body-sm) * var(--type-arabic-leading-factor));
+    color: var(--color-text-muted);
+  }
+
+  .dates {
+    margin-block-start: var(--space-2);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1);
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
+    color: var(--color-text-muted);
+  }
+
+  .dates time,
+  .reading {
+    font-family: var(--type-family-record);
+    font-size: var(--type-record-sm);
+  }
+
+  /* Editorial emphasis: more room. No badge, no ribbon, no "featured" word. */
+  .entry--featured .title {
+    font-size: calc(var(--type-display-md) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-display-md) * var(--type-arabic-leading-factor));
+  }
+
+  .entry--featured .subtitle,
+  .entry--featured .excerpt {
+    font-size: calc(var(--type-body-md) * var(--type-arabic-size-factor));
+    max-width: var(--type-measure-editorial);
+  }
+
+  @media (min-width: 768px) {
+    .entry {
+      padding-block-start: var(--space-4);
+    }
+  }
+</style>

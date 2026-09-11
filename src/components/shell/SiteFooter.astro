@@ -1,0 +1,196 @@
+---
+/**
+ * SITE FOOTER — three groups, per locale.
+ *
+ * The STANDARDS group exists to be found, not hidden. Its presence in a persistent footer is
+ * itself a trust signal, and it guarantees /editorial-standards/, /brands/ and the legal pages
+ * are never orphans.
+ *
+ * "How I test" rather than "Method": the footer is where a hesitant reader looks, and the
+ * plainer phrasing converts better than the label.
+ *
+ * THE SOCIAL ROW DOES NOT EXIST. Every profile has sameAsEligible: false, so nothing renders —
+ * no greyed-out icon, no placeholder handle, no follower count. Absence is silent.
+ */
+import type { Locale } from "../../../content/schema/types";
+import { eligibleSocialProfiles, navigation, person } from "../../lib/content";
+import { isImplemented, path, siteName } from "../../lib/routing";
+import { t } from "../../lib/ui-strings";
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+
+/** site.json routeKey -> the key used by IMPLEMENTED_ROUTES. */
+const routeKeyFor: Record<string, string> = {
+  "reviews.index": "reviewsIndex",
+  method: "method",
+  "journal.index": "journalIndex",
+  "brands.index": "brandsIndex",
+  "work.index": "workIndex",
+  contact: "contact",
+  "editorial-standards": "editorialStandards",
+  privacy: "privacy",
+  terms: "terms",
+};
+
+const routeFor: Record<string, (l: Locale) => string> = {
+  "reviews.index": path.reviewsIndex,
+  method: path.method,
+  "journal.index": path.journalIndex,
+  "brands.index": path.brandsIndex,
+  "work.index": path.workIndex,
+  contact: path.contact,
+  "editorial-standards": path.editorialStandards,
+  privacy: path.privacy,
+  terms: path.terms,
+};
+
+/**
+ * The footer filters against the same registry as the header, then drops any group left empty.
+ * Today that removes the Professional and Standards groups entirely: /work/, /contact/,
+ * /editorial-standards/, /privacy/ and /terms/ are not built.
+ *
+ * An empty footer group is worse than a missing one — it is a heading over nothing.
+ */
+const groups = navigation()
+  .footer.map((group) => ({
+    title: group.group[locale],
+    links: group.links
+      .filter((link) => isImplemented(routeKeyFor[link.routeKey] ?? link.routeKey))
+      .map((link) => ({
+        label: link.label[locale],
+        href: (routeFor[link.routeKey] ?? path.home)(locale),
+      })),
+  }))
+  .filter((group) => group.links.length > 0);
+
+const bio = person().locales[locale]?.bios?.homepageIntro ?? "";
+const social = eligibleSocialProfiles();
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="identity">
+        <p class="wordmark">{siteName(locale)}</p>
+        <p class="bio">{bio}</p>
+      </div>
+
+      <nav class="groups" aria-label={t(locale, "footerNavigation")}>
+        {
+          groups.map((group) => (
+            <div class="group">
+              <h2 class="label">{group.title}</h2>
+              <ul class="plain">
+                {group.links.map((link) => (
+                  <li>
+                    <a href={link.href}>{link.label}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </nav>
+    </div>
+
+    {/* Rendered only when a profile is confirmed official in writing. Today: none. */}
+    {
+      social.length > 0 && (
+        <ul class="social plain">
+          {social.map((profile) => (
+            <li>
+              <a href={profile.url} rel="me noopener" target="_blank">
+                {profile.platform}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+
+    <p class="copyright">© {year} {siteName(locale)}</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-block-start: var(--space-12);
+    padding-block: var(--space-8);
+    border-block-start: var(--border-rule-hairline);
+    background: var(--color-ground-base);
+  }
+
+  .footer-top {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .wordmark {
+    font-family: var(--type-family-display);
+    font-size: calc(var(--type-display-sm) * var(--type-arabic-size-factor));
+  }
+
+  .bio {
+    margin-block-start: var(--space-1);
+    max-width: 42ch;
+    font-size: calc(var(--type-body-sm) * var(--type-arabic-size-factor));
+    color: var(--color-text-secondary);
+  }
+
+  .groups {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .group h2 {
+    margin-block-end: var(--space-2);
+  }
+
+  .group ul {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .group a {
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+    color: var(--color-text-secondary);
+    text-decoration: none;
+  }
+
+  .group a:hover {
+    color: var(--color-accent-clay-hover);
+    text-decoration: underline;
+  }
+
+  .social {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-block-start: var(--space-5);
+  }
+
+  .copyright {
+    margin-block-start: var(--space-6);
+    padding-block-start: var(--space-3);
+    border-block-start: var(--border-rule-hairline);
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
+    color: var(--color-text-muted);
+  }
+
+  @media (min-width: 768px) {
+    .groups {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .footer-top {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+      gap: var(--space-8);
+    }
+  }
+</style>

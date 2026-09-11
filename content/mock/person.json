@@ -1,0 +1,114 @@
+{
+  "__MOCK_DATA__": true,
+  "collection": "person",
+  "schemaVersion": "1.0.0",
+  "notice": "FICTIONAL MOCK CONTENT. Bios, location and expertise below are INVENTED placeholders and are NOT verified facts about Zina Almokri. Only the name is CONFIRMED. PHASE 1 CHANGE: the six-stage testing protocol was moved out of this record into content/mock/method.json, where it is a first-class entity with its own route. The person now references it.",
+  "items": [
+    {
+      "id": "mock-person-zina-almokri",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "name": {
+        "latin": "Zina Almokri",
+        "arabic": "زينا المقري",
+        "display": "Zina Almokri",
+        "_verification": "CONFIRMED",
+        "_source": "docs/CONTENT_VERIFICATION_MATRIX.md"
+      },
+      "pronouns": "she/her",
+      "methodId": "mock-method-six-stage",
+      "location": {
+        "value": "Dubai, United Arab Emirates",
+        "_verification": "MOCK",
+        "_note": "Invented. Location materially affects Arabic dialect targeting, hreflang region and any climate-based testing claim. Must be confirmed before copy references it."
+      },
+      "images": {
+        "portraitPrimary": { "src": "/mock-media/person/zina-portrait-primary.jpg", "alt": "Placeholder portrait of Zina Almokri", "width": 1200, "height": 1600, "_mock": true, "_note": "Placeholder path. No asset exists on disk. Real photography required from client." },
+        "portraitEditorial": { "src": "/mock-media/person/zina-portrait-editorial.jpg", "alt": "Placeholder editorial portrait", "width": 1600, "height": 2000, "_mock": true },
+        "workingShot": { "src": "/mock-media/person/zina-testing-bench.jpg", "alt": "Placeholder image of a product testing bench", "width": 2000, "height": 1333, "_mock": true },
+        "openGraph": { "src": "/mock-media/person/zina-og.jpg", "alt": "Zina Almokri", "width": 1200, "height": 630, "_mock": true }
+      },
+      "locales": {
+        "en": {
+          "slug": "about",
+          "translationStatus": "original",
+          "professionalTitle": "Beauty Creator and Product Testing Specialist",
+          "tagline": "I test it on my own skin, then I tell you exactly what happened.",
+          "bios": {
+            "homepageIntro": "Beauty creator. Every product on this site was worn, timed, photographed and documented on my own skin.",
+            "short": "Zina Almokri is a beauty creator who tests cosmetics and skincare on her own skin and publishes what actually happens: wear time, texture, finish, and the exact conditions each product was tested in.",
+            "long": "Zina Almokri makes beauty reviews for people who are tired of being sold to. Her work begins where most product content stops: a bare-skin baseline photograph, a fixed wear window, a named set of conditions, and a written record of how a formula behaved from application to removal.\n\nShe works primarily in complexion, where performance is hardest to fake and easiest to measure. Long-wear behaviour in heat and humidity, colour shift over an eight-hour day, and shade accuracy across medium-to-deep warm undertones are recurring subjects, because those are the areas where marketing copy most often diverges from lived experience.\n\nEvery review on this site separates three things that are usually blurred together: what the brand claims, what she observed, and what she concluded. Sponsored and gifted products are labelled at the top of the page, never at the bottom. Reviews are revisited and re-dated when a formula, a shade range, or her opinion changes.",
+            "editorialByline": "Zina Almokri is a beauty creator and product-testing specialist. She writes about complexion performance, long-wear formulas and shade accuracy, and tests every product she reviews on her own skin.",
+            "collaboration": "Zina Almokri partners with beauty brands on product launches, long-form testing series, campaign photography and social content. Her audience comes to her for one reason: she says what a product actually did. Partnerships are accepted only where that independence is preserved. She does not agree to pre-approved verdicts, and every paid or gifted placement is disclosed prominently. Available for launch campaigns, extended wear-test series, editorial review features, UGC packages and event coverage."
+          },
+          "expertise": [
+            { "label": "Complexion performance", "detail": "Foundations, skin tints and concealers assessed on wear time, transfer, colour shift and finish." },
+            { "label": "Heat and humidity wear testing", "detail": "Long-wear behaviour in high-temperature, high-humidity conditions rather than air-conditioned studio conditions." },
+            { "label": "Shade accuracy", "detail": "Shade-range evaluation with particular attention to medium-to-deep warm and olive undertones." },
+            { "label": "Barrier-focused skincare", "detail": "Routine-level assessment of moisturisers and serums over multi-week periods." },
+            { "label": "Product comparison", "detail": "Side-by-side testing of competing formulas under identical conditions." }
+          ],
+          "philosophy": {
+            "statement": "A review is only worth reading if you can tell what was measured, what was observed, and what was opinion.",
+            "principles": [
+              "The testing conditions are published, not implied.",
+              "Brand claims are quoted, not repeated as fact.",
+              "Observation and conclusion are written separately.",
+              "Nothing is described as suitable for everyone.",
+              "No medical, clinical or dermatological claims are made.",
+              "Disclosure appears above the review, not beneath it.",
+              "Reviews are revisited and re-dated when the product or the verdict changes."
+            ]
+          },
+          "seo": {
+            "title": "About Zina Almokri",
+            "description": "Beauty creator and product-testing specialist. How she works, what she tests, and the editorial standards behind every review on this site.",
+            "focusKeyword": "zina almokri",
+            "secondaryKeywords": ["zina almokri beauty", "zina almokri reviews"],
+            "canonicalPath": "/en/about/"
+          }
+        },
+        "ar": {
+          "slug": "about",
+          "translationStatus": "adapted",
+          "professionalTitle": "صانعة محتوى تجميل ومختصة في تجربة المنتجات",
+          "tagline": "أجربه على بشرتي، ثم أخبرك بما حدث بالضبط.",
+          "bios": {
+            "homepageIntro": "صانعة محتوى تجميل. كل منتج على هذا الموقع تم استخدامه وتوثيقه على بشرتي.",
+            "short": "زينا المقري صانعة محتوى تجميل تختبر مستحضرات التجميل والعناية بالبشرة على بشرتها، وتنشر ما يحدث فعليا: مدة الثبات، والملمس، والنهائية، والظروف التي جرب فيها كل منتج.",
+            "long": "زينا المقري تصنع مراجعات تجميل لمن سئم من أسلوب البيع المباشر. يبدأ عملها من حيث ينتهي معظم المحتوى التسويقي: صورة مرجعية للبشرة قبل الاستخدام، ومدة ثبات محددة، وظروف اختبار معلنة، وتوثيق مكتوب لسلوك التركيبة من لحظة التطبيق حتى الإزالة.\n\nتركز عملها على منتجات البشرة، حيث يصعب تزييف الأداء ويسهل قياسه. الثبات في الحرارة والرطوبة، وتغير اللون خلال ساعات اليوم، ودقة الدرجات للبشرة المتوسطة والداكنة ذات التحت-لون الدافئ، مواضيع متكررة في عملها.\n\nكل مراجعة تفصل بوضوح بين ثلاثة أمور: ما تدعيه العلامة التجارية، وما لاحظته هي، وما استنتجته. المنتجات المدفوعة أو المهداة توضح في أعلى الصفحة، لا في أسفلها. وتُعاد زيارة المراجعات وتأريخها عند تغير التركيبة أو مجموعة الدرجات أو الرأي.",
+            "editorialByline": "زينا المقري صانعة محتوى تجميل ومختصة في تجربة المنتجات. تكتب عن أداء منتجات البشرة والتركيبات طويلة الثبات ودقة الدرجات، وتختبر كل منتج تراجعه على بشرتها.",
+            "collaboration": "تتعاون زينا المقري مع علامات التجميل في إطلاق المنتجات، وسلاسل التجربة الطويلة، وتصوير الحملات، والمحتوى الاجتماعي. يأتي جمهورها إليها لسبب واحد: أنها تقول ما فعله المنتج فعلا. تُقبل الشراكات فقط عندما تُحفظ هذه الاستقلالية. لا توافق على أحكام متفق عليها مسبقا، ويُفصح عن كل تعاون مدفوع أو مُهدى بشكل واضح."
+          },
+          "expertise": [
+            { "label": "أداء منتجات البشرة", "detail": "كريمات الأساس والكونسيلر تُقيَّم من حيث الثبات والانتقال وتغير اللون والنهائية." },
+            { "label": "الاختبار في الحرارة والرطوبة", "detail": "سلوك الثبات في ظروف حرارة ورطوبة عالية بدل ظروف الاستوديو المكيف." },
+            { "label": "دقة الدرجات", "detail": "تقييم مجموعات الدرجات مع اهتمام خاص بالتحت-لون الدافئ والزيتوني في البشرة المتوسطة والداكنة." },
+            { "label": "العناية بحاجز البشرة", "detail": "تقييم المرطبات والسيرومات على مستوى الروتين عبر فترات ممتدة لأسابيع." },
+            { "label": "مقارنة المنتجات", "detail": "اختبار متزامن لتركيبات متنافسة في ظروف متطابقة." }
+          ],
+          "philosophy": {
+            "statement": "المراجعة تستحق القراءة فقط إذا استطعت التمييز بين ما قيس وما لوحظ وما كان رأيا.",
+            "principles": [
+              "ظروف الاختبار تُنشر ولا يُلمَّح إليها.",
+              "ادعاءات العلامات تُقتبس ولا تُكرر كحقائق.",
+              "الملاحظة والاستنتاج يُكتبان منفصلين.",
+              "لا يوصف أي منتج بأنه يناسب الجميع.",
+              "لا تُقدَّم أي ادعاءات طبية أو سريرية أو جلدية.",
+              "الإفصاح يظهر أعلى المراجعة لا أسفلها.",
+              "تُعاد زيارة المراجعات وتأريخها عند تغير المنتج أو الحكم."
+            ]
+          },
+          "seo": {
+            "title": "عن زينا المقري",
+            "description": "صانعة محتوى تجميل ومختصة في تجربة المنتجات. كيف تعمل، وماذا تختبر، والمعايير التحريرية خلف كل مراجعة على هذا الموقع.",
+            "focusKeyword": "زينا المقري",
+            "secondaryKeywords": ["زينا المقري تجميل", "زينا المقري مراجعات"],
+            "canonicalPath": "/ar/about/"
+          }
+        }
+      }
+    }
+  ]
+}

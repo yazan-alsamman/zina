@@ -1,0 +1,87 @@
+---
+/**
+ * SIGNATURE DEVICE 3a — THE CLAIM VOICE
+ *
+ * What the BRAND says. The quietest text on the page, and the site's argument expressed in type:
+ * the hierarchy is INVERTED from convention on purpose — marketing copy is quietest, the
+ * reviewer's conclusion is loudest.
+ *
+ * THE DOTTED RULE IS THE SIGNATURE. A dotted line reads as provisional, as "someone else said
+ * this". Solid rules mark things that were observed.
+ *
+ * SIX SIGNALS distinguish a claim from an observation, and colour is the sixth:
+ *   1 text label (Claimed by the brand)   4 rule style (dotted, not solid)
+ *   2 semantics (blockquote + cite)       5 size and volume (16px, quietest)
+ *   3 typeface (text, not mono)           6 colour (muted)
+ * Five of the six survive greyscale and forced-colors. The label alone is sufficient for a
+ * screen reader.
+ *
+ * FORBIDDEN: a quotation-mark glyph as decoration, an info icon, a coloured badge, or any
+ * treatment that makes the claim look endorsed.
+ */
+import type { Locale } from "../../../content/schema/types";
+import { t } from "../../lib/ui-strings";
+
+interface Props {
+  locale: Locale;
+  claims: string[];
+  brandName?: string;
+}
+
+const { locale, claims, brandName } = Astro.props;
+---
+
+{
+  claims.length > 0 && (
+    <div class="claims">
+      <p class="label claim-label">{t(locale, "claimedByTheBrand")}</p>
+      {claims.map((claim) => (
+        <blockquote class="claim">
+          <p>{claim}</p>
+          {brandName && <cite class="visually-hidden">{brandName}</cite>}
+        </blockquote>
+      ))}
+    </div>
+  )
+}
+
+<style>
+  .claims {
+    background: var(--color-ground-raised);
+    padding: var(--space-3);
+    margin-inline-start: var(--space-2);
+    max-width: var(--type-measure-editorial);
+  }
+
+  .claim-label {
+    color: var(--color-text-muted);
+  }
+
+  .claim {
+    margin-block-start: var(--space-2);
+    /* THE DOTTED RULE. Provisional by construction. */
+    border-inline-start: var(--border-rule-claim);
+    padding-inline-start: var(--space-2);
+  }
+
+  .claim p {
+    font-size: calc(var(--type-body-sm) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-body-sm) * var(--type-arabic-leading-factor));
+    /* The quietest text on the page. Measured at 5.74:1 on raised — above AA. */
+    color: var(--color-evidence-claim);
+  }
+
+  @media (min-width: 1024px) {
+    .claims {
+      margin-inline-start: var(--space-3);
+      padding: var(--space-4);
+    }
+  }
+
+  @media (forced-colors: active) {
+    /* The dotted-versus-solid distinction is exactly what survives a forced palette. */
+    .claim {
+      border-inline-start-color: CanvasText;
+    }
+  }
+</style>

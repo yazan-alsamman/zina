@@ -1,0 +1,141 @@
+---
+/**
+ * RELATED CONTENT — the exits. Article ends, navigation begins.
+ *
+ * One of only three contained surfaces on the site (C-2): peer objects, individually actionable,
+ * and the block must separate cleanly from the article. A hairline alone does not create enough
+ * distance even after 128px of space.
+ *
+ * ============================================================================
+ * THE INDEX TREATMENT — NOT CARDS
+ * ============================================================================
+ * Image, hairline, type. No container per item, no border, no padding box, no shadow, no hover
+ * lift. The hairline does the separating that a card's edge would have done, at a fraction of
+ * the visual weight. This is the component most likely to drift into a generic card grid, and
+ * the rule is what prevents it.
+ *
+ * LOCALE FILTERING HAPPENS BEFORE THE COUNT IS TAKEN. A related link never crosses languages
+ * silently, and a filtered-out item never leaves a hole: the group renders at the layout its
+ * remaining count deserves (0 removes the group, 1 gets full width, 2 side by side, 3 a grid).
+ *
+ * FORBIDDEN: a carousel, dots, auto-advance, "you might also like", an empty cell.
+ */
+import type { Locale } from "../../../content/schema/types";
+
+export interface RelatedItem {
+  href: string;
+  title: string;
+  meta?: string;
+  eyebrow?: string;
+}
+
+export interface RelatedGroup {
+  title: string;
+  items: RelatedItem[];
+}
+
+interface Props {
+  locale: Locale;
+  groups: RelatedGroup[];
+  headingId: string;
+}
+
+const { groups, headingId } = Astro.props;
+// Absence is silent: a group with nothing in it is removed, not rendered empty.
+const populated = groups.filter((group) => group.items.length > 0);
+---
+
+{
+  populated.length > 0 && (
+    <div class="related" aria-labelledby={headingId}>
+      <div class="container">
+        <div class="groups" data-groups={populated.length}>
+          {populated.map((group) => (
+            <section class="group">
+              <h3 class="label">{group.title}</h3>
+              <ul class="items plain" data-count={group.items.length}>
+                {group.items.map((item) => (
+                  <li class="item">
+                    <a href={item.href}>
+                      {item.eyebrow && <span class="eyebrow label">{item.eyebrow}</span>}
+                      <span class="title">{item.title}</span>
+                      {item.meta && <span class="meta">{item.meta}</span>}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+<style>
+  .related {
+    /* The largest gap on the page: 128px at desktop, stepped down by the token. */
+    margin-block-start: var(--space-related-above);
+    padding-block: var(--space-6);
+    background: var(--color-ground-raised);
+    border-block-start: var(--border-rule-hairline);
+  }
+
+  .groups {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .group h3 {
+    padding-block-end: var(--space-1);
+    border-block-end: var(--border-rule-hairline);
+  }
+
+  .items {
+    display: grid;
+    gap: var(--space-3);
+    margin-block-start: var(--space-3);
+  }
+
+  /* THE INDEX TREATMENT. The whole block is the link; the ring surrounds all of it. */
+  .item a {
+    display: grid;
+    gap: var(--space-0-5);
+    text-decoration: none;
+    color: var(--color-text-primary);
+    padding-block: var(--space-1);
+  }
+
+  .item a:hover .title {
+    color: var(--color-accent-clay-hover);
+    text-decoration: underline;
+  }
+
+  .eyebrow {
+    color: var(--color-text-muted);
+  }
+
+  .title {
+    font-size: calc(var(--type-body-md) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-body-md) * var(--type-arabic-leading-factor));
+  }
+
+  .meta {
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
+    color: var(--color-text-muted);
+  }
+
+  @media (min-width: 768px) {
+    .groups[data-groups="2"],
+    .groups[data-groups="3"] {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .groups[data-groups="3"] {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

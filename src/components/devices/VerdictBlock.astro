@@ -1,0 +1,110 @@
+---
+/**
+ * SIGNATURE DEVICE 3c — THE VERDICT VOICE
+ *
+ * The loudest block on the page, and the only place two things appear:
+ *   - the DISPLAY SERIF in the body of the page
+ *   - the 2px CLAY RULE
+ * Both are reserved absolutely, so the block reads as CONCLUSION the moment it enters view.
+ * The clay rule appears once per review page and nowhere else in the system.
+ *
+ * An h2 despite being the largest text on the page. Heading level follows document structure,
+ * never visual size (decision D3-9).
+ *
+ * NO SCORE. NO STARS. NO BADGE. NO NUMBER. Removed by Phase 1 decision and enforced by
+ * tools/validate-content.mjs, which fails the build on any rating, score or stars field.
+ */
+import type { Locale } from "../../../content/schema/types";
+import { t } from "../../lib/ui-strings";
+
+interface Props {
+  locale: Locale;
+  headingId: string;
+  summary: string;
+  bestFor: string;
+  wouldRepurchase: string;
+}
+
+const { locale, headingId, summary, bestFor, wouldRepurchase } = Astro.props;
+---
+
+<section class="verdict full-bleed">
+  <div class="container inner">
+    <h2 class="label verdict-label" id={headingId}>{t(locale, "verdict")}</h2>
+    <p class="summary display-md">{summary}</p>
+    <dl class="supporting">
+      <div class="pair">
+        <dt>{t(locale, "bestFor")}</dt>
+        <dd>{bestFor}</dd>
+      </div>
+      <div class="pair">
+        <dt>{t(locale, "wouldRepurchase")}</dt>
+        <dd>{wouldRepurchase}</dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<style>
+  .verdict {
+    background: var(--color-ground-raised);
+    /* THE ONLY 2px CLAY RULE ON THE PAGE. */
+    border-block-start: var(--border-rule-verdict);
+    margin-block: var(--space-section) var(--space-8);
+  }
+
+  .inner {
+    padding-block: var(--space-6);
+  }
+
+  .verdict-label {
+    color: var(--color-accent-clay);
+  }
+
+  .summary {
+    margin-block-start: var(--space-2);
+    max-width: var(--type-measure-editorial);
+    color: var(--color-evidence-verdict);
+  }
+
+  .supporting {
+    margin-block-start: var(--space-4);
+    display: grid;
+    gap: var(--space-2);
+    max-width: var(--type-measure-editorial);
+  }
+
+  .pair {
+    display: grid;
+    gap: var(--space-0-5);
+  }
+
+  .supporting dt {
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
+    letter-spacing: var(--type-tracking-label);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  :global(html[lang="ar"]) .supporting dt {
+    text-transform: none;
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+  }
+
+  .supporting dd {
+    font-size: calc(var(--type-body-md) * var(--type-arabic-size-factor));
+    color: var(--color-text-secondary);
+  }
+
+  @media (min-width: 768px) {
+    .inner {
+      padding-block: var(--space-8);
+    }
+
+    .supporting {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-5);
+    }
+  }
+</style>

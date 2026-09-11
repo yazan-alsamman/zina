@@ -1,0 +1,443 @@
+---
+/**
+ * THE METHOD — /{locale}/method/
+ *
+ * The trust moment in every user flow, and the destination of the most-repeated internal link on
+ * the site.
+ *
+ * ============================================================================
+ * PROJECT MOCK METHOD — the constraint that governs this entire page
+ * ============================================================================
+ * The six stages were drafted in Phase 0. They have NOT been confirmed as Zina Almokri's
+ * practice. This page must never read as a verified, proprietary, clinical, medical, laboratory,
+ * certified, accredited or proven methodology, and it says so in its own words, above the stages,
+ * in both locales.
+ *
+ * The notice is placed BEFORE the stages, not after: a reader should meet the limit before they
+ * invest in the protocol, not discover it in a footnote afterwards.
+ *
+ * Enforcement beyond copy: the record carries `_verification: "MOCK"`, which cannot reach a
+ * publishable state, and `tools/check-mock-guard.mjs` fails any build carrying the marker.
+ *
+ * ============================================================================
+ * THE PAGE'S ARGUMENT
+ * ============================================================================
+ * A sceptic is not persuaded by a process diagram. They are persuaded by someone volunteering
+ * what their process CANNOT establish. So `doesNotProve` renders at the SAME visual weight as
+ * `purpose` — same family, same size, same colour, same column width. The only difference is a
+ * hairline and a label.
+ *
+ * That is checkable in a diff. If `doesNotProve` ever acquires a smaller size token, a muted
+ * colour or a <details> wrapper, the page's argument has been inverted.
+ *
+ * NOT: scientific instrumentation, a medical dashboard, lab software, a SaaS process diagram, a
+ * startup infographic, a funnel, progress bars, gauges, animated counters, or scroll animation.
+ * The stages are an ordered list with a strong reading rhythm, set like an index.
+ */
+import type { GetStaticPaths } from "astro";
+import type { Locale, MethodStageKey } from "../../../../content/schema/types";
+import {
+  LOCALES,
+  IS_INDEXABLE_BUILD,
+  method,
+  person,
+  reviews as reviewsIn,
+} from "../../../lib/content";
+import { absoluteUrl, path, robotsContent, sectionBreadcrumb } from "../../../lib/routing";
+import { breadcrumbSchema, jsonLd, templatedMeta } from "../../../lib/seo";
+import { t } from "../../../lib/ui-strings";
+import { isolateValue } from "../../../lib/bidi";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
+
+export const getStaticPaths = (() =>
+  LOCALES.map((locale) => ({ params: { locale } }))) satisfies GetStaticPaths;
+
+const { locale } = Astro.params as { locale: Locale };
+
+const record = method();
+const content = record.locales[locale];
+if (!content) {
+  // Method is required in BOTH locales; the validator fails the build otherwise. This is a
+  // belt-and-braces guard, not an expected path.
+  throw new Error(`method has no ${locale} content but a route was generated`);
+}
+
+/** Stages in the canonical order declared on the record, not in authoring order. */
+const stages = record.stageOrder
+  .map((key) => content.stages.find((stage) => stage.key === key))
+  .filter((stage): stage is NonNullable<typeof stage> => Boolean(stage));
+
+/**
+ * METHOD -> REVIEW, derived from the content model rather than invented.
+ * `review.testing.methodStageKeys` is the existing relationship; a stage lists the reviews in
+ * THIS locale that ran it. A stage nobody has used yet simply shows nothing — the protocol is
+ * not defined by what has been published.
+ */
+const reviewsUsingStage = (key: MethodStageKey) =>
+  reviewsIn(locale).filter((review) => review.testing.methodStageKeys.includes(key));
+
+const selfPath = path.method(locale);
+const meta = templatedMeta(content.name, content.tagline, {
+  canonical: absoluteUrl(selfPath),
+  robots: robotsContent(IS_INDEXABLE_BUILD, content.seo?.noindex),
+  locale,
+});
+
+/** Required in both locales, so the pair is reciprocal by construction. */
+const alternates = [
+  ...LOCALES.map((l) => ({ hreflang: l, href: absoluteUrl(path.method(l)) })),
+  { hreflang: "x-default", href: absoluteUrl(path.method("en")) },
+];
+
+const crumbs = sectionBreadcrumb(locale, {
+  home: t(locale, "home"),
+  section: t(locale, "method"),
+});
+
+/**
+ * JSON-LD ENTITY SAFETY.
+ *
+ * BreadcrumbList only. No `HowTo`, because a HowTo asserts a repeatable procedure a reader can
+ * follow to obtain a result — which is precisely the claim an unverified method must not make.
+ * No `Person` credential, no `Organization`, no laboratory or medical entity of any kind. Zina is
+ * not a clinician, a laboratory or a certified testing authority, and nothing in this markup may
+ * imply otherwise.
+ */
+const schemas = [jsonLd(breadcrumbSchema(crumbs))];
+
+const bio = person().locales[locale]?.bios?.editorialByline ?? "";
+---
+
+<BaseLayout
+  locale={locale}
+  meta={meta}
+  alternates={alternates}
+  schemas={schemas}
+  switcherHref={path.method(locale === "en" ? "ar" : "en")}
+>
+  <div class="container method">
+    <Breadcrumbs locale={locale} crumbs={crumbs} />
+
+    <h1 class="display-lg title">{content.name}</h1>
+    <p class="tagline">{content.tagline}</p>
+
+    <div class="intro text-column">
+      {content.introduction.split("\n\n").map((para) => <p>{para}</p>)}
+    </div>
+
+    {/*
+      THE BOUNDARY, ABOVE THE STAGES.
+      Same surface treatment as the review page's disclosure band, deliberately: both are
+      statements about the limits of authority. Never a <details>, never small print.
+    */}
+    <section class="boundary" aria-labelledby="boundary-heading">
+      <h2 class="label boundary-label" id="boundary-heading">{t(locale, "methodIntroLabel")}</h2>
+      <p class="boundary-statement">{content.boundaryStatement}</p>
+      <p class="mock-notice">{t(locale, "projectMockMethodNotice")}</p>
+    </section>
+
+    <section class="stages-section" aria-labelledby="stages-heading">
+      <h2 class="section-heading" id="stages-heading">{t(locale, "methodStagesHeading")}</h2>
+
+      {/* An ORDERED list: the stages have an order, and the order is meaning. */}
+      <ol class="stages plain">
+        {
+          stages.map((stage, index) => {
+            const used = reviewsUsingStage(stage.key);
+            return (
+              <li class="stage" id={stage.key}>
+                <div class="stage-index record">
+                  <Fragment set:html={isolateValue(String(index + 1).padStart(2, "0"))} />
+                </div>
+
+                <div class="stage-body">
+                  <h3 class="stage-name">{stage.name}</h3>
+                  <p class="stage-purpose">{stage.purpose}</p>
+
+                  <div class="stage-lists">
+                    <div class="stage-list">
+                      <h4 class="label">{t(locale, "whatIsObserved")}</h4>
+                      <ul class="plain markers">
+                        {stage.observes.map((item) => <li>{item}</li>)}
+                      </ul>
+                    </div>
+
+                    <div class="stage-list">
+                      <h4 class="label">{t(locale, "whatIsRecorded")}</h4>
+                      <ul class="plain markers">
+                        {stage.evidence.map((item) => <li>{item}</li>)}
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/*
+                    IDENTICAL WEIGHT TO .stage-purpose. Same family, size, colour, measure.
+                    The only difference is the hairline above and the label.
+                  */}
+                  <div class="does-not-prove">
+                    <h4 class="label">{t(locale, "doesNotProve")}</h4>
+                    <p class="stage-purpose">{stage.doesNotProve}</p>
+                  </div>
+
+                  {used.length > 0 && (
+                    <div class="stage-reviews">
+                      <h4 class="label">{t(locale, "reviewsUsingStage")}</h4>
+                      <ul class="plain review-links">
+                        {used.map((review) => (
+                          <li>
+                            <a href={path.review(locale, review.locales[locale]!.slug!)}>
+                              {review.locales[locale]!.title}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </li>
+            );
+          })
+        }
+      </ol>
+    </section>
+
+    <section class="cannot-tell" aria-labelledby="cannot-heading">
+      <h2 class="section-heading" id="cannot-heading">{t(locale, "whatThisCannotTell")}</h2>
+      <ul class="plain markers cannot-list">
+        {content.whatThisCannotTell.map((item) => <li>{item}</li>)}
+      </ul>
+    </section>
+
+    <p class="byline text-column">{bio}</p>
+
+    <p class="onward">
+      <a href={path.reviewsIndex(locale)}>{t(locale, "viewAllReviews")}</a>
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .method {
+    padding-block: var(--space-6) var(--space-10);
+  }
+
+  .title {
+    margin-block-start: var(--space-3);
+    max-width: 18ch;
+  }
+
+  .tagline {
+    margin-block-start: var(--space-2);
+    max-width: var(--type-measure-editorial);
+    font-family: var(--type-family-display);
+    font-size: calc(var(--type-display-sm) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-display-sm) * var(--type-arabic-leading-factor));
+    color: var(--color-text-secondary);
+  }
+
+  .intro {
+    margin-block-start: var(--space-6);
+    display: grid;
+    gap: var(--space-2);
+    font-size: calc(var(--type-body-lg) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-body-lg) * var(--type-arabic-leading-factor));
+  }
+
+  /* The boundary. Same treatment as the disclosure band: a statement about limits of authority. */
+  .boundary {
+    margin-block-start: var(--space-8);
+    padding: var(--space-4);
+    background: var(--color-ground-raised);
+    background-image: repeating-linear-gradient(
+        0deg,
+        rgb(255 255 255 / 1.5%) 0 1px,
+        transparent 1px 3px
+      ),
+      repeating-linear-gradient(90deg, rgb(255 255 255 / 1.5%) 0 1px, transparent 1px 4px);
+    border-block-start: var(--border-rule-verdict);
+  }
+
+  .boundary-label {
+    color: var(--color-accent-clay);
+  }
+
+  .boundary-statement {
+    margin-block-start: var(--space-2);
+    max-width: var(--type-measure-editorial);
+    font-size: calc(var(--type-body-md) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-body-md) * var(--type-arabic-leading-factor));
+    color: var(--color-text-primary);
+  }
+
+  .mock-notice {
+    margin-block-start: var(--space-3);
+    padding-block-start: var(--space-2);
+    border-block-start: var(--border-rule-hairline);
+    max-width: var(--type-measure-editorial);
+    font-size: calc(var(--type-body-sm) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-body-sm) * var(--type-arabic-leading-factor));
+    color: var(--color-text-secondary);
+  }
+
+  .section-heading {
+    margin-block-end: var(--space-4);
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
+    font-weight: var(--type-weight-medium);
+    letter-spacing: var(--type-tracking-label);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  :global(html[lang="ar"]) .section-heading {
+    text-transform: none;
+    font-weight: var(--type-weight-regular);
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+  }
+
+  .stages-section {
+    margin-block-start: var(--space-10);
+  }
+
+  .stages {
+    display: grid;
+    gap: var(--space-9);
+  }
+
+  .stage {
+    display: grid;
+    gap: var(--space-2);
+    padding-block-start: var(--space-3);
+    border-block-start: var(--border-rule-hairline);
+    scroll-margin-top: 6rem;
+  }
+
+  .stage-index {
+    color: var(--color-accent-mineral);
+    font-size: var(--type-record-md);
+  }
+
+  .stage-name {
+    font-family: var(--type-family-display);
+    font-size: calc(var(--type-display-sm) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-display-sm) * var(--type-arabic-leading-factor));
+    font-weight: var(--type-weight-regular);
+  }
+
+  /* THE EQUAL-WEIGHT RULE. .stage-purpose is used by BOTH purpose and doesNotProve. There is
+     deliberately no separate class to give one of them a smaller size. */
+  .stage-purpose {
+    margin-block-start: var(--space-1);
+    max-width: var(--type-measure-editorial);
+    font-size: calc(var(--type-body-md) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-body-md) * var(--type-arabic-leading-factor));
+    color: var(--color-text-primary);
+  }
+
+  .stage-lists {
+    display: grid;
+    gap: var(--space-4);
+    margin-block-start: var(--space-4);
+  }
+
+  .markers {
+    display: grid;
+    gap: var(--space-1);
+    margin-block-start: var(--space-2);
+  }
+
+  .markers li {
+    position: relative;
+    padding-inline-start: var(--space-2);
+    max-width: var(--type-measure-editorial);
+    font-size: calc(var(--type-body-sm) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-body-sm) * var(--type-arabic-leading-factor));
+    color: var(--color-text-secondary);
+  }
+
+  .markers li::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: 0;
+    inset-block-start: 0.6em;
+    inline-size: 6px;
+    block-size: 6px;
+    background: var(--color-accent-mineral);
+  }
+
+  .does-not-prove {
+    margin-block-start: var(--space-4);
+    padding-block-start: var(--space-2);
+    border-block-start: var(--border-rule-hairline);
+  }
+
+  .stage-reviews {
+    margin-block-start: var(--space-4);
+  }
+
+  .review-links {
+    display: grid;
+    gap: var(--space-1);
+    margin-block-start: var(--space-2);
+  }
+
+  .review-links a {
+    font-size: calc(var(--type-body-sm) * var(--type-arabic-size-factor));
+  }
+
+  .cannot-tell {
+    margin-block-start: var(--space-10);
+    padding: var(--space-4);
+    background: var(--color-ground-inset);
+  }
+
+  .cannot-list li {
+    color: var(--color-text-primary);
+    font-size: calc(var(--type-body-md) * var(--type-arabic-size-factor));
+  }
+
+  .byline {
+    margin-block-start: var(--space-8);
+    font-size: calc(var(--type-body-sm) * var(--type-arabic-size-factor));
+    color: var(--color-text-muted);
+  }
+
+  .onward {
+    margin-block-start: var(--space-6);
+    padding-block-start: var(--space-3);
+    border-block-start: var(--border-rule-hairline);
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+  }
+
+  @media (min-width: 768px) {
+    .stage-lists {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-6);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    /* The stage number moves into the margin index column, as on the review page. */
+    .stage {
+      grid-template-columns: var(--layout-index-width) minmax(0, 1fr);
+      gap: var(--layout-index-gap);
+      align-items: start;
+    }
+
+    .stage-index {
+      padding-block-start: 0.35em;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .boundary {
+      background-image: none;
+    }
+
+    .markers li::before {
+      background: CanvasText;
+    }
+  }
+</style>

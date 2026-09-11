@@ -1,0 +1,146 @@
+{
+  "__MOCK_DATA__": true,
+  "collection": "site",
+  "schemaVersion": "1.0.0",
+  "notice": "FICTIONAL MOCK CONTENT. The domain, email addresses and legal entity are INVENTED placeholders on reserved example domains and must never render in production. PHASE 1: this record now carries the locale routing configuration, the route table and per-locale navigation. It is the single source of truth for URL construction, hreflang generation and sitemap output.",
+  "items": [
+    {
+      "id": "mock-site-config",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "siteName": { "en": "Zina Almokri", "ar": "زينا المقري" },
+      "domain": {
+        "value": "https://zinaalmokri.example.com",
+        "_verification": "MOCK",
+        "_note": "INVENTED. The real domain is unknown and remains blocking for canonical URLs, hreflang, sitemap generation and Search Console. Unknown U-01."
+      },
+      "i18n": {
+        "locales": [
+          { "code": "en", "label": "English", "labelNative": "English", "dir": "ltr", "hreflang": "en", "default": true },
+          { "code": "ar", "label": "Arabic", "labelNative": "العربية", "dir": "rtl", "hreflang": "ar", "default": false }
+        ],
+        "xDefault": "en",
+        "rootBehaviour": "redirect-302-by-accept-language",
+        "_rootNote": "The bare root / is never an indexable page. It issues a 302 (not 301) to /en/ or /ar/ based on Accept-Language, with a cookie override once the user chooses. x-default points at /en/. A 301 would prevent Google from crawling the other locale and would cache the wrong choice in shared proxies. See docs/MULTILINGUAL_SEO_ARCHITECTURE.md section 2.",
+        "pathSegmentsLocalised": false,
+        "_segmentNote": "Path segments (reviews, brands, work, journal, method) stay in English in BOTH locales. Slugs are per-locale and independently authored. Rationale and the rejected alternatives are in docs/SEO_URL_ARCHITECTURE.md section 3.",
+        "trailingSlash": "always",
+        "missingTranslationBehaviour": "no-route-no-hreflang-switcher-falls-back-to-index"
+      },
+      "routes": [
+        { "key": "home", "pattern": "/{locale}/", "collection": null, "indexable": true, "priority": 1.0, "changefreq": "weekly" },
+        { "key": "about", "pattern": "/{locale}/about/", "collection": "person", "indexable": true, "priority": 0.9, "changefreq": "monthly" },
+        { "key": "method", "pattern": "/{locale}/method/", "collection": "method", "indexable": true, "priority": 0.9, "changefreq": "monthly" },
+        { "key": "reviews.index", "pattern": "/{locale}/reviews/", "collection": "reviews", "indexable": true, "priority": 0.9, "changefreq": "weekly" },
+        { "key": "reviews.category", "pattern": "/{locale}/reviews/{category}/", "collection": "reviews", "indexable": true, "priority": 0.7, "changefreq": "weekly", "gated": true, "gateRule": "minimum 5 published reviews in that category and locale", "status": "deferred" },
+        { "key": "reviews.detail", "pattern": "/{locale}/reviews/{slug}/", "collection": "reviews", "indexable": true, "priority": 0.8, "changefreq": "monthly" },
+        { "key": "brands.index", "pattern": "/{locale}/brands/", "collection": "brands", "indexable": true, "priority": 0.6, "changefreq": "monthly" },
+        { "key": "brands.detail", "pattern": "/{locale}/brands/{slug}/", "collection": "brands", "indexable": true, "priority": 0.6, "changefreq": "monthly", "gated": true, "gateRule": "see brands.json indexGate" },
+        { "key": "work.index", "pattern": "/{locale}/work/", "collection": "work", "indexable": true, "priority": 0.7, "changefreq": "monthly" },
+        { "key": "work.detail", "pattern": "/{locale}/work/{slug}/", "collection": "work", "indexable": true, "priority": 0.6, "changefreq": "yearly" },
+        { "key": "journal.index", "pattern": "/{locale}/journal/", "collection": "journal", "indexable": true, "priority": 0.8, "changefreq": "weekly" },
+        { "key": "journal.category", "pattern": "/{locale}/journal/{category}/", "collection": "journal", "indexable": true, "priority": 0.6, "changefreq": "monthly", "gated": true, "gateRule": "minimum 3 published articles in that category and locale" },
+        { "key": "journal.detail", "pattern": "/{locale}/journal/{slug}/", "collection": "journal", "indexable": true, "priority": 0.7, "changefreq": "yearly" },
+        { "key": "editorial-standards", "pattern": "/{locale}/editorial-standards/", "collection": null, "indexable": true, "priority": 0.5, "changefreq": "yearly" },
+        { "key": "contact", "pattern": "/{locale}/contact/", "collection": null, "indexable": true, "priority": 0.8, "changefreq": "yearly" },
+        { "key": "privacy", "pattern": "/{locale}/privacy/", "collection": null, "indexable": true, "priority": 0.2, "changefreq": "yearly" },
+        { "key": "terms", "pattern": "/{locale}/terms/", "collection": null, "indexable": true, "priority": 0.2, "changefreq": "yearly" },
+        { "key": "notfound", "pattern": "/{locale}/404/", "collection": null, "indexable": false, "priority": null, "changefreq": null },
+        { "key": "press", "pattern": "/{locale}/press/", "collection": "press", "indexable": true, "priority": 0.4, "changefreq": "yearly", "status": "deferred", "gateRule": "minimum 3 verified press mentions with live URLs" },
+        { "key": "products.detail", "pattern": "/{locale}/brands/{brandSlug}/{productSlug}/", "collection": "products", "indexable": true, "priority": 0.5, "status": "not-built", "gateRule": "2+ published reviews of that product in the locale, or 1 review plus a published comparison feature" }
+      ],
+      "reservedSlugs": {
+        "_rule": "Category segments share a path level with detail slugs, so a review or article slug must never collide with a category key. The validator enforces this.",
+        "reviews": ["foundation", "concealer", "mascara", "lip", "serum", "moisturizer"],
+        "journal": ["testing-notes", "guides", "comparisons", "essays"]
+      },
+      "navigation": {
+        "primary": [
+          { "key": "reviews", "routeKey": "reviews.index", "label": { "en": "Reviews", "ar": "المراجعات" } },
+          { "key": "method", "routeKey": "method", "label": { "en": "Method", "ar": "الطريقة" } },
+          { "key": "journal", "routeKey": "journal.index", "label": { "en": "Journal", "ar": "المجلة" } },
+          { "key": "work", "routeKey": "work.index", "label": { "en": "Work", "ar": "الأعمال" } },
+          { "key": "about", "routeKey": "about", "label": { "en": "About", "ar": "عن زينا" } }
+        ],
+        "_primaryNote": "Five items plus a Contact call to action and a language switcher. Brands was removed from the primary navigation in Phase 1: it is reachable from every review and from the reviews index, and two of five mock brands do not qualify for a page in at least one locale. Promoting a partially populated section to primary navigation advertises the emptiest part of the site.",
+        "cta": { "key": "contact", "routeKey": "contact", "label": { "en": "Collaborate", "ar": "تعاون" } },
+        "footer": [
+          {
+            "group": { "en": "Content", "ar": "المحتوى" },
+            "links": [
+              { "routeKey": "reviews.index", "label": { "en": "All reviews", "ar": "كل المراجعات" } },
+              { "routeKey": "method", "label": { "en": "How I test", "ar": "كيف أختبر" } },
+              { "routeKey": "journal.index", "label": { "en": "Journal", "ar": "المجلة" } },
+              { "routeKey": "brands.index", "label": { "en": "Brands", "ar": "العلامات" } }
+            ]
+          },
+          {
+            "group": { "en": "Professional", "ar": "للمحترفين" },
+            "links": [
+              { "routeKey": "work.index", "label": { "en": "Selected work", "ar": "أعمال مختارة" } },
+              { "routeKey": "contact", "label": { "en": "Collaborate", "ar": "تعاون" } }
+            ]
+          },
+          {
+            "group": { "en": "Standards", "ar": "المعايير" },
+            "links": [
+              { "routeKey": "editorial-standards", "label": { "en": "Editorial standards", "ar": "المعايير التحريرية" } },
+              { "routeKey": "privacy", "label": { "en": "Privacy", "ar": "الخصوصية" } },
+              { "routeKey": "terms", "label": { "en": "Terms", "ar": "الشروط" } }
+            ]
+          }
+        ]
+      },
+      "seoDefaults": {
+        "titleTemplate": { "en": "%s | Zina Almokri", "ar": "%s | زينا المقري" },
+        "_titleTemplateNote": "NOT applied to review, journal or work detail pages, whose seo.title fields are already length-optimised and are used verbatim. Applied to index and utility pages only.",
+        "defaultTitle": { "en": "Zina Almokri: beauty creator and product testing", "ar": "زينا المقري: صانعة محتوى تجميل وتجربة منتجات" },
+        "defaultDescription": {
+          "en": "Beauty product reviews built on documented testing. Every product worn, timed and photographed on my own skin, with the conditions published.",
+          "ar": "مراجعات منتجات تجميل مبنية على اختبار موثق. كل منتج استُخدم وقيست مدته وصُوّر على بشرتي، مع نشر ظروف الاختبار."
+        },
+        "openGraphImage": "/mock-media/person/zina-og.jpg",
+        "twitterCard": "summary_large_image",
+        "themeColor": "#0E0E0F"
+      },
+      "contact": {
+        "generalEmail": { "value": "hello@zinaalmokri.example.com", "_verification": "MOCK" },
+        "collaborationEmail": { "value": "collaborations@zinaalmokri.example.com", "_verification": "MOCK" },
+        "pressEmail": { "value": "press@zinaalmokri.example.com", "_verification": "MOCK" },
+        "management": { "represented": false, "agencyName": null, "agencyEmail": null, "_verification": "NEEDS_VERIFICATION" },
+        "phone": { "value": null, "_verification": "NEEDS_VERIFICATION", "_note": "Deliberately null. A public phone number is an explicit client decision, not a default." },
+        "inquiryTypes": [
+          { "value": "collaboration", "label": { "en": "Brand collaboration", "ar": "تعاون مع علامة" } },
+          { "value": "product-testing", "label": { "en": "Product testing request", "ar": "طلب تجربة منتج" } },
+          { "value": "press", "label": { "en": "Press or media", "ar": "صحافة وإعلام" } },
+          { "value": "event", "label": { "en": "Event or appearance", "ar": "فعالية أو ظهور" } },
+          { "value": "other", "label": { "en": "Something else", "ar": "أمر آخر" } }
+        ]
+      },
+      "legal": {
+        "entityName": { "value": null, "_verification": "NEEDS_VERIFICATION" },
+        "jurisdiction": { "value": null, "_verification": "NEEDS_VERIFICATION", "_note": "Determines the applicable privacy regime and therefore the required consent behaviour. Blocking for analytics. Unknown U-03." },
+        "copyrightHolder": "Zina Almokri"
+      },
+      "editorialStandards": {
+        "_verification": "MOCK",
+        "_note": "Proposed standards, not Zina's stated positions. Each must be approved before publication. High-value E-E-A-T assets that belong at a real indexable URL, not in a modal.",
+        "en": {
+          "disclosurePolicy": "Every review states its commercial status above the content: bought independently, gifted, or paid. Paid placements never come with agreed verdicts.",
+          "correctionsPolicy": "Errors are corrected in place, with the change and its date recorded in the review update log rather than removed.",
+          "medicalBoundary": "Nothing on this site is medical, clinical or dermatological advice. Persistent skin concerns belong with a qualified professional.",
+          "aiPolicy": "Reviews are written from first-hand testing. Testing observations, photographs and verdicts are not generated.",
+          "ratingsPolicy": "This site does not publish numeric scores. A number makes comparison easy and hides the reason, and the reason is the product."
+        },
+        "ar": {
+          "disclosurePolicy": "كل مراجعة تذكر وضعها التجاري أعلى المحتوى: شراء مستقل، أو مُهدى، أو مدفوع. التعاونات المدفوعة لا تأتي أبدا بأحكام متفق عليها مسبقا.",
+          "correctionsPolicy": "تُصحح الأخطاء في مكانها، مع تسجيل التغيير وتاريخه في سجل تحديثات المراجعة بدل حذفه.",
+          "medicalBoundary": "لا شيء على هذا الموقع يُعد استشارة طبية أو سريرية أو جلدية. مشكلات البشرة المستمرة مكانها عند مختص مؤهل.",
+          "aiPolicy": "تُكتب المراجعات من تجربة مباشرة. ملاحظات الاختبار والصور والأحكام ليست مولدة آليا.",
+          "ratingsPolicy": "لا ينشر هذا الموقع تقييمات رقمية. الرقم يسهّل المقارنة ويخفي السبب، والسبب هو جوهر المراجعة."
+        }
+      }
+    }
+  ]
+}

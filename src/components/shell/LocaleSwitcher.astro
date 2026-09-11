@@ -1,0 +1,74 @@
+---
+/**
+ * LOCALE SWITCHER — the one navigation element with real logic behind it.
+ *
+ * Three states, resolved by the caller through lib/routing switcherTarget():
+ *   counterpart       link directly to the other language's version
+ *   section-fallback  the section index, with a visible explanation on arrival
+ *   home-fallback     the target locale home
+ *
+ * IT NEVER LINKS TO A 404.
+ *
+ * Presentation: each label in its OWN SCRIPT, never a flag. Flags represent countries; Arabic
+ * is spoken across dozens of them.
+ *
+ * `lang` and `hreflang` are both present so a screen reader announces "العربية" in Arabic
+ * rather than mispronouncing it in English.
+ */
+import type { Locale } from "../../../content/schema/types";
+import { localeConfig } from "../../lib/content";
+import { otherLocale } from "../../lib/routing";
+import { t } from "../../lib/ui-strings";
+
+interface Props {
+  locale: Locale;
+  href: string;
+  state?: "counterpart" | "section-fallback" | "home-fallback";
+}
+
+const { locale, href, state = "counterpart" } = Astro.props;
+const target = otherLocale(locale);
+const targetConfig = localeConfig(target);
+const currentConfig = localeConfig(locale);
+---
+
+<div class="switcher">
+  <span class="current" lang={locale}>{currentConfig.labelNative}</span>
+  <span class="divider" aria-hidden="true">/</span>
+  <a
+    href={href}
+    lang={target}
+    hreflang={target}
+    dir={targetConfig.dir}
+    data-switcher-state={state}
+    aria-label={`${t(locale, "languageSwitcher")}: ${targetConfig.labelNative}`}
+    >{targetConfig.labelNative}</a
+  >
+</div>
+
+<style>
+  .switcher {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-1);
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+    white-space: nowrap;
+  }
+
+  .current {
+    color: var(--color-text-muted);
+  }
+
+  .divider {
+    color: var(--color-line-strong);
+  }
+
+  .switcher a {
+    color: var(--color-text-secondary);
+  }
+
+  .switcher a:hover {
+    color: var(--color-accent-clay-hover);
+  }
+</style>

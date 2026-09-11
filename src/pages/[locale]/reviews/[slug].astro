@@ -1,0 +1,591 @@
+---
+/**
+ * THE REVIEW PAGE — the canonical experience, and the implementation proving ground.
+ *
+ * Section order is FIXED and identical in every locale and at every breakpoint. Two reviews on
+ * this site must be readable side by side, which means the order is not an editorial choice per
+ * post — and a shared URL must show the same thing to everyone, which means no section is
+ * reordered by media query.
+ *
+ * DOM order == visual order == reading order == screen-reader order. At every width. In both
+ * directions.
+ *
+ * Sections 8–11 (conditions, method stages, observations, plates) ARE THE REPORT. Everything
+ * before them is orientation and everything after is navigation. If a future pass compresses
+ * this page, those four survive intact.
+ *
+ * ROUTE GENERATION derives availability from ACTUAL LOCALE CONTENT: six reviews produce TEN
+ * routes, not twelve. One review is English-only and one is Arabic-original, so neither gets a
+ * counterpart route, an hreflang alternate or a stub.
+ */
+import type { GetStaticPaths } from "astro";
+import type { Locale, Review } from "../../../../content/schema/types";
+import {
+  brandById,
+  comparisonReviews,
+  isDisclosurePublishable,
+  IS_INDEXABLE_BUILD,
+  person,
+  productById,
+  relatedJournal,
+  relatedReviews,
+  relatedWork,
+  reviews as reviewsIn,
+} from "../../../lib/content";
+import {
+  absoluteUrl,
+  alternatesFor,
+  isImplemented,
+  localeSlugPaths,
+  path,
+  reviewBreadcrumb,
+  robotsContent,
+  switcherTarget,
+  otherLocale,
+} from "../../../lib/routing";
+import { brandDestination } from "../../../lib/facets";
+import { journalForReview } from "../../../lib/journal";
+import {
+  breadcrumbSchema,
+  detailMeta,
+  jsonLd,
+  personSchema,
+  reviewSchema,
+} from "../../../lib/seo";
+import { t } from "../../../lib/ui-strings";
+import { isolateIdentifier, isolateValue } from "../../../lib/bidi";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
+import DisclosureBand from "../../../components/devices/DisclosureBand.astro";
+import ConditionsWell from "../../../components/devices/ConditionsWell.astro";
+import ObservationTimeline from "../../../components/devices/ObservationTimeline.astro";
+import VerdictBlock from "../../../components/devices/VerdictBlock.astro";
+import Plate from "../../../components/devices/Plate.astro";
+import Frame from "../../../components/media/Frame.astro";
+import TestingSummary from "../../../components/review/TestingSummary.astro";
+import MethodRelationship from "../../../components/review/MethodRelationship.astro";
+import Assessment from "../../../components/review/Assessment.astro";
+import ProductContext from "../../../components/review/ProductContext.astro";
+import RelatedContent from "../../../components/review/RelatedContent.astro";
+import type { RelatedGroup } from "../../../components/review/RelatedContent.astro";
+
+export const getStaticPaths = (() => {
+  const all = [...reviewsIn("en"), ...reviewsIn("ar")];
+  const unique = Array.from(new Map(all.map((r) => [r.id, r])).values());
+  return localeSlugPaths(unique);
+}) satisfies GetStaticPaths;
+
+const { locale } = Astro.params as { locale: Locale; slug: string };
+const { record } = Astro.props as { record: Review };
+
+const content = record.locales[locale];
+if (!content) {
+  throw new Error(`review ${record.id} has no ${locale} content but a route was generated`);
+}
+
+/* ---------------------------------------------------------------- entities */
+
+const product = productById(record.entity.productId);
+const brand = brandById(record.entity.brandId);
+const brandLocale = brand?.locales?.[locale];
+
+/**
+ * THE GATED-LINK RULE — the most likely source of a broken internal link in this architecture
+ * (risk R-14). The brand link is a FUNCTION OF THE GATE, evaluated at build time in the current
+ * locale. When the gate fails the brand name is plain text or a link to the filtered index —
+ * never a link to a page that does not exist, and never a hint that one was withheld.
+ */
+const brandName = brandLocale?.name ?? brand?.slug;
+const brandHref = brandDestination(brand, locale);
+
+/* ---------------------------------------------------------------- metadata */
+
+const canonicalPath = path.review(locale, content.slug!);
+const canonical = absoluteUrl(canonicalPath);
+const alternates = alternatesFor(record, (l, s) => path.review(l, s));
+
+const meta = detailMeta(content.seo, content.title, {
+  canonical,
+  robots: robotsContent(IS_INDEXABLE_BUILD, content.seo?.noindex),
+  locale,
+});
+
+const target = otherLocale(locale);
+const switcher = switcherTarget(
+  target,
+  record,
+  (l, s) => path.review(l, s),
+  path.reviewsIndex,
+  reviewsIn(target).length > 0
+);
+
+const crumbs = reviewBreadcrumb(
+  locale,
+  { home: t(locale, "home"), reviews: t(locale, "reviews") },
+  content.title
+);
+
+const personRecord = person();
+const personId = absoluteUrl(`/${locale}/about/#person`);
+
+const schemas = [
+  jsonLd(breadcrumbSchema(crumbs)),
+  jsonLd(personSchema(personRecord, locale)),
+  jsonLd(
+    reviewSchema({
+      review: record,
+      product,
+      brandName,
+      locale,
+      canonical,
+      personId,
+    })
+  ),
+];
+
+/* ---------------------------------------------------------------- related, locale-filtered */
+
+const groups: RelatedGroup[] = [
+  {
+    title: t(locale, "relatedReviews"),
+    items: relatedReviews(record, locale).map((r) => ({
+      href: path.review(locale, r.locales[locale]!.slug!),
+      title: r.locales[locale]!.title,
+      eyebrow: r.locales[locale]!.disclosureLabel,
+    })),
+  },
+  /*
+   * Related journal and work are LOCALE-FILTERED AND TEMPLATE-FILTERED. Their templates are not
+   * built, so the groups render as empty and RelatedContent removes them entirely — absence is
+   * silent. The relationships stay in the data and light up when the templates land; nothing
+   * here promises a page that does not exist. Phase 5 brief section 20.
+   */
+  {
+    title: t(locale, "fromTheJournal"),
+    items: isImplemented("journal")
+      ? journalForReview(record.id, relatedJournal(record, locale), locale).map((a) => ({
+          href: path.journal(locale, a.locales[locale]!.slug!),
+          title: a.locales[locale]!.title,
+          eyebrow: a.category,
+        }))
+      : [],
+  },
+  {
+    title: t(locale, "relatedWork"),
+    items: isImplemented("work")
+      ? relatedWork(record, locale).map((w) => ({
+          href: path.work(locale, w.locales[locale]!.slug!),
+          title: w.locales[locale]!.title,
+          eyebrow: w.locales[locale]!.client,
+        }))
+      : [],
+  },
+];
+
+const comparisons = comparisonReviews(record, locale);
+
+/* ---------------------------------------------------------------- ids for headings */
+
+const id = {
+  conditions: "testing-conditions",
+  stages: "method-stages",
+  observations: "observations",
+  evidence: "visual-evidence",
+  strengths: "strengths",
+  suitability: "suitability",
+  verdict: "verdict",
+  details: "product-details",
+  related: "related",
+};
+
+const disclosurePublishable = isDisclosurePublishable(record);
+const evidence = record.media?.evidence ?? [];
+const updates = record.updateLog ?? [];
+---
+
+<BaseLayout
+  locale={locale}
+  meta={meta}
+  alternates={alternates}
+  schemas={schemas}
+  switcherHref={switcher.href}
+  switcherState={switcher.state}
+>
+  <article class="review">
+    {/* 1–4 · orientation */}
+    <div class="container">
+      <Breadcrumbs locale={locale} crumbs={crumbs} />
+
+      <p class="identity">
+        {
+          brandName && brandHref ? (
+            <a href={brandHref} set:html={isolateIdentifier(brandName, locale)} />
+          ) : (
+            brandName && <span set:html={isolateIdentifier(brandName, locale)} />
+          )
+        }
+        <span class="sep" aria-hidden="true">·</span>
+        <span>{record.entity.category}</span>
+        <span class="sep" aria-hidden="true">·</span>
+        <span>{record.locales[locale]?.excerpt ? record.entity.productType : ""}</span>
+      </p>
+
+      <h1 class="display-lg title">{content.title}</h1>
+      <p class="subtitle">{content.subtitle}</p>
+    </div>
+
+    {/*
+      5 · THE DISCLOSURE BAND — ABOVE THE HERO.
+      Read before the image can seduce. Present at first paint, never revealed by script.
+      A disclosure pending verification cannot publish, but it must still RENDER with its
+      warning treatment if a preview build encounters one.
+    */}
+    <DisclosureBand
+      locale={locale}
+      type={record.disclosure.primary}
+      label={content.disclosureLabel}
+      statement={content.disclosureStatement}
+      additional={record.disclosure.additional}
+    />
+
+    {!disclosurePublishable && (
+      <p class="visually-hidden">Disclosure pending verification: this review cannot be published.</p>
+    )}
+
+    {/* 6 · HERO — the LCP element. No text over it, no animation, no scrim. */}
+    <div class="hero full-bleed">
+      <Frame
+        src={record.media?.hero?.src}
+        alt={record.media?.hero?.alt ?? content.title}
+        width={record.media?.hero?.width ?? 1600}
+        height={record.media?.hero?.height ?? 1000}
+        priority={true}
+      />
+    </div>
+    {
+      record.media?.hero?.caption && (
+        <div class="container">
+          <p class="hero-caption">{record.media.hero.caption}</p>
+        </div>
+      )
+    }
+
+    {/* 7 · TESTING SUMMARY — the first record-density block. Two seconds to scan. */}
+    <div class="container">
+      <div class="section">
+        <h2 class="visually-hidden">{t(locale, "testingSummary")}</h2>
+        <TestingSummary locale={locale} testing={record.testing} />
+      </div>
+
+      {/* 8 · INTRODUCTION — one step larger than the body that follows, which signals
+             "start here" without a drop cap or any other ornament. */}
+      <div class="section">
+        <h2 class="visually-hidden">{t(locale, "introduction")}</h2>
+        <p class="introduction text-column">{content.introduction}</p>
+      </div>
+
+      {/* 9 · TESTING CONTEXT AND CONDITIONS — the section no competitor has. */}
+      <section class="section" aria-labelledby={id.conditions}>
+        <h2 class="section-heading" id={id.conditions}>{t(locale, "testingConditions")}</h2>
+        <p class="prose text-column">{content.testingContext}</p>
+        <p class="prose text-column">{content.applicationContext}</p>
+        <div class="well-wrap">
+          <ConditionsWell
+            locale={locale}
+            caption={t(locale, "testingConditions")}
+            conditions={content.conditions}
+          />
+        </div>
+      </section>
+
+      {/* 10 · METHOD STAGES — including the ones this test did not run. */}
+      <section class="section" aria-labelledby={id.stages}>
+        <h2 class="section-heading" id={id.stages}>{t(locale, "methodStages")}</h2>
+        <MethodRelationship
+          locale={locale}
+          appliedKeys={record.testing.methodStageKeys}
+          headingId={id.stages}
+        />
+        <p class="method-link">
+          <a href={path.method(locale)}>{t(locale, "readTheMethod")}</a>
+        </p>
+      </section>
+
+      {/* 11 · OBSERVATIONS — the core of the page. */}
+      <section class="section" aria-labelledby={id.observations}>
+        <h2 class="section-heading" id={id.observations}>{t(locale, "observations")}</h2>
+        <ObservationTimeline
+          locale={locale}
+          observations={content.observations}
+          headingId={id.observations}
+        />
+      </section>
+    </div>
+
+    {/* 12 · EVIDENCE PLATES — removed entirely when there are none. */}
+    {
+      evidence.length > 0 && (
+        <section class="section evidence" aria-labelledby={id.evidence}>
+          <div class="container">
+            <h2 class="section-heading" id={id.evidence}>{t(locale, "visualEvidence")}</h2>
+            {content.evidenceNotes && <p class="prose text-column">{content.evidenceNotes}</p>}
+            <div class="plates" data-count={evidence.length}>
+              {evidence.map((asset, index) => (
+                <Plate locale={locale} asset={asset} number={index + 1} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )
+    }
+
+    <div class="container">
+      {/* 13–14 · ASSESSMENT — limitations at identical weight to strengths. */}
+      <section class="section" aria-labelledby={id.strengths}>
+        <h2 class="section-heading" id={id.strengths}>{t(locale, "assessment")}</h2>
+        <h2 class="visually-hidden" id={id.suitability}>{t(locale, "suitability")}</h2>
+        <Assessment
+          locale={locale}
+          strengths={content.strengths}
+          limitations={content.limitations}
+          suitsWell={content.suitability.suitsWell}
+          mayNotSuit={content.suitability.mayNotSuit}
+          strengthsId={id.strengths}
+          suitabilityId={id.suitability}
+        />
+      </section>
+    </div>
+
+    {/* 15 · VERDICT — the loudest block, the only 2px clay rule. */}
+    <VerdictBlock
+      locale={locale}
+      headingId={id.verdict}
+      summary={content.verdict.summary}
+      bestFor={content.verdict.bestFor}
+      wouldRepurchase={content.verdict.wouldRepurchase}
+    />
+
+    <div class="container">
+      {/* 16 · CONCLUSION */}
+      <div class="section">
+        <h2 class="visually-hidden">{t(locale, "conclusion")}</h2>
+        <p class="prose text-column">{content.conclusion}</p>
+      </div>
+
+      {/* 17 · UPDATE LOG — removed when empty. No "never updated" line. Never behind a toggle. */}
+      {
+        updates.length > 0 && (
+          <section class="section update-log">
+            <h2 class="section-heading">{t(locale, "updateLog")}</h2>
+            <ul class="plain updates">
+              {updates.map((entry) => (
+                <li class="update">
+                  <time class="record" datetime={entry.date} set:html={isolateValue(entry.date)} />
+                  <p class="update-note">{entry.note}</p>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+
+      {/* 18 · PRODUCT DETAILS AND BRAND CLAIMS — after the verdict, deliberately. */}
+      <section class="section" aria-labelledby={id.details}>
+        <h2 class="section-heading" id={id.details}>{t(locale, "productDetails")}</h2>
+        <ProductContext
+          locale={locale}
+          product={product}
+          brandName={brandName}
+          disclosureType={record.disclosure.primary}
+          headingId={id.details}
+        />
+      </section>
+
+      {/* Comparison: the contextual link, in prose, where the comparison is discussed. */}
+      {
+        comparisons.length > 0 && (
+          <p class="section comparison prose text-column">
+            {t(locale, "testedAgainst")}:{" "}
+            {comparisons.map((r, index) => (
+              <>
+                {index > 0 && ", "}
+                <a href={path.review(locale, r.locales[locale]!.slug!)}>
+                  {r.locales[locale]!.title}
+                </a>
+              </>
+            ))}
+          </p>
+        )
+      }
+    </div>
+
+    {/* 19 · RELATED — the exits. */}
+    <h2 class="visually-hidden" id={id.related}>{t(locale, "related")}</h2>
+    <RelatedContent locale={locale} groups={groups} headingId={id.related} />
+  </article>
+</BaseLayout>
+
+<style>
+  .review {
+    padding-block-start: var(--space-4);
+  }
+
+  .identity {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1);
+    margin-block-start: var(--space-3);
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+    color: var(--color-text-muted);
+  }
+
+  .identity a {
+    color: var(--color-text-secondary);
+  }
+
+  .sep {
+    color: var(--color-line-strong);
+  }
+
+  .title {
+    margin-block-start: var(--space-1);
+    max-width: 20ch;
+  }
+
+  .subtitle {
+    margin-block-start: var(--space-2);
+    margin-block-end: var(--space-6);
+    max-width: var(--type-measure-editorial);
+    font-family: var(--type-family-display);
+    font-size: calc(var(--type-display-sm) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-display-sm) * var(--type-arabic-leading-factor));
+    color: var(--color-text-secondary);
+  }
+
+  /* HERO — art-directed by ratio per breakpoint. A real crop, not a scale: mobile downloads a
+     smaller file when real photography exists. */
+  .hero {
+    margin-block-end: var(--space-3);
+  }
+
+  .hero :global(.frame) {
+    aspect-ratio: 4 / 5;
+  }
+
+  .hero-caption {
+    font-size: calc(var(--type-body-sm) * var(--type-arabic-size-factor));
+    color: var(--color-text-secondary);
+    max-width: var(--type-measure-editorial);
+  }
+
+  .section-heading {
+    margin-block-end: var(--space-3);
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
+    font-weight: var(--type-weight-medium);
+    letter-spacing: var(--type-tracking-label);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  :global(html[lang="ar"]) .section-heading {
+    text-transform: none;
+    font-weight: var(--type-weight-regular);
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+  }
+
+  .introduction {
+    font-size: calc(var(--type-body-lg) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-body-lg) * var(--type-arabic-leading-factor));
+  }
+
+  .prose {
+    margin-block-end: var(--space-3);
+  }
+
+  .prose:last-child {
+    margin-block-end: 0;
+  }
+
+  .well-wrap {
+    margin-block-start: var(--space-5);
+  }
+
+  .method-link {
+    margin-block-start: var(--space-3);
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+  }
+
+  .plates {
+    display: grid;
+    gap: var(--space-6);
+    margin-block-start: var(--space-5);
+  }
+
+  .updates {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .update {
+    display: grid;
+    gap: var(--space-0-5);
+    padding-block-start: var(--space-2);
+    border-block-start: var(--border-rule-hairline);
+  }
+
+  .update time {
+    color: var(--color-accent-mineral);
+    font-size: var(--type-record-sm);
+  }
+
+  .update-note {
+    font-size: calc(var(--type-body-sm) * var(--type-arabic-size-factor));
+    color: var(--color-text-secondary);
+    max-width: var(--type-measure-editorial);
+  }
+
+  /* ---------------------------------------------------------------- 768: two-column blocks */
+  @media (min-width: 768px) {
+    .hero :global(.frame) {
+      aspect-ratio: 3 / 2;
+    }
+
+    .update {
+      grid-template-columns: 120px minmax(0, 1fr);
+      gap: var(--space-3);
+    }
+  }
+
+  /* ---------------------------------------------------------------- 1024: the design becomes
+     itself — margin index, air column, 16:10 hero. */
+  @media (min-width: 1024px) {
+    .hero :global(.frame) {
+      aspect-ratio: 16 / 10;
+    }
+
+    .title {
+      max-width: 16ch;
+    }
+
+    /* Sections that carry a margin index align their heading to the index column, so the
+       heading and the markers share an edge. */
+    .section-heading {
+      margin-inline-start: 0;
+    }
+
+    .plates[data-count="2"],
+    .plates[data-count="4"] {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 2px;
+    }
+
+    .plates[data-count="2"] :global(.frame),
+    .plates[data-count="4"] :global(.frame) {
+      aspect-ratio: 1 / 1;
+    }
+  }
+</style>

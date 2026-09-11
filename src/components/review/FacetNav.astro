@@ -1,0 +1,123 @@
+---
+/**
+ * FACET NAVIGATION — real links to real routes.
+ *
+ * NOT client-side filter state. Every facet here is a server-rendered, statically generated,
+ * directly addressable URL (risk R-15). Nothing on this page requires JavaScript, and the whole
+ * corpus is reachable by a crawler that executes none.
+ *
+ * It is a <nav> of links, not a listbox or a set of chips backed by a control. `aria-current`
+ * marks the active one. That is the honest semantic: these are navigation, and pretending they
+ * are form controls would add ARIA to describe behaviour that does not exist.
+ *
+ * The count beside each facet is derived from actual published records in THIS locale. It is not
+ * social proof and not a ranking — it is how many records exist, which is the one number an
+ * archive can state without implying anything.
+ */
+import type { Locale } from "../../../content/schema/types";
+
+export interface FacetLink {
+  label: string;
+  href: string;
+  count: number;
+  current?: boolean;
+}
+
+interface Props {
+  locale: Locale;
+  heading: string;
+  links: FacetLink[];
+  /** The unfiltered index, always offered first so a facet is never a dead end. */
+  allHref: string;
+  allLabel: string;
+  allCurrent?: boolean;
+}
+
+const { heading, links, allHref, allLabel, allCurrent = false } = Astro.props;
+---
+
+{
+  links.length > 0 && (
+    <nav class="facets" aria-label={heading}>
+      <h2 class="label facet-heading">{heading}</h2>
+      <ul class="facet-list plain">
+        <li>
+          <a href={allHref} aria-current={allCurrent ? "page" : undefined}>
+            {allLabel}
+          </a>
+        </li>
+        {links.map((link) => (
+          <li>
+            <a href={link.href} aria-current={link.current ? "page" : undefined}>
+              {link.label}
+              <span class="count record" aria-hidden="true">
+                {link.count}
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+<style>
+  .facets {
+    margin-block-start: var(--space-4);
+  }
+
+  .facet-heading {
+    margin-block-end: var(--space-2);
+  }
+
+  .facet-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-2);
+  }
+
+  /* 2px radius on a control-like affordance is the ONLY radius in the system besides 0. */
+  .facet-list a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    min-block-size: 44px;
+    padding-inline: var(--space-2);
+    border: var(--border-rule-strong);
+    border-radius: var(--radius-control);
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+    color: var(--color-text-secondary);
+    text-decoration: none;
+  }
+
+  .facet-list a:hover {
+    border-color: var(--color-accent-clay);
+    color: var(--color-accent-clay-hover);
+  }
+
+  /* Active state is not colour alone: a filled mineral marker plus the border and aria-current. */
+  .facet-list a[aria-current="page"] {
+    border-color: var(--color-accent-clay);
+    color: var(--color-text-primary);
+  }
+
+  .facet-list a[aria-current="page"]::before {
+    content: "";
+    inline-size: 6px;
+    block-size: 6px;
+    background: var(--color-accent-mineral);
+    flex: none;
+  }
+
+  .count {
+    font-size: var(--type-record-sm);
+    color: var(--color-text-muted);
+  }
+
+  @media (forced-colors: active) {
+    .facet-list a[aria-current="page"]::before {
+      background: CanvasText;
+    }
+  }
+</style>

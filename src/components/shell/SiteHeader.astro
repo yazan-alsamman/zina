@@ -1,0 +1,311 @@
+---
+/**
+ * SITE HEADER — editorial, five items, one CTA, one language control.
+ *
+ * MEASURED CONSTRAINTS (docs/PHASE_3_BILINGUAL_TYPE_PROOF.md section 4):
+ *   intrinsic width   English 753px · Arabic 686px  → the full header does not exist below 1024
+ *   height            English 82px  · Arabic 88px   → height is RESERVED for the Arabic line box
+ *                                                     in BOTH locales, so the header does not
+ *                                                     change height when the language changes
+ *
+ * Phase 2 instructed "lay the header out to the Arabic width". Measured, English is 9% wider and
+ * Arabic binds VERTICALLY. The rule is now: lay out to the wider of the two measured sets, and
+ * reserve height for Arabic. Recorded as C3-3 / D3-3.
+ *
+ * NO JAVASCRIPT. The mobile menu is a checkbox-driven disclosure — it works on a slow connection
+ * and with scripting unavailable, which is the exact condition of the mobile audience.
+ * No mega-menu, no dropdowns: every primary item is a real page, and a dropdown would imply a
+ * hierarchy the information architecture does not have.
+ */
+import type { Locale } from "../../../content/schema/types";
+import { navigation } from "../../lib/content";
+import { isImplemented, path, siteName } from "../../lib/routing";
+import { t } from "../../lib/ui-strings";
+import LocaleSwitcher from "./LocaleSwitcher.astro";
+
+interface Props {
+  locale: Locale;
+  switcherHref: string;
+  switcherState?: "counterpart" | "section-fallback" | "home-fallback";
+}
+
+const { locale, switcherHref, switcherState } = Astro.props;
+const nav = navigation();
+
+/**
+ * NAVIGATION EXPOSES ONLY WHAT EXISTS.
+ *
+ * The Phase 1 information architecture declares five primary items. Three of their destinations
+ * are not built yet, so they are NOT RENDERED — not greyed out, not disabled, not marked "soon".
+ * A disabled navigation item advertises a gap; a missing one is simply a smaller navigation.
+ *
+ * Order is preserved from site.json: content first, commerce last. Leading with Work would tell
+ * every organic visitor that the site is a media kit.
+ *
+ * The Collaborate CTA is likewise hidden until /contact/ exists — a call to action that leads
+ * nowhere is worse than none.
+ */
+const routeKeyFor: Record<string, string> = {
+  reviews: "reviewsIndex",
+  method: "method",
+  journal: "journalIndex",
+  work: "workIndex",
+  about: "about",
+};
+
+const hrefFor: Record<string, (l: Locale) => string> = {
+  reviews: path.reviewsIndex,
+  method: path.method,
+  journal: path.journalIndex,
+  work: path.workIndex,
+  about: path.about,
+};
+
+const items = nav.primary
+  .filter((item) => isImplemented(routeKeyFor[item.key] ?? item.key))
+  .map((item) => ({
+    key: item.key,
+    label: item.label[locale],
+    href: (hrefFor[item.key] ?? path.home)(locale),
+  }));
+
+const showCta = isImplemented("contact");
+const ctaLabel = nav.cta.label[locale];
+const ctaHref = path.contact(locale);
+const currentPath = Astro.url.pathname;
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="wordmark" href={path.home(locale)}>{siteName(locale)}</a>
+
+    {/* Checkbox-driven disclosure: no JS, no hydration, no layout shift. */}
+    <input type="checkbox" id="menu-toggle" class="menu-toggle visually-hidden" />
+    <label class="menu-trigger" for="menu-toggle">
+      <span class="menu-trigger-open">{t(locale, "openMenu")}</span>
+      <span class="menu-trigger-close">{t(locale, "closeMenu")}</span>
+    </label>
+
+    <nav class="primary-nav" aria-label={t(locale, "primaryNavigation")}>
+      <ul class="nav-list plain">
+        {
+          items.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                aria-current={currentPath === item.href ? "page" : undefined}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      {showCta && <a class="cta" href={ctaHref}>{ctaLabel}</a>}
+
+      <div class="switcher-slot">
+        <LocaleSwitcher locale={locale} href={switcherHref} state={switcherState} />
+      </div>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    border-block-end: var(--border-rule-hairline);
+    background: var(--color-ground-base);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    /* Height reserved for the ARABIC line box in both locales (measured 88px). */
+    min-block-size: 88px;
+  }
+
+  .wordmark {
+    font-family: var(--type-family-display);
+    font-size: calc(1.25rem * var(--type-arabic-size-factor));
+    color: var(--color-text-primary);
+    text-decoration: none;
+    white-space: nowrap;
+    margin-inline-end: auto;
+  }
+
+  .wordmark:hover {
+    color: var(--color-accent-clay-hover);
+  }
+
+  /* ---------------------------------------------------------------- below 1024
+     The full header needs 753px of intrinsic width plus margins. It does not exist here;
+     the overlay replaces it. This is a composition change, not a squeeze. */
+
+  .menu-trigger {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 44px;
+    min-inline-size: 44px;
+    padding-inline: var(--space-1);
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    border: var(--border-rule-strong);
+    border-radius: var(--radius-control);
+  }
+
+  .menu-trigger:hover {
+    color: var(--color-accent-clay-hover);
+  }
+
+  /* The label is the control; give it a real focus ring driven by the hidden checkbox. */
+  .menu-toggle:focus-visible + .menu-trigger {
+    outline: var(--border-width-accent) solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+
+  .menu-trigger-close {
+    display: none;
+  }
+
+  .menu-toggle:checked + .menu-trigger .menu-trigger-open {
+    display: none;
+  }
+
+  .menu-toggle:checked + .menu-trigger .menu-trigger-close {
+    display: inline;
+  }
+
+  .primary-nav {
+    display: none;
+  }
+
+  /* Full-screen overlay, not a slide-down strip. Opaque — no blur, because a contrast ratio
+     over a shifting backdrop cannot be measured. */
+  .menu-toggle:checked ~ .primary-nav {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-overlay);
+    display: flex;
+    flex-direction: column;
+    /* Items in the LOWER TWO-THIRDS, within thumb reach. A menu that needs a second hand has
+       failed. */
+    justify-content: flex-end;
+    gap: var(--space-4);
+    padding: var(--space-6) var(--layout-margin) var(--space-10);
+    background: var(--color-ground-overlay);
+    animation: reveal var(--motion-duration-base) var(--motion-easing-standard);
+  }
+
+  @keyframes reveal {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .nav-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .nav-list a {
+    display: block;
+    min-block-size: 44px;
+    padding-block: var(--space-1);
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-body-lg) * var(--type-arabic-size-factor));
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+
+  .nav-list a[aria-current="page"] {
+    /* State, not colour alone: weight plus a rule beneath. */
+    font-weight: var(--type-weight-medium);
+    border-block-end: var(--border-rule-verdict);
+    padding-block-end: var(--space-0-5);
+  }
+
+  .nav-list a:hover {
+    color: var(--color-accent-clay-hover);
+  }
+
+  .cta {
+    align-self: flex-start;
+    padding: var(--space-1) var(--space-3);
+    min-block-size: 44px;
+    display: inline-flex;
+    align-items: center;
+    border: var(--border-rule-strong);
+    border-radius: var(--radius-control);
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+    color: var(--color-text-primary);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .cta:hover {
+    border-color: var(--color-accent-clay);
+    color: var(--color-accent-clay-hover);
+  }
+
+  .switcher-slot {
+    padding-block-start: var(--space-2);
+    border-block-start: var(--border-rule-hairline);
+  }
+
+  /* ---------------------------------------------------------------- 1024 and up
+     The full header appears. Measured to fit: 961px available at 1024, 753px needed in
+     English, 686px in Arabic. */
+
+  @media (min-width: 1024px) {
+    .menu-trigger,
+    .menu-toggle {
+      display: none;
+    }
+
+    .primary-nav,
+    .menu-toggle:checked ~ .primary-nav {
+      position: static;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: var(--space-4);
+      padding: 0;
+      background: none;
+      animation: none;
+      inset: auto;
+    }
+
+    .nav-list {
+      flex-direction: row;
+      gap: var(--space-4);
+    }
+
+    .nav-list a {
+      min-block-size: 0;
+      font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+      color: var(--color-text-secondary);
+      white-space: nowrap;
+    }
+
+    .nav-list a[aria-current="page"] {
+      color: var(--color-text-primary);
+    }
+
+    .cta {
+      align-self: auto;
+    }
+
+    .switcher-slot {
+      padding-block-start: 0;
+      border-block-start: none;
+    }
+  }
+</style>

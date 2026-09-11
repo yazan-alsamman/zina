@@ -1,0 +1,89 @@
+{
+  "__MOCK_DATA__": true,
+  "collection": "press",
+  "schemaVersion": "1.0.0",
+  "notice": "FICTIONAL MOCK CONTENT AND THE HIGHEST-RISK FILE IN THE PROJECT. Every publication, award and quotation below is INVENTED, and every publication named is a fictional outlet on a reserved example domain. Publishing a fabricated press mention or award is a reputational and potentially legal problem, not just an SEO one. This entire collection must be either replaced with verified entries or deleted, and the /press route removed, before any deployment. See docs/REAL_CONTENT_MIGRATION.md.",
+  "items": [
+    {
+      "id": "mock-press-mention-01",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "type": "MENTION",
+      "outlet": "The Atlas Review",
+      "outletNote": "FICTIONAL OUTLET. Does not exist.",
+      "headline": "The creators publishing their testing conditions",
+      "excerpt": "A short group feature on beauty creators who publish testing protocols alongside verdicts.",
+      "url": "https://the-atlas-review.example.com/features/testing-conditions",
+      "date": "2026-05-19",
+      "logo": {
+        "src": "/mock-media/press/atlas-review-logo.svg",
+        "alt": "The Atlas Review logo (placeholder)",
+        "width": 240,
+        "height": 60,
+        "_mock": true
+      }
+    },
+    {
+      "id": "mock-press-mention-02",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "type": "INTERVIEW",
+      "outlet": "Meridian Beauty Journal",
+      "outletNote": "FICTIONAL OUTLET. Does not exist.",
+      "headline": "Interview: testing beauty products in 40 degree heat",
+      "excerpt": "A long-form interview on warm-climate wear testing and why most long-wear claims are tested in air conditioning.",
+      "url": "https://meridian-beauty.example.com/interviews/warm-climate-testing",
+      "date": "2026-07-03",
+      "logo": {
+        "src": "/mock-media/press/meridian-logo.svg",
+        "alt": "Meridian Beauty Journal logo (placeholder)",
+        "width": 240,
+        "height": 60,
+        "_mock": true
+      }
+    },
+    {
+      "id": "mock-press-mention-03",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "type": "MENTION",
+      "outlet": "قنديل",
+      "outletNote": "FICTIONAL ARABIC-LANGUAGE OUTLET. Does not exist. Included to test RTL rendering of an outlet name inside an otherwise LTR list.",
+      "headline": "من تثقين بها في مراجعات التجميل",
+      "excerpt": "مقال عن معايير الثقة في محتوى مراجعات التجميل باللغة العربية.",
+      "url": "https://qandeel.example.com/beauty/trust",
+      "date": "2026-08-11",
+      "logo": {
+        "src": "/mock-media/press/qandeel-logo.svg",
+        "alt": "Qandeel logo (placeholder)",
+        "width": 240,
+        "height": 60,
+        "_mock": true
+      }
+    },
+    {
+      "id": "mock-award-01",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "type": "AWARD",
+      "outlet": "Meridian Beauty Journal",
+      "outletNote": "FICTIONAL AWARD FROM A FICTIONAL OUTLET.",
+      "headline": "Shortlisted, Independent Beauty Review of the Year",
+      "excerpt": "A shortlisting rather than a win, included deliberately so the UI has to handle a nuanced credential without inflating it.",
+      "url": "https://meridian-beauty.example.com/awards/2026/shortlist",
+      "date": "2026-09-01",
+      "logo": {
+        "src": "/mock-media/press/meridian-logo.svg",
+        "alt": "Meridian Beauty Journal logo (placeholder)",
+        "width": 240,
+        "height": 60,
+        "_mock": true
+      },
+      "_warning": "Never upgrade a shortlisting to award-winning in copy or in schema. This is the most common way credible sites lose credibility."
+    }
+  ]
+}

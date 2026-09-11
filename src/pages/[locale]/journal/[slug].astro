@@ -1,0 +1,489 @@
+---
+/**
+ * THE JOURNAL ARTICLE — the first serious long-form reading surface.
+ *
+ * The Journal is the third surface of one editorial system:
+ *   the REVIEWS are the evidence · the METHOD explains the practice · the JOURNAL interprets.
+ *
+ * So an article is judged on one thing above all: does it point at the records that evidence it?
+ * `related.reviewIds` is rendered as a named block, and `<ReviewReference>` makes the same link
+ * available inside the prose, which is where it does the most work (Flow E).
+ *
+ * ROUTE GENERATION derives from actual locale content: six records produce TEN routes, not
+ * twelve. One article is English-only, one is Arabic-original, and neither gets a counterpart
+ * route, an hreflang alternate or a stub.
+ *
+ * NO AUTOMATIC TABLE OF CONTENTS. Phase 1 gates it at 4+ sections and the gate is applied here;
+ * an article with three headings does not need navigation, it needs to be read. When it renders,
+ * it is a plain <nav> of anchors to real heading ids — no JavaScript, no scroll interception.
+ */
+import type { GetStaticPaths } from "astro";
+import type { JournalArticle, Locale } from "../../../../content/schema/types";
+import {
+  IS_INDEXABLE_BUILD,
+  journalArticles,
+  method,
+  person,
+} from "../../../lib/content";
+import {
+  articleBrands,
+  articleReviews,
+  articleSiblings,
+  articleStages,
+  earnsTableOfContents,
+  readingTime,
+} from "../../../lib/journal";
+import { journalBody, journalHeadings } from "../../../lib/journal-bodies";
+import { categoryLabel } from "../../../lib/journal-labels";
+import {
+  absoluteUrl,
+  alternatesFor,
+  localeSlugPaths,
+  path,
+  robotsContent,
+  sectionBreadcrumb,
+  switcherTarget,
+  otherLocale,
+} from "../../../lib/routing";
+import { articleSchema, breadcrumbSchema, detailMeta, jsonLd, personSchema } from "../../../lib/seo";
+import { t } from "../../../lib/ui-strings";
+import { formatDate, formatCount } from "../../../lib/format";
+import { isolateValue } from "../../../lib/bidi";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
+import Prose from "../../../components/editorial/Prose.astro";
+import EditorialNote from "../../../components/editorial/EditorialNote.astro";
+import ReviewReference from "../../../components/editorial/ReviewReference.astro";
+import ReviewEntry from "../../../components/review/ReviewEntry.astro";
+import JournalEntry from "../../../components/editorial/JournalEntry.astro";
+
+export const getStaticPaths = (() => {
+  const all = [...journalArticles("en"), ...journalArticles("ar")];
+  const unique = Array.from(new Map(all.map((a) => [a.id, a])).values());
+  return localeSlugPaths(unique);
+}) satisfies GetStaticPaths;
+
+const { locale } = Astro.params as { locale: Locale; slug: string };
+const { record } = Astro.props as { record: JournalArticle };
+
+const content = record.locales[locale];
+if (!content) {
+  throw new Error(`journal ${record.id} has no ${locale} content but a route was generated`);
+}
+
+/**
+ * The MDX body. Required: `tools/check-journal-bodies.mjs` fails the build if a renderable
+ * article has no body file, so this is a guard rather than an expected path.
+ */
+const body = journalBody(record.id, locale);
+if (!body?.Content) {
+  throw new Error(
+    `journal ${record.id}.${locale} has no MDX body. Run: node scripts/seed-journal-mdx.mjs`
+  );
+}
+const Body = body.Content;
+
+/** TOC gate: 4+ h2 sections, per Phase 1. Not automatic. The threshold lives in lib/journal.ts
+    so its REFUSAL path is testable — no article in the corpus falls below it. */
+const headings = journalHeadings(record.id, locale).filter((h) => h.depth === 2);
+const showToc = earnsTableOfContents(headings.length);
+
+/* ---------------------------------------------------------------- relationships */
+
+const reviews = articleReviews(record, locale);
+const siblings = articleSiblings(record, locale);
+const brands = articleBrands(record, locale);
+const stages = articleStages(record);
+
+const methodRecord = method();
+const methodLocale = methodRecord.locales[locale];
+const stageNames = stages
+  .map((key) => ({ key, name: methodLocale?.stages?.find((s) => s.key === key)?.name }))
+  .filter((s) => Boolean(s.name));
+
+/* ---------------------------------------------------------------- metadata */
+
+const canonicalPath = path.journal(locale, content.slug!);
+const canonical = absoluteUrl(canonicalPath);
+const alternates = alternatesFor(record, (l, s) => path.journal(l, s));
+
+const meta = detailMeta(content.seo, content.title, {
+  canonical,
+  robots: robotsContent(IS_INDEXABLE_BUILD, content.seo?.noindex),
+  locale,
+});
+
+const target = otherLocale(locale);
+const switcher = switcherTarget(
+  target,
+  record,
+  (l, s) => path.journal(l, s),
+  path.journalIndex,
+  journalArticles(target).length > 0
+);
+
+const crumbs = sectionBreadcrumb(
+  locale,
+  { home: t(locale, "home"), section: t(locale, "journal") },
+  content.title,
+  path.journalIndex
+);
+
+const personRecord = person();
+const personId = absoluteUrl(`/${locale}/about/#person`);
+const minutes = readingTime(record);
+const updated = record.dates?.updatedAt && record.dates.updatedAt !== record.dates.publishedAt;
+
+const schemas = [
+  jsonLd(breadcrumbSchema(crumbs)),
+  jsonLd(personSchema(personRecord, locale)),
+  jsonLd(
+    articleSchema({
+      article: record,
+      locale,
+      canonical,
+      personId,
+    })
+  ),
+];
+
+const id = { toc: "contents", references: "referenced-records", related: "related-reading" };
+---
+
+<BaseLayout
+  locale={locale}
+  meta={meta}
+  alternates={alternates}
+  schemas={schemas}
+  switcherHref={switcher.href}
+  switcherState={switcher.state}
+>
+  <article class="article">
+    <div class="container">
+      <Breadcrumbs locale={locale} crumbs={crumbs} />
+
+      {/* Format and type: the editorial IA, stated plainly. */}
+      <p class="meta">
+        <span class="format label">{categoryLabel(locale, record.category)}</span>
+        {
+          record.type && (
+            <>
+              <span class="sep" aria-hidden="true">·</span>
+              <span class="type label">
+                {record.type === "Pillar"
+                  ? t(locale, "articleCategoryPillar")
+                  : t(locale, "articleCategorySupporting")}
+              </span>
+            </>
+          )
+        }
+      </p>
+
+      <h1 class="display-lg title">{content.title}</h1>
+      {content.subtitle && <p class="deck">{content.subtitle}</p>}
+
+      <p class="byline">
+        <span>{t(locale, "byline")}</span>{" "}
+        <span class="author">{personRecord.name[locale === "ar" ? "arabic" : "latin"]}</span>
+        <span class="sep" aria-hidden="true">·</span>
+        <time datetime={record.dates.publishedAt} set:html={isolateValue(formatDate(record.dates.publishedAt, locale))} />
+        {
+          updated && (
+            <>
+              <span class="sep" aria-hidden="true">·</span>
+              <span>{t(locale, "updatedOn")}</span>{" "}
+              <time datetime={record.dates.updatedAt} set:html={isolateValue(formatDate(record.dates.updatedAt, locale))} />
+            </>
+          )
+        }
+        {
+          minutes !== undefined && (
+            <>
+              <span class="sep" aria-hidden="true">·</span>
+              <span class="reading">
+                <Fragment set:html={isolateValue(formatCount(minutes, locale))} /> {t(locale, "readingTime")}
+              </span>
+            </>
+          )
+        }
+      </p>
+
+      {/* The deck paragraph — the article's own opening, from the canonical record. */}
+      {
+        content.openingParagraph && (
+          <p class="opening text-column">{content.openingParagraph}</p>
+        )
+      }
+
+      {/* TOC only where the article earns one. Real anchors, no JavaScript. */}
+      {
+        showToc && (
+          <nav class="toc" aria-labelledby={id.toc}>
+            <h2 class="label" id={id.toc}>{t(locale, "contents")}</h2>
+            <ol class="toc-list">
+              {headings.map((heading) => (
+                <li>
+                  <a href={`#${heading.slug}`}>{heading.text}</a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )
+      }
+
+      {/*
+        THE BODY. MDX, rendered statically. Components are passed in so an article body can use
+        editorial vocabulary without importing anything — and so the set of available components
+        is controlled here rather than by whoever writes the body.
+      */}
+      <Prose>
+        {/*
+          The component set an article body may use is declared HERE, not by whoever writes the
+          body. A body cannot reach for a component that is not on this list, which is what stops
+          the MDX vocabulary growing by accident.
+
+          Each component takes `locale` as an explicit prop in the body, because the body file is
+          already per-locale (`{id}.{locale}.mdx`) and an explicit attribute is checkable:
+          `tools/check-journal-bodies.mjs` asserts every `locale="…"` in a body matches its
+          filename.
+        */}
+        <Body components={{ EditorialNote, ReviewReference }} />
+      </Prose>
+
+      {/* Method stages this article explains — the link that keeps the Journal tied to the
+          Method rather than drifting into generic beauty content. */}
+      {
+        stageNames.length > 0 && (
+          <p class="stage-link">
+            <span class="label">{t(locale, "relatedMethodStage")}</span>
+            {stageNames.map((stage, index) => (
+              <>
+                {index > 0 && <span class="sep" aria-hidden="true">·</span>}
+                <a href={`${path.method(locale)}#${stage.key}`}>{stage.name}</a>
+              </>
+            ))}
+          </p>
+        )
+      }
+
+      {/* Brands discussed — rendered ONLY where the per-locale gate passes. A gated brand is
+          never exposed, and its name is not turned into a dead link. */}
+      {
+        brands.length > 0 && (
+          <p class="brands">
+            {brands.map((brand) => (
+              <span class="brand">{brand.locales?.[locale]?.name ?? brand.slug}</span>
+            ))}
+          </p>
+        )
+      }
+    </div>
+
+    {/* THE RECORDS THIS ARTICLE RESTS ON. The most valuable block on the page. */}
+    {
+      reviews.length > 0 && (
+        <section class="references" aria-labelledby={id.references}>
+          <div class="container">
+            <h2 class="section-heading" id={id.references}>{t(locale, "referencedReviews")}</h2>
+            <div class="entries">
+              {reviews.map((review) => (
+                <ReviewEntry locale={locale} review={review} headingLevel={3} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )
+    }
+
+    {
+      siblings.length > 0 && (
+        <section class="related" aria-labelledby={id.related}>
+          <div class="container">
+            <h2 class="section-heading" id={id.related}>{t(locale, "relatedArticles")}</h2>
+            <div class="entries">
+              {siblings.map((sibling) => (
+                <JournalEntry locale={locale} article={sibling} headingLevel={3} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )
+    }
+
+    <div class="container">
+      <p class="onward">
+        <a href={path.journalIndex(locale)}>{t(locale, "allArticles")}</a>
+        <a href={path.reviewsIndex(locale)}>{t(locale, "viewAllReviews")}</a>
+      </p>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .article {
+    padding-block: var(--space-6) var(--space-10);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1);
+    margin-block-start: var(--space-3);
+  }
+
+  .format {
+    color: var(--color-accent-mineral);
+  }
+
+  .type {
+    color: var(--color-text-muted);
+  }
+
+  .sep {
+    color: var(--color-line-strong);
+  }
+
+  .title {
+    margin-block-start: var(--space-1);
+    max-width: 22ch;
+  }
+
+  .deck {
+    margin-block-start: var(--space-2);
+    max-width: var(--type-measure-editorial);
+    font-family: var(--type-family-display);
+    font-size: calc(var(--type-display-sm) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-display-sm) * var(--type-arabic-leading-factor));
+    color: var(--color-text-secondary);
+  }
+
+  .byline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1);
+    margin-block-start: var(--space-4);
+    padding-block: var(--space-2);
+    border-block: var(--border-rule-hairline);
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
+    color: var(--color-text-muted);
+  }
+
+  .author {
+    color: var(--color-text-secondary);
+  }
+
+  .byline time,
+  .reading {
+    font-family: var(--type-family-record);
+    font-size: var(--type-record-sm);
+  }
+
+  /* The opening paragraph is set one step larger than the body that follows — "start here"
+     without a drop cap or any other ornament. */
+  .opening {
+    margin-block-start: var(--space-6);
+    font-size: calc(var(--type-body-lg) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-body-lg) * var(--type-arabic-leading-factor));
+    color: var(--color-text-primary);
+  }
+
+  .toc {
+    margin-block-start: var(--space-6);
+    padding-block: var(--space-3);
+    border-block: var(--border-rule-hairline);
+    max-width: var(--type-measure-editorial);
+  }
+
+  .toc-list {
+    display: grid;
+    gap: var(--space-1);
+    margin-block-start: var(--space-2);
+    padding-inline-start: var(--space-3);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .toc-list a {
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+  }
+
+  .toc-list li::marker {
+    color: var(--color-accent-mineral);
+    font-family: var(--type-family-record);
+    font-size: var(--type-record-sm);
+  }
+
+  .article :global(.prose) {
+    margin-block-start: var(--space-6);
+  }
+
+  .stage-link,
+  .brands {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1);
+    margin-block-start: var(--space-6);
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+  }
+
+  .brands .brand {
+    color: var(--color-text-muted);
+  }
+
+  .section-heading {
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
+    font-weight: var(--type-weight-medium);
+    letter-spacing: var(--type-tracking-label);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  :global(html[lang="ar"]) .section-heading {
+    text-transform: none;
+    font-weight: var(--type-weight-regular);
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+  }
+
+  .references {
+    margin-block-start: var(--space-10);
+    padding-block: var(--space-6);
+    border-block-start: var(--border-rule-verdict);
+  }
+
+  .related {
+    margin-block-start: var(--space-8);
+    padding-block: var(--space-6);
+    background: var(--color-ground-raised);
+    border-block-start: var(--border-rule-hairline);
+  }
+
+  .entries {
+    display: grid;
+    gap: var(--space-5);
+    margin-block-start: var(--space-4);
+  }
+
+  .onward {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-block-start: var(--space-8);
+    padding-block-start: var(--space-3);
+    border-block-start: var(--border-rule-hairline);
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+  }
+
+  @media (min-width: 1024px) {
+    .entries {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-6);
+    }
+  }
+</style>

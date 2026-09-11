@@ -1,0 +1,231 @@
+---
+/**
+ * REVIEW ENTRY — the index treatment, and the reason there is no Card in this codebase.
+ *
+ * Image, hairline, type. No container, no border, no padding box, no shadow, no hover lift.
+ * The hairline does the separating that a card's edge would have done, at a fraction of the
+ * visual weight.
+ *
+ * WHAT AN ENTRY EXPOSES, and why each field is here rather than "because we have it":
+ *
+ *   disclosure label   FIRST. A review's commercial status is part of its identity even in a
+ *                      listing. This is the single most important thing an archive of paid and
+ *                      unpaid testing can show at a glance, and it is why no filter for it is
+ *                      needed: the answer is already on every row.
+ *   brand + category   what was tested, and from whom
+ *   title              the product
+ *   subtitle           THE TEST — "Eight hours in 38 degree heat, tested four times". This is
+ *                      what makes the archive an index of testing records rather than a product
+ *                      grid
+ *   conditions         at most two, in record density, where the review published them
+ *   dates              tested / updated, because a record's age is part of the record
+ *
+ * WHAT IT MUST NEVER EXPOSE: a score, a star, a rank, a "best" label, an award, a popularity
+ * or engagement figure, or any social proof. The archive must not imply that reviews are
+ * scientifically equivalent measurements.
+ */
+import type { Locale, Review } from "../../../content/schema/types";
+import { brandById, brandPassesGate } from "../../lib/content";
+import { path } from "../../lib/routing";
+import { t } from "../../lib/ui-strings";
+import { isolateIdentifier, isolateValue } from "../../lib/bidi";
+import { formatDate } from "../../lib/format";
+
+interface Props {
+  locale: Locale;
+  review: Review;
+  /** The featured entry gets more room; layout is chosen by count, not scaled. */
+  featured?: boolean;
+  /**
+   * Heading level, declared by the CALLER because it is a property of the document outline
+   * rather than of this component.
+   *
+   *   reviews index / facet pages   h2  — the entries sit directly under the page h1
+   *   homepage "Recent records"     h3  — the entries sit under that section's h2
+   *
+   * Hard-coding h3 produced an h1 -> h3 skip on the facet pages, caught by
+   * tests/global.test.mjs.
+   */
+  headingLevel?: 2 | 3;
+}
+
+const { locale, review, featured = false, headingLevel = 2 } = Astro.props;
+const Heading: "h2" | "h3" = headingLevel === 3 ? "h3" : "h2";
+
+const content = review.locales[locale]!;
+const brand = brandById(review.entity.brandId);
+const brandName = brand?.locales?.[locale]?.name ?? brand?.slug;
+
+// The gated-link rule (R-14): the brand name is only a LINK to a brand page when that page
+// exists in this locale. Here it is never a link at all — the whole row already links to the
+// review, and a nested link would give the row two targets.
+const brandLinked = brand ? brandPassesGate(brand, locale) : false;
+
+// At most two conditions, from what the review actually published. Not padded to two.
+const conditions = (content.conditions ?? []).slice(0, 2);
+---
+
+<article class:list={["entry", featured && "entry--featured"]}>
+  <a class="entry-link" href={path.review(locale, content.slug!)}>
+    <p class="label disclosure">{content.disclosureLabel}</p>
+
+    <p class="identity">
+      {brandName && <Fragment set:html={isolateIdentifier(brandName, locale)} />}
+      <span class="sep" aria-hidden="true">·</span>
+      <span>{review.entity.category}</span>
+    </p>
+
+    <Heading class="title">{content.title}</Heading>
+    <p class="subtitle">{content.subtitle}</p>
+  </a>
+
+  {
+    conditions.length > 0 && (
+      <dl class="conditions record">
+        {conditions.map((condition) => (
+          <div class="condition">
+            <dt>{condition.label}</dt>
+            <dd set:html={isolateValue(condition.value)} />
+          </div>
+        ))}
+      </dl>
+    )
+  }
+
+  <p class="dates">
+    <span>{t(locale, "tested")}</span>{" "}
+    <time datetime={review.dates.testedTo} set:html={isolateValue(formatDate(review.dates.testedTo, locale))} />
+    {
+      review.dates.updatedAt !== review.dates.publishedAt && (
+        <>
+          <span class="sep" aria-hidden="true">·</span>
+          <span>{t(locale, "updated")}</span>{" "}
+          <time datetime={review.dates.updatedAt} set:html={isolateValue(formatDate(review.dates.updatedAt, locale))} />
+        </>
+      )
+    }
+    {
+      !brandLinked && brandName && (
+        <span class="visually-hidden">{brandName}</span>
+      )
+    }
+  </p>
+</article>
+
+<style>
+  .entry {
+    padding-block-start: var(--space-3);
+    border-block-start: var(--border-rule-hairline);
+  }
+
+  /* The whole block is the link. One focusable element, one accessible name, and the ring
+     surrounds all of it. */
+  .entry-link {
+    display: grid;
+    gap: var(--space-1);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .disclosure {
+    color: var(--color-text-muted);
+  }
+
+  .identity {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1);
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+    color: var(--color-text-secondary);
+  }
+
+  .sep {
+    color: var(--color-line-strong);
+  }
+
+  .title {
+    font-family: var(--type-family-display);
+    font-size: calc(var(--type-display-sm) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-display-sm) * var(--type-arabic-leading-factor));
+    font-weight: var(--type-weight-regular);
+    color: var(--color-text-primary);
+  }
+
+  .entry-link:hover .title {
+    color: var(--color-accent-clay-hover);
+    text-decoration: underline;
+  }
+
+  .subtitle {
+    max-width: 52ch;
+    font-size: calc(var(--type-body-sm) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-body-sm) * var(--type-arabic-leading-factor));
+    color: var(--color-text-secondary);
+  }
+
+  /* Record density, rationed: two values, no tiles, no borders, no icons. */
+  .conditions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-4);
+    margin-block-start: var(--space-2);
+  }
+
+  .condition {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-1);
+    min-width: 0;
+  }
+
+  .conditions dt {
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
+    color: var(--color-text-muted);
+  }
+
+  .conditions dd {
+    font-family: var(--type-family-record);
+    font-size: var(--type-record-sm);
+    color: var(--color-accent-mineral);
+  }
+
+  .conditions dd :global(bdi) {
+    white-space: nowrap;
+  }
+
+  .dates {
+    margin-block-start: var(--space-2);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    align-items: baseline;
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
+    color: var(--color-text-muted);
+  }
+
+  .dates time {
+    font-family: var(--type-family-record);
+    font-size: var(--type-record-sm);
+  }
+
+  /* Layout by count: the featured entry is given MORE space, not a different component. */
+  .entry--featured .title {
+    font-size: calc(var(--type-display-md) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-display-md) * var(--type-arabic-leading-factor));
+  }
+
+  .entry--featured .subtitle {
+    font-size: calc(var(--type-body-md) * var(--type-arabic-size-factor));
+    max-width: var(--type-measure-editorial);
+  }
+
+  @media (min-width: 768px) {
+    .entry {
+      padding-block-start: var(--space-4);
+    }
+  }
+</style>

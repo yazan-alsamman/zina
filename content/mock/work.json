@@ -1,0 +1,243 @@
+{
+  "__MOCK_DATA__": true,
+  "collection": "work",
+  "schemaVersion": "1.0.0",
+  "notice": "FICTIONAL MOCK CONTENT. None of these projects happened. Every client, campaign, deliverable, date and result is INVENTED. All brands referenced are fictional brands defined in brands.json, never real companies. results.figures is modelled as verifiable-or-omitted: a performance figure may only ship when the client supplied it in writing and the source is named on the page. An empty figures array is a valid, complete state.",
+  "resultsRule": "A performance figure renders ONLY when source names a written client-supplied origin AND _verification is CONFIRMED. Figures without a written source are omitted entirely, never rounded, estimated or inferred. The work template must look intentional with zero figures, because that will often be the real situation.",
+  "items": [
+    {
+      "id": "mock-work-voile-lumiere-launch",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "brandId": "mock-brand-maison-eclat",
+      "category": "Product Launch",
+      "year": 2026,
+      "month": "2026-06",
+      "featured": true,
+      "media": {
+        "hero": { "src": "/mock-media/work/voile-lumiere-launch-hero.jpg", "alt": "Voile Lumiere launch campaign still (placeholder)", "width": 2400, "height": 1350, "_mock": true },
+        "gallery": [
+          { "src": "/mock-media/work/voile-lumiere-launch-01.jpg", "alt": "Shade-matching explainer frame (placeholder)", "width": 1600, "height": 2000, "_mock": true },
+          { "src": "/mock-media/work/voile-lumiere-launch-02.jpg", "alt": "Eight-hour wear film frame (placeholder)", "width": 1600, "height": 2000, "_mock": true }
+        ]
+      },
+      "results": {
+        "status": "MOCK",
+        "figures": [
+          { "label": "Explainer film views", "value": "1.2M", "source": "MOCK", "_verification": "MOCK" },
+          { "label": "Saves on the shade-matching post", "value": "38K", "source": "MOCK", "_verification": "MOCK" }
+        ]
+      },
+      "relatedReviewIds": ["mock-review-voile-lumiere-skin-tint"],
+      "locales": {
+        "en": {
+          "slug": "maison-eclat-voile-lumiere-launch",
+          "translationStatus": "original",
+          "title": "Voile Lumiere launch",
+          "client": "Maison Eclat",
+          "campaign": "Voile Lumiere Skin Tint global launch",
+          "summary": "Launch content for a 34-shade skin tint, built around the shade-matching problem rather than around the product.",
+          "description": "Maison Eclat launched Voile Lumiere with an undertone-family shade system that is genuinely useful and completely unintuitive at first contact. The brief asked for standard launch content. The counter-proposal was to build the content around the shade system itself: a shade-finding explainer, an eight-hour wear film, and stills shot in three named lighting conditions rather than in studio light only.\n\nThe review published on this site was produced independently of the campaign and was not shown to the brand before publication. That separation is stated on both the review and this page.",
+          "deliverables": ["One 90-second shade-matching explainer film", "One 8-hour wear-test film", "12 stills across three lighting conditions", "6 short-form social cutdowns", "Usage licence for paid social, 6 months, regional"],
+          "role": "Concept, on-camera talent, testing protocol, stills direction",
+          "disclosure": "Paid campaign.",
+          "seo": {
+            "title": "Maison Eclat Voile Lumiere launch campaign",
+            "description": "Launch campaign work for Maison Eclat: shade-matching explainer, eight-hour wear film and stills across three lighting conditions.",
+            "focusKeyword": "beauty product launch campaign creator",
+            "canonicalPath": "/en/work/maison-eclat-voile-lumiere-launch/"
+          }
+        },
+        "ar": {
+          "slug": "maison-eclat-voile-lumiere-launch",
+          "translationStatus": "adapted",
+          "title": "إطلاق فوال لوميير",
+          "client": "ميزون إيكلا",
+          "campaign": "الإطلاق العالمي لكريم فوال لوميير",
+          "summary": "محتوى إطلاق لكريم أساس بأربع وثلاثين درجة، مبني حول مشكلة تحديد الدرجة لا حول المنتج نفسه.",
+          "description": "أطلقت ميزون إيكلا فوال لوميير بنظام درجات قائم على عائلات التحت-لون، وهو نظام مفيد فعلا وغير بديهي إطلاقا عند أول تعامل معه. طلب الموجز محتوى إطلاق تقليديا، وكان الاقتراح المقابل بناء المحتوى حول نظام الدرجات نفسه: فيلم شارح لتحديد الدرجة، وفيلم ثبات لثماني ساعات، وصور ثابتة في ثلاث ظروف إضاءة محددة بدل إضاءة الاستوديو وحدها.\n\nأُنتجت المراجعة المنشورة على هذا الموقع بشكل مستقل عن الحملة ولم تُعرض على العلامة قبل النشر. هذا الفصل مذكور في المراجعة وفي هذه الصفحة معا.",
+          "deliverables": ["فيلم شارح لتحديد الدرجة مدته تسعون ثانية", "فيلم اختبار ثبات لثماني ساعات", "اثنتا عشرة صورة في ثلاث ظروف إضاءة", "ست نسخ قصيرة للتواصل الاجتماعي", "رخصة استخدام للإعلانات المدفوعة، ستة أشهر، إقليميا"],
+          "role": "الفكرة، الظهور أمام الكاميرا، بروتوكول الاختبار، إدارة التصوير",
+          "disclosure": "حملة مدفوعة.",
+          "seo": {
+            "title": "حملة إطلاق ميزون إيكلا فوال لوميير",
+            "description": "عمل حملة إطلاق لميزون إيكلا: فيلم شارح لتحديد الدرجة، وفيلم ثبات لثماني ساعات، وصور في ثلاث ظروف إضاءة.",
+            "focusKeyword": "حملة إطلاق منتج تجميل",
+            "canonicalPath": "/ar/work/maison-eclat-voile-lumiere-launch/"
+          }
+        }
+      }
+    },
+    {
+      "id": "mock-work-velvet-hour-wear-series",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "brandId": "mock-brand-veloura-beauty",
+      "category": "Editorial Review Series",
+      "year": 2026,
+      "month": "2026-04",
+      "featured": true,
+      "media": {
+        "hero": { "src": "/mock-media/work/velvet-hour-series-hero.jpg", "alt": "Velvet Hour wear series still (placeholder)", "width": 2400, "height": 1350, "_mock": true },
+        "gallery": [
+          { "src": "/mock-media/work/velvet-hour-series-01.jpg", "alt": "Napkin test frame (placeholder)", "width": 1600, "height": 1067, "_mock": true }
+        ]
+      },
+      "results": {
+        "status": "MOCK",
+        "figures": [
+          { "label": "Series completion rate", "value": "61%", "source": "MOCK", "_verification": "MOCK" }
+        ]
+      },
+      "relatedReviewIds": ["mock-review-velvet-hour-lip-cream", "mock-review-cils-infini-mascara"],
+      "locales": {
+        "en": {
+          "slug": "veloura-velvet-hour-wear-series",
+          "translationStatus": "original",
+          "_localeNote": "DELIBERATELY ENGLISH-ONLY. This is what gates the Arabic Veloura brand page: in Arabic the brand has 1 review and 0 work, which falls below the index threshold.",
+          "title": "The Velvet Hour wear series",
+          "client": "Veloura Beauty",
+          "campaign": "Velvet Hour long-wear editorial series",
+          "summary": "A five-part editorial series testing a brand's own published wear-time claims, commissioned by that brand.",
+          "description": "Veloura publishes internal wear-test figures on its packaging, which is unusual and invites scrutiny. The brand commissioned a five-part series that tested its own claims in public, with the condition, agreed in writing before work began, that findings would be published whatever they were.\n\nTwo of the five episodes contradicted a brand claim. Both were published unchanged. That is why this project is in the portfolio: it demonstrates the terms under which a review-led creator can be commissioned without either side losing credibility.",
+          "deliverables": ["5 long-form episodes, 6 to 9 minutes each", "5 written companion reviews", "Napkin-test and timed-photography protocol documentation", "15 short-form cutdowns", "Usage licence for organic social only, 12 months"],
+          "role": "Series concept, testing protocol, on-camera talent, writing",
+          "disclosure": "Paid editorial series with contractual editorial independence.",
+          "seo": {
+            "title": "Veloura Beauty long-wear editorial series",
+            "description": "A five-part commissioned editorial series testing Veloura Beauty's own published wear-time claims, with contractual editorial independence.",
+            "focusKeyword": "beauty editorial review series creator",
+            "canonicalPath": "/en/work/veloura-velvet-hour-wear-series/"
+          }
+        }
+      }
+    },
+    {
+      "id": "mock-work-barrier-season-campaign",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "brandId": "mock-brand-lune-skin",
+      "category": "Social Content Campaign",
+      "year": 2026,
+      "month": "2026-05",
+      "featured": false,
+      "media": {
+        "hero": { "src": "/mock-media/work/barrier-season-hero.jpg", "alt": "Barrier Season campaign still (placeholder)", "width": 2400, "height": 1350, "_mock": true },
+        "gallery": [
+          { "src": "/mock-media/work/barrier-season-01.jpg", "alt": "Weekly routine documentation frame (placeholder)", "width": 1600, "height": 2000, "_mock": true }
+        ]
+      },
+      "results": {
+        "status": "MOCK",
+        "figures": [],
+        "_fixtureNote": "DELIBERATELY EMPTY. The work template must look complete and intentional when a client supplies no figures, because that will often be the real situation."
+      },
+      "relatedReviewIds": ["mock-review-nuit-barrier-serum"],
+      "locales": {
+        "en": {
+          "slug": "lune-skin-barrier-season-campaign",
+          "translationStatus": "original",
+          "title": "Barrier Season",
+          "client": "Lune Skin",
+          "campaign": "Barrier Season social content campaign",
+          "summary": "Eight weeks of routine-documentation content for a brand that refuses to market with active percentages.",
+          "description": "Lune Skin sells a short range with no percentage-led marketing, which removes the usual hook for skincare content. The campaign replaced the hook with duration: an eight-week documented routine, published weekly, with the routine held constant so the content had a fixed reference point.\n\nThe editorial rule agreed at the outset was that no post would claim an outcome. Content described texture, layering, comfort and routine fit only. That constraint made the work harder to write and considerably easier to stand behind.",
+          "deliverables": ["8 weekly routine posts", "24 short-form videos", "One written testing-method article", "Photography set of 30 images", "Usage licence for organic and paid social, 9 months"],
+          "role": "Concept, routine protocol, photography direction, writing, on-camera talent",
+          "disclosure": "Paid campaign.",
+          "seo": {
+            "title": "Lune Skin Barrier Season campaign",
+            "description": "An eight-week documented skincare routine campaign for Lune Skin, built without outcome claims.",
+            "focusKeyword": "skincare social content campaign creator",
+            "canonicalPath": "/en/work/lune-skin-barrier-season-campaign/"
+          }
+        },
+        "ar": {
+          "slug": "lune-skin-barrier-season-campaign",
+          "translationStatus": "adapted",
+          "title": "موسم حاجز البشرة",
+          "client": "لونيه سكِن",
+          "campaign": "حملة محتوى اجتماعي بعنوان موسم حاجز البشرة",
+          "summary": "ثمانية أسابيع من محتوى توثيق الروتين لعلامة ترفض التسويق بنسب المكونات الفعالة.",
+          "description": "تبيع لونيه سكِن مجموعة قصيرة بلا تسويق قائم على النسب، ما يلغي المدخل المعتاد لمحتوى العناية بالبشرة. استبدلت الحملة ذلك المدخل بالمدة: روتين موثق على مدى ثمانية أسابيع، يُنشر أسبوعيا، مع تثبيت الروتين ليكون للمحتوى مرجع ثابت.\n\nالقاعدة التحريرية المتفق عليها منذ البداية كانت ألا يدّعي أي منشور نتيجة. وصف المحتوى الملمس والطبقات والراحة والانسجام مع الروتين فقط. هذا القيد جعل العمل أصعب في الكتابة وأسهل بكثير في الدفاع عنه.",
+          "deliverables": ["ثمانية منشورات روتين أسبوعية", "أربعة وعشرون مقطعا قصيرا", "مقال مكتوب عن طريقة الاختبار", "مجموعة تصوير من ثلاثين صورة", "رخصة استخدام للنشر العضوي والمدفوع، تسعة أشهر"],
+          "role": "الفكرة، بروتوكول الروتين، إدارة التصوير، الكتابة، الظهور أمام الكاميرا",
+          "disclosure": "حملة مدفوعة.",
+          "seo": {
+            "title": "حملة لونيه سكِن موسم حاجز البشرة",
+            "description": "حملة روتين عناية موثق على مدى ثمانية أسابيع للونيه سكِن، مبنية دون ادعاء أي نتيجة.",
+            "focusKeyword": "حملة محتوى عناية بالبشرة",
+            "canonicalPath": "/ar/work/lune-skin-barrier-season-campaign/"
+          }
+        }
+      }
+    },
+    {
+      "id": "mock-work-layers-of-light-campaign",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "brandId": "mock-brand-atelier-noor",
+      "category": "Beauty Campaign",
+      "year": 2025,
+      "month": "2025-11",
+      "featured": true,
+      "media": {
+        "hero": { "src": "/mock-media/work/layers-of-light-hero.jpg", "alt": "Layers of Light campaign still (placeholder)", "width": 2400, "height": 1350, "_mock": true },
+        "gallery": [
+          { "src": "/mock-media/work/layers-of-light-01.jpg", "alt": "Bilingual shade-matching sequence frame (placeholder)", "width": 1600, "height": 2000, "_mock": true },
+          { "src": "/mock-media/work/layers-of-light-02.jpg", "alt": "Warm lighting condition still (placeholder)", "width": 1600, "height": 1067, "_mock": true }
+        ]
+      },
+      "results": {
+        "status": "MOCK",
+        "figures": [
+          { "label": "Arabic film completion rate", "value": "54%", "source": "MOCK", "_verification": "MOCK" },
+          { "label": "Shade-finder page sessions attributed to campaign", "value": "112K", "source": "MOCK", "_verification": "MOCK" }
+        ]
+      },
+      "relatedReviewIds": ["mock-review-sitara-luminous-concealer"],
+      "locales": {
+        "en": {
+          "slug": "atelier-noor-layers-of-light-campaign",
+          "translationStatus": "original",
+          "title": "Layers of Light",
+          "client": "Atelier Noor",
+          "campaign": "Layers of Light seasonal beauty campaign",
+          "summary": "A bilingual seasonal campaign built around shade accuracy for medium-to-deep warm tones.",
+          "description": "Atelier Noor develops complexion products for warm climates and for a shade range most imported brands under-serve. The campaign made that the subject rather than the footnote: every still and every film was shot in three lighting conditions, and the shade-matching sequence was published in Arabic and English with parallel scripts rather than subtitles.\n\nThe bilingual production was the substantive part of the work. Beauty terminology does not translate cleanly, and a subtitled English script reads as an afterthought to an Arabic-first audience. Both language versions were written independently from the same brief.",
+          "deliverables": ["One 2-minute campaign film in Arabic and English", "Shade-matching sequence, both languages", "20 stills across three lighting conditions", "10 short-form cutdowns per language", "Usage licence for all channels, 12 months, regional"],
+          "role": "Concept, bilingual scripting, on-camera talent, shade-testing protocol",
+          "disclosure": "Paid campaign.",
+          "seo": {
+            "title": "Atelier Noor Layers of Light campaign",
+            "description": "A bilingual Arabic and English seasonal beauty campaign for Atelier Noor built around shade accuracy for medium-to-deep warm tones.",
+            "focusKeyword": "bilingual beauty campaign creator arabic",
+            "canonicalPath": "/en/work/atelier-noor-layers-of-light-campaign/"
+          }
+        },
+        "ar": {
+          "slug": "atelier-noor-layers-of-light-campaign",
+          "translationStatus": "original",
+          "title": "طبقات من الضوء",
+          "client": "أتيليه نور",
+          "campaign": "حملة تجميل موسمية بعنوان طبقات من الضوء",
+          "summary": "حملة موسمية ثنائية اللغة مبنية حول دقة الدرجات للبشرة المتوسطة إلى الداكنة ذات التحت-لون الدافئ.",
+          "description": "تطور أتيليه نور منتجات بشرة للمناخات الحارة ولنطاق درجات تهمله معظم العلامات المستوردة. جعلت الحملة ذلك موضوعها الأساسي لا هامشا فيها: صُوّرت كل صورة وكل فيلم في ثلاث ظروف إضاءة، ونُشر تسلسل تحديد الدرجة بالعربية والإنجليزية بنصين متوازيين لا بترجمة مكتوبة.\n\nالإنتاج ثنائي اللغة كان الجزء الجوهري من العمل. مصطلحات التجميل لا تُترجم بسلاسة، والنص الإنجليزي المترجم يبدو لاحقة مضافة أمام جمهور عربي أولا. كُتبت النسختان بشكل مستقل انطلاقا من الموجز نفسه.",
+          "deliverables": ["فيلم حملة مدته دقيقتان بالعربية والإنجليزية", "تسلسل تحديد الدرجة باللغتين", "عشرون صورة في ثلاث ظروف إضاءة", "عشر نسخ قصيرة لكل لغة", "رخصة استخدام لجميع القنوات، اثنا عشر شهرا، إقليميا"],
+          "role": "الفكرة، كتابة النصين، الظهور أمام الكاميرا، بروتوكول اختبار الدرجات",
+          "disclosure": "حملة مدفوعة.",
+          "seo": {
+            "title": "حملة أتيليه نور طبقات من الضوء",
+            "description": "حملة تجميل موسمية ثنائية اللغة لأتيليه نور مبنية حول دقة الدرجات للبشرة المتوسطة إلى الداكنة ذات التحت-لون الدافئ.",
+            "focusKeyword": "حملة تجميل ثنائية اللغة",
+            "canonicalPath": "/ar/work/atelier-noor-layers-of-light-campaign/"
+          }
+        }
+      }
+    }
+  ]
+}

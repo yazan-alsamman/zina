@@ -1,0 +1,161 @@
+---
+/**
+ * THE JOURNAL INDEX — an authored editorial archive.
+ *
+ * NOT a blog grid, not a magazine homepage, not a product grid, not a collection of rounded
+ * cards. The same index treatment as the reviews archive — hairline, type, nothing else — so the
+ * two read as one editorial system rather than as a site with a blog bolted on.
+ *
+ * The organising axis is the EDITORIAL FORMAT (guides, essays, comparisons, testing notes), which
+ * is a different information architecture from the review facets (product category, brand). The
+ * two taxonomies are deliberately never merged — see docs/JOURNAL_LINKING.md.
+ *
+ * ONE ARTICLE IS EMPHASISED, and it is emphasised by EDITORIAL HIERARCHY — more space — because
+ * the record carries `featured: true`. Never a badge, never "trending", never a popularity claim.
+ */
+import type { GetStaticPaths } from "astro";
+import type { Locale } from "../../../../content/schema/types";
+import { LOCALES, journalArticles, IS_INDEXABLE_BUILD } from "../../../lib/content";
+import { featuredArticle, journalCategories } from "../../../lib/journal";
+import { categoryLabel } from "../../../lib/journal-labels";
+import {
+  absoluteUrl,
+  path,
+  robotsContent,
+  sectionBreadcrumb,
+  otherLocale,
+} from "../../../lib/routing";
+import { breadcrumbSchema, jsonLd, templatedMeta } from "../../../lib/seo";
+import { t } from "../../../lib/ui-strings";
+import { formatCount } from "../../../lib/format";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
+import JournalEntry from "../../../components/editorial/JournalEntry.astro";
+import FacetNav from "../../../components/review/FacetNav.astro";
+
+export const getStaticPaths = (() =>
+  LOCALES.map((locale) => ({ params: { locale } }))) satisfies GetStaticPaths;
+
+const { locale } = Astro.params as { locale: Locale };
+
+/** Locale is an authoring contract: only articles written in this language appear. */
+const articles = journalArticles(locale);
+const categories = journalCategories(locale);
+const featured = featuredArticle(locale);
+const rest = articles.filter((a) => a.id !== featured?.id);
+
+const selfPath = path.journalIndex(locale);
+const meta = templatedMeta(t(locale, "journalIndexTitle"), t(locale, "journalIndexIntro"), {
+  canonical: absoluteUrl(selfPath),
+  robots: robotsContent(IS_INDEXABLE_BUILD),
+  locale,
+});
+
+/** The index exists in both locales, so the pair is reciprocal by construction. */
+const alternates = [
+  ...LOCALES.map((l) => ({ hreflang: l, href: absoluteUrl(path.journalIndex(l)) })),
+  { hreflang: "x-default", href: absoluteUrl(path.journalIndex("en")) },
+];
+
+const crumbs = sectionBreadcrumb(
+  locale,
+  { home: t(locale, "home"), section: t(locale, "journal") },
+  undefined,
+  path.journalIndex
+);
+
+const schemas = [jsonLd(breadcrumbSchema(crumbs))];
+
+const target = otherLocale(locale);
+const switcherHref =
+  journalArticles(target).length > 0 ? path.journalIndex(target) : path.home(target);
+---
+
+<BaseLayout
+  locale={locale}
+  meta={meta}
+  alternates={alternates}
+  schemas={schemas}
+  switcherHref={switcherHref}
+>
+  <div class="container index">
+    <Breadcrumbs locale={locale} crumbs={crumbs} />
+
+    <h1 class="display-lg title">{t(locale, "journalIndexTitle")}</h1>
+
+    <p class="intro text-column">{t(locale, "journalIndexIntro")}</p>
+
+    <p class="count record">
+      <span class="count-value">{formatCount(articles.length, locale)}</span>
+      <span class="count-label">{t(locale, "articleCount")}</span>
+      <span class="count-label">·</span>
+      <span class="count-label">{t(locale, "inThisLocale")}</span>
+    </p>
+
+    {/* Crawlable format routes. Gated for indexation, never for existence. */}
+    <FacetNav
+      locale={locale}
+      heading={t(locale, "browseByFormat")}
+      allHref={selfPath}
+      allLabel={t(locale, "allArticles")}
+      allCurrent={true}
+      links={categories.map((category) => ({
+        label: categoryLabel(locale, category.key),
+        href: path.journalByCategory(locale, category.key),
+        count: category.count,
+      }))}
+    />
+
+    <div class="entries">
+      {featured && <JournalEntry locale={locale} article={featured} featured={true} />}
+      {rest.map((article) => <JournalEntry locale={locale} article={article} />)}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .index {
+    padding-block: var(--space-6) var(--space-10);
+  }
+
+  .title {
+    margin-block-start: var(--space-3);
+  }
+
+  .intro {
+    margin-block-start: var(--space-3);
+    font-size: calc(var(--type-body-lg) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-body-lg) * var(--type-arabic-leading-factor));
+    color: var(--color-text-secondary);
+  }
+
+  .count {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1);
+    margin-block-start: var(--space-4);
+    color: var(--color-text-muted);
+  }
+
+  .count-value {
+    color: var(--color-accent-mineral);
+  }
+
+  .count-label {
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
+  }
+
+  .entries {
+    display: grid;
+    gap: var(--space-5);
+    margin-block-start: var(--space-8);
+  }
+
+  @media (min-width: 768px) {
+    .entries {
+      gap: var(--space-6);
+    }
+  }
+</style>

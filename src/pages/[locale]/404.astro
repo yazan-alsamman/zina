@@ -1,0 +1,100 @@
+---
+/**
+ * 404 — recover a dead link into a live one.
+ *
+ * Not a formality. A review site accumulates dead links from social posts and from reformulated
+ * products, and this is also where a visitor lands who typed a URL that exists in the OTHER
+ * locale but not this one.
+ *
+ * TONE: no apology, no illustration, no humour, no large "404". State the fact and offer the
+ * nearest real thing.
+ *
+ * IT DOES NOT OFFER THE OTHER LOCALE'S VERSION of a missing page (decision D3-7). That would
+ * reintroduce the "the real site is English, Arabic is a subset" framing the multilingual
+ * architecture rejects — and a reader who wanted the other language would already be there.
+ *
+ * noindex.
+ */
+import type { GetStaticPaths } from "astro";
+import type { Locale } from "../../../content/schema/types";
+import { LOCALES, reviews as reviewsIn } from "../../lib/content";
+import { absoluteUrl, localeHome, path } from "../../lib/routing";
+import { templatedMeta } from "../../lib/seo";
+import { t } from "../../lib/ui-strings";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export const getStaticPaths = (() =>
+  LOCALES.map((locale) => ({ params: { locale } }))) satisfies GetStaticPaths;
+
+const { locale } = Astro.params as { locale: Locale };
+
+const recent = reviewsIn(locale).slice(0, 3);
+
+const meta = templatedMeta(t(locale, "notFoundTitle"), t(locale, "notFoundBody"), {
+  canonical: absoluteUrl(path.notFound(locale)),
+  robots: "noindex, follow",
+  locale,
+});
+---
+
+<BaseLayout locale={locale} meta={meta} switcherHref={localeHome(locale === "en" ? "ar" : "en")}>
+  <div class="container not-found">
+    <h1 class="display-md">{t(locale, "notFoundTitle")}</h1>
+    <p class="body">{t(locale, "notFoundBody")}</p>
+
+    {
+      recent.length > 0 && (
+        <section class="recent">
+          <h2 class="label">{t(locale, "recentReviews")}</h2>
+          <ul class="plain items">
+            {recent.map((review) => (
+              <li>
+                <a href={path.review(locale, review.locales[locale]!.slug!)}>
+                  {review.locales[locale]!.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    <p class="all">
+      <a href={path.reviewsIndex(locale)}>{t(locale, "allReviews")}</a>
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .not-found {
+    padding-block: var(--space-10);
+    max-width: var(--type-measure-editorial);
+  }
+
+  .body {
+    margin-block-start: var(--space-2);
+    color: var(--color-text-secondary);
+  }
+
+  .recent {
+    margin-block-start: var(--space-8);
+    padding-block-start: var(--space-3);
+    border-block-start: var(--border-rule-hairline);
+  }
+
+  .items {
+    display: grid;
+    gap: var(--space-2);
+    margin-block-start: var(--space-3);
+  }
+
+  .items a {
+    font-size: calc(var(--type-body-md) * var(--type-arabic-size-factor));
+  }
+
+  .all {
+    margin-block-start: var(--space-6);
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+  }
+</style>

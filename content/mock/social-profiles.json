@@ -1,0 +1,111 @@
+{
+  "__MOCK_DATA__": true,
+  "collection": "socialProfiles",
+  "schemaVersion": "1.0.0",
+  "notice": "FICTIONAL MOCK CONTENT. Every URL below is a NON-RESOLVING placeholder using a .mock suffix on the handle. These are NOT Zina Almokri's real accounts and MUST NOT be emitted into schema.org sameAs, link tags, or any visible link until the real, official handles are verified by the client.",
+  "items": [
+    {
+      "id": "mock-social-instagram",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "platform": "Instagram",
+      "handle": "@zina.almokri.mock",
+      "url": "https://www.instagram.com/zina.almokri.mock",
+      "primary": true,
+      "sameAsEligible": false,
+      "role": "Primary visual channel. Short-form reviews, shade swatches, wear-test check-ins.",
+      "followers": {
+        "value": 428000,
+        "display": "428K",
+        "asOf": "2026-08-01",
+        "_verification": "MOCK",
+        "_note": "INVENTED NUMBER. Never render without a verified source and an as-of date."
+      }
+    },
+    {
+      "id": "mock-social-tiktok",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "platform": "TikTok",
+      "handle": "@zina.almokri.mock",
+      "url": "https://www.tiktok.com/@zina.almokri.mock",
+      "primary": true,
+      "sameAsEligible": false,
+      "role": "Highest-reach channel. Application demos, first-impression and eight-hour wear videos.",
+      "followers": {
+        "value": 690000,
+        "display": "690K",
+        "asOf": "2026-08-01",
+        "_verification": "MOCK",
+        "_note": "INVENTED NUMBER."
+      }
+    },
+    {
+      "id": "mock-social-youtube",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "platform": "YouTube",
+      "handle": "@zinaalmokri.mock",
+      "url": "https://www.youtube.com/@zinaalmokri.mock",
+      "primary": false,
+      "sameAsEligible": false,
+      "role": "Long-form testing series, comparison videos, full-routine documentation.",
+      "followers": {
+        "value": 82000,
+        "display": "82K",
+        "asOf": "2026-08-01",
+        "_verification": "MOCK",
+        "_note": "INVENTED NUMBER."
+      }
+    },
+    {
+      "id": "mock-social-snapchat",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "platform": "Snapchat",
+      "handle": "zina.almokri.mock",
+      "url": "https://www.snapchat.com/add/zina.almokri.mock",
+      "primary": false,
+      "sameAsEligible": false,
+      "role": "Regionally significant channel for Gulf beauty audiences. Daily testing notes.",
+      "followers": {
+        "value": 137000,
+        "display": "137K",
+        "asOf": "2026-08-01",
+        "_verification": "MOCK",
+        "_note": "INVENTED NUMBER. Snapchat is included because it is disproportionately important in Gulf beauty audiences. Confirm whether Zina actually maintains this channel."
+      }
+    },
+    {
+      "id": "mock-social-pinterest",
+      "_mock": true,
+      "status": "mock",
+      "_verification": "MOCK",
+      "platform": "Pinterest",
+      "handle": "zina.almokri.mock",
+      "url": "https://www.pinterest.com/zina.almokri.mock",
+      "primary": false,
+      "sameAsEligible": false,
+      "role": "Passive discovery surface for swatch and comparison imagery.",
+      "followers": {
+        "value": 21000,
+        "display": "21K",
+        "asOf": "2026-08-01",
+        "_verification": "MOCK",
+        "_note": "INVENTED NUMBER."
+      }
+    }
+  ],
+  "aggregate": {
+    "totalReach": {
+      "value": 1358000,
+      "display": "1.35M",
+      "_verification": "MOCK",
+      "_note": "INVENTED. Also methodologically unsound: summing followers across platforms double-counts the same people. If a combined figure is ever published, it must be labelled 'combined followers, not unique reach'."
+    }
+  }
+}

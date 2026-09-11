@@ -1,0 +1,128 @@
+---
+/**
+ * PRODUCT CONTEXT — specification, then the brand's own language.
+ *
+ * Placed AFTER the verdict, deliberately: the brand's language is the last thing on the page,
+ * not the first.
+ *
+ * Products have NO ROUTE. `routingPolicy.hasStandaloneRoute` is false, and this component is
+ * where product data lives instead. A product page today would be a manufacturer description
+ * plus a link, and it would compete with its own review for the exact query the review is built
+ * to win.
+ *
+ * PARTIAL STATES: every field renders only if present. No official URL means no link and NO
+ * PLACEHOLDER. No claims means the claim block is removed and the specs remain.
+ *
+ * The official link carries rel="nofollow", plus "sponsored" where a paid relationship exists —
+ * which is a function of the review's disclosure, not of anyone remembering.
+ */
+import type { DisclosureType, Locale, Product } from "../../../content/schema/types";
+import { t } from "../../lib/ui-strings";
+import { isolateValue, isolateIdentifier } from "../../lib/bidi";
+import ClaimBlock from "../devices/ClaimBlock.astro";
+
+interface Props {
+  locale: Locale;
+  product: Product | undefined;
+  brandName: string | undefined;
+  disclosureType: DisclosureType;
+  headingId: string;
+}
+
+const { locale, product, brandName, disclosureType, headingId } = Astro.props;
+const productLocale = product?.locales?.[locale];
+
+const specs: Array<{ label: string; value: string }> = [];
+if (product?.shadeCount) {
+  specs.push({ label: t(locale, "shadeRange"), value: String(product.shadeCount) });
+}
+if (product?.sizeMl) {
+  specs.push({ label: t(locale, "size"), value: `${product.sizeMl} ml` });
+}
+if (productLocale?.finish) {
+  specs.push({ label: t(locale, "priceTier"), value: product?.priceTier ?? "" });
+}
+
+const paid = disclosureType === "paid-collaboration" || disclosureType === "sponsored";
+const rel = paid ? "nofollow sponsored noopener" : "nofollow noopener";
+const claims = productLocale?.brandClaims ?? [];
+---
+
+<div class="product" aria-labelledby={headingId}>
+  {
+    product && (
+      <p class="product-name">
+        <Fragment set:html={isolateIdentifier(product.name, locale)} />
+      </p>
+    )
+  }
+
+  {
+    specs.length > 0 && (
+      <dl class="specs">
+        {specs
+          .filter((spec) => spec.value)
+          .map((spec) => (
+            <div class="spec">
+              <dt class="label">{spec.label}</dt>
+              <dd class="record" set:html={isolateValue(spec.value)} />
+            </div>
+          ))}
+      </dl>
+    )
+  }
+
+  {
+    product?.officialUrl && (
+      <p class="official">
+        <a href={product.officialUrl} rel={rel} target="_blank">
+          {t(locale, "officialSite")}
+          <span class="visually-hidden"> ({t(locale, "opensExternalSite")})</span>
+        </a>
+      </p>
+    )
+  }
+
+  {/* The quietest text on the page, last. */}
+  <ClaimBlock locale={locale} claims={claims} brandName={brandName} />
+</div>
+
+<style>
+  .product {
+    display: grid;
+    gap: var(--space-3);
+    max-width: var(--type-measure-editorial);
+  }
+
+  .product-name {
+    font-family: var(--type-family-display);
+    font-size: calc(var(--type-display-sm) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-display-sm) * var(--type-arabic-leading-factor));
+  }
+
+  .specs {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .spec {
+    display: grid;
+    gap: var(--space-0-5);
+  }
+
+  .spec dd {
+    color: var(--color-text-primary);
+  }
+
+  .official a {
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+  }
+
+  @media (min-width: 768px) {
+    .specs {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-4);
+    }
+  }
+</style>

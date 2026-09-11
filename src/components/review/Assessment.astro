@@ -1,0 +1,140 @@
+---
+/**
+ * STRENGTHS / LIMITATIONS and SUITABILITY.
+ *
+ * ============================================================================
+ * THE NON-NEGOTIABLE
+ * ============================================================================
+ * Limitations get IDENTICAL treatment to strengths: same family, same size, same colour, same
+ * column width, same marker. The moment limitations are made smaller or quieter than strengths,
+ * the page becomes marketing.
+ *
+ * This is checkable in a diff. A change introducing a smaller size token, a muted colour or a
+ * narrower column for `.limitations` should be rejected in review.
+ *
+ * NO TICKS, NO CROSSES, NO GREEN, NO RED. Those turn a balanced assessment into a scorecard and
+ * code limitations as failures. Both lists use the same mineral square.
+ *
+ * SUITABILITY is one of only three contained surfaces on the entire site (C-1). The two lists
+ * BELONG TO EACH OTHER — the pairing is the meaning, and rules alone would read as two
+ * unrelated lists. Both halves are identical in treatment for the same reason as above.
+ *
+ * Both arrays are validator-required and non-empty, so there is no empty state for either.
+ */
+import type { Locale } from "../../../content/schema/types";
+import { t } from "../../lib/ui-strings";
+
+interface Props {
+  locale: Locale;
+  strengths: string[];
+  limitations: string[];
+  suitsWell: string[];
+  mayNotSuit: string[];
+  strengthsId: string;
+  suitabilityId: string;
+}
+
+const { locale, strengths, limitations, suitsWell, mayNotSuit, strengthsId, suitabilityId } =
+  Astro.props;
+---
+
+{/* Strengths first in DOM order and in visual order, at every breakpoint. */}
+<div class="assessment" aria-labelledby={strengthsId}>
+  <section class="column">
+    <h3 class="label">{t(locale, "strengths")}</h3>
+    <ul class="items plain">
+      {strengths.map((item) => <li>{item}</li>)}
+    </ul>
+  </section>
+
+  <section class="column">
+    <h3 class="label">{t(locale, "limitations")}</h3>
+    <ul class="items plain">
+      {limitations.map((item) => <li>{item}</li>)}
+    </ul>
+  </section>
+</div>
+
+<div class="suitability" aria-labelledby={suitabilityId}>
+  <section class="column">
+    <h3 class="label">{t(locale, "suitsWell")}</h3>
+    <ul class="items plain">
+      {suitsWell.map((item) => <li>{item}</li>)}
+    </ul>
+  </section>
+
+  <section class="column">
+    <h3 class="label">{t(locale, "mayNotSuit")}</h3>
+    <ul class="items plain">
+      {mayNotSuit.map((item) => <li>{item}</li>)}
+    </ul>
+  </section>
+</div>
+
+<style>
+  .assessment,
+  .suitability {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .suitability {
+    /* One of three contained surfaces on the site. The pairing is the meaning. */
+    margin-block-start: var(--space-section);
+    padding: var(--space-4);
+    background: var(--color-ground-raised);
+    border: var(--border-rule-hairline);
+  }
+
+  .column {
+    min-width: 0;
+  }
+
+  .column h3 {
+    padding-block-end: var(--space-1);
+    border-block-end: var(--border-rule-hairline);
+  }
+
+  .items {
+    display: grid;
+    gap: var(--space-1);
+    margin-block-start: var(--space-2);
+  }
+
+  /* IDENTICAL for every list in this file. There is deliberately no per-list override. */
+  .items li {
+    position: relative;
+    padding-inline-start: var(--space-2);
+    font-size: calc(var(--type-body-md) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-body-md) * var(--type-arabic-leading-factor));
+    color: var(--color-text-primary);
+  }
+
+  .items li::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: 0;
+    inset-block-start: 0.62em;
+    inline-size: 6px;
+    block-size: 6px;
+    background: var(--color-accent-mineral);
+  }
+
+  @media (min-width: 768px) {
+    .assessment,
+    .suitability {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-6);
+    }
+
+    .suitability {
+      padding: var(--space-5);
+    }
+  }
+
+  @media (forced-colors: active) {
+    .items li::before {
+      background: CanvasText;
+    }
+  }
+</style>

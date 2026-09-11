@@ -1,0 +1,17 @@
+# Build output
+dist/
+.astro/
+
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.production
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Development verification artefacts (Phase 4 browser pass)
+verification/screenshots/

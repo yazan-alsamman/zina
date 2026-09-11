@@ -1,0 +1,192 @@
+---
+/**
+ * JOURNAL FORMAT ARCHIVE — /{locale}/journal/{category}/
+ *
+ * The archive of an editorial FORMAT (guides, essays, comparisons, testing notes) — never a
+ * product category. The two taxonomies stay separate by design; see docs/JOURNAL_LINKING.md.
+ *
+ * Same principle as the review facets (Phase 5, D5-1):
+ *
+ *     ROUTE EXISTENCE  !=  INDEXABILITY
+ *
+ *   >= 3 articles in this format and locale   index, follow    + self-canonical
+ *   fewer                                     noindex, follow  + canonical -> /journal/
+ *
+ * The gate is Phase 1's, unchanged (docs/JOURNAL_ARCHITECTURE.md section 1). No threshold was
+ * invented.
+ *
+ * TODAY NO FORMAT REACHES THREE IN EITHER LOCALE — the corpus holds at most two guides — so every
+ * one of these pages is navigation only, and each says so on itself rather than hiding the status
+ * in a meta tag.
+ *
+ * The segments are reserved in site.json `reservedSlugs.journal`, so an article slug can never
+ * collide with a format; `tests/journal.test.mjs` asserts the two sets are disjoint.
+ */
+import type { GetStaticPaths } from "astro";
+import type { Locale } from "../../../../content/schema/types";
+import { IS_INDEXABLE_BUILD, LOCALES } from "../../../lib/content";
+import { journalCategories, journalCategory } from "../../../lib/journal";
+import { categoryLabel } from "../../../lib/journal-labels";
+import { facetIndexing } from "../../../lib/facets";
+import {
+  absoluteUrl,
+  path,
+  robotsContent,
+  sectionBreadcrumb,
+  otherLocale,
+} from "../../../lib/routing";
+import { breadcrumbSchema, jsonLd, templatedMeta } from "../../../lib/seo";
+import { t } from "../../../lib/ui-strings";
+import { formatCount } from "../../../lib/format";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
+import JournalEntry from "../../../components/editorial/JournalEntry.astro";
+import FacetNav from "../../../components/review/FacetNav.astro";
+
+export const getStaticPaths = (() => {
+  const paths: Array<{ params: { locale: Locale; category: string } }> = [];
+  for (const locale of LOCALES) {
+    for (const category of journalCategories(locale)) {
+      paths.push({ params: { locale, category: category.key } });
+    }
+  }
+  return paths;
+}) satisfies GetStaticPaths;
+
+const { locale, category } = Astro.params as { locale: Locale; category: string };
+
+const facet = journalCategory(locale, category);
+if (!facet) {
+  throw new Error(`journal format ${locale}/${category} was routed but holds no articles`);
+}
+
+const selfPath = path.journalByCategory(locale, facet.key);
+const indexPath = path.journalIndex(locale);
+
+/** The same helper the review facets use, so the two families cannot drift apart. */
+const indexing = facetIndexing(facet, selfPath, indexPath, "category");
+
+/**
+ * TWO GATES COMPOSE: the format's own thin-page gate, and the build-level gate. A preview build
+ * is noindex site-wide, without exception.
+ */
+const facetIsIndexable = indexing.robots.startsWith("index");
+const robots = robotsContent(IS_INDEXABLE_BUILD && facetIsIndexable);
+
+const label = categoryLabel(locale, facet.key);
+
+const meta = templatedMeta(label, t(locale, "formatIndexIntro"), {
+  canonical: absoluteUrl(indexing.canonicalPath),
+  robots,
+  locale,
+});
+
+/** A gated archive claims no cross-language equivalence, so it emits no alternates. */
+const alternates = robots.startsWith("index")
+  ? LOCALES.filter((l) => journalCategory(l, facet.key)).map((l) => ({
+      hreflang: l,
+      href: absoluteUrl(path.journalByCategory(l, facet.key)),
+    }))
+  : [];
+
+const crumbs = sectionBreadcrumb(
+  locale,
+  { home: t(locale, "home"), section: t(locale, "journal") },
+  label,
+  path.journalIndex
+);
+
+const schemas = [jsonLd(breadcrumbSchema(crumbs))];
+
+const target = otherLocale(locale);
+const switcherHref = journalCategory(target, facet.key)
+  ? path.journalByCategory(target, facet.key)
+  : path.journalIndex(target);
+
+const siblings = journalCategories(locale);
+---
+
+<BaseLayout
+  locale={locale}
+  meta={meta}
+  alternates={alternates}
+  schemas={schemas}
+  switcherHref={switcherHref}
+>
+  <div class="container archive">
+    <Breadcrumbs locale={locale} crumbs={crumbs} />
+
+    <h1 class="display-lg title">{label}</h1>
+    <p class="intro text-column">{t(locale, "formatIndexIntro")}</p>
+
+    <p class="count record">
+      <span class="count-value">{formatCount(facet.count, locale)}</span>
+      <span class="count-label">{t(locale, "articleCount")}</span>
+      {
+        /* Stated plainly rather than hidden in a meta tag. */
+        !facet.indexable && <span class="count-label nav-only">{t(locale, "navigationOnly")}</span>
+      }
+    </p>
+
+    <FacetNav
+      locale={locale}
+      heading={t(locale, "browseByFormat")}
+      allHref={indexPath}
+      allLabel={t(locale, "allArticles")}
+      links={siblings.map((sibling) => ({
+        label: categoryLabel(locale, sibling.key),
+        href: path.journalByCategory(locale, sibling.key),
+        count: sibling.count,
+        current: sibling.key === facet.key,
+      }))}
+    />
+
+    <div class="entries">
+      {facet.articles.map((article) => <JournalEntry locale={locale} article={article} />)}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .archive {
+    padding-block: var(--space-6) var(--space-10);
+  }
+
+  .title {
+    margin-block-start: var(--space-3);
+  }
+
+  .intro {
+    margin-block-start: var(--space-3);
+    font-size: calc(var(--type-body-lg) * var(--type-arabic-size-factor));
+    color: var(--color-text-secondary);
+  }
+
+  .count {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1);
+    margin-block-start: var(--space-4);
+    color: var(--color-text-muted);
+  }
+
+  .count-value {
+    color: var(--color-accent-mineral);
+  }
+
+  .count-label {
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
+  }
+
+  .nav-only {
+    color: var(--color-text-secondary);
+  }
+
+  .entries {
+    display: grid;
+    gap: var(--space-5);
+    margin-block-start: var(--space-8);
+  }
+</style>

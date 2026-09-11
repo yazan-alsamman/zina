@@ -1,0 +1,92 @@
+---
+/**
+ * SIGNATURE DEVICE 2 — THE PLATE
+ *
+ * Evidence photography, numbered and captioned, referenced from the prose by number.
+ * A plate is a RECORD, not a gallery item. It is numbered BECAUSE IT IS REFERRED TO.
+ *
+ * The art-book treatment: image flush to the grid, plate number in mono mineral above the
+ * caption, caption below, and a hairline beneath the CAPTION — the rule closes the caption
+ * rather than boxing the image. No frame, no border, no radius, no shadow.
+ *
+ * RATIO NEVER CHANGES ACROSS BREAKPOINTS. Every other image on the site is art-directed per
+ * breakpoint; evidence plates are not, because COMPARABILITY IS THEIR FUNCTION. An hour-0 frame
+ * and an hour-8 frame must be the same shape to be read against each other.
+ *
+ * ALT DESCRIBES WHAT THE FRAME SHOWS — "Hour six, product lifting around the nose" — never
+ * "review photo". The plate is evidence; its alt text carries the evidence. The caption is
+ * public annotation and the alt is description, and THEY MUST NOT DUPLICATE EACH OTHER: a blind
+ * reader should be able to follow the observation sequence from alt and caption alone.
+ *
+ * FORBIDDEN: a before/after slider (hides half the evidence at any moment and is unusable by
+ * keyboard), a lightbox, a carousel, zoom, parallax, or ANY motion on the image. A record that
+ * animates is a record you cannot trust.
+ */
+import type { EvidenceAsset, Locale } from "../../../content/schema/types";
+import { t } from "../../lib/ui-strings";
+import { isolateValue } from "../../lib/bidi";
+import Frame from "../media/Frame.astro";
+
+interface Props {
+  locale: Locale;
+  asset: EvidenceAsset;
+  /** 1-based. Zero-padded for column alignment: Plate 03 / لوحة 03. */
+  number: number;
+}
+
+const { locale, asset, number } = Astro.props;
+const padded = String(number).padStart(2, "0");
+---
+
+<figure class="plate">
+  <Frame
+    src={asset.src}
+    alt={asset.alt}
+    width={asset.width}
+    height={asset.height}
+    ratio="3 / 2"
+  />
+  <figcaption class="caption">
+    <p class="plate-number record">
+      <span class="word">{t(locale, "plate")}</span>
+      <Fragment set:html={isolateValue(padded)} />
+    </p>
+    {asset.caption && <p class="caption-text">{asset.caption}</p>}
+  </figcaption>
+</figure>
+
+<style>
+  .plate {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .caption {
+    /* The rule closes the caption rather than boxing the image. */
+    border-block-end: var(--border-rule-hairline);
+    padding-block-end: var(--space-1);
+    max-width: var(--type-measure-editorial);
+  }
+
+  .plate-number {
+    color: var(--color-accent-mineral);
+    font-size: var(--type-record-sm);
+  }
+
+  .plate-number .word {
+    /* Latin "Plate" is set in mono with the numeral; the Arabic word is not. */
+    font-family: var(--type-family-record);
+  }
+
+  :global(html[lang="ar"]) .plate-number .word {
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-record-sm) * var(--type-arabic-size-factor));
+  }
+
+  .caption-text {
+    margin-block-start: var(--space-1);
+    font-size: calc(var(--type-body-sm) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-body-sm) * var(--type-arabic-leading-factor));
+    color: var(--color-text-secondary);
+  }
+</style>
