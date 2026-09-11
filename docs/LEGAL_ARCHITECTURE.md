@@ -5,10 +5,10 @@ advice.**
 
 | | |
 |---|---|
-| **Status** | Architecture implemented (Phase 7); **U-03 partially resolved Phase 9** |
+| **Status** | Architecture implemented (Phase 7); **U-03 partially resolved Phase 9**; **audited, one fact added, Phase 10** |
 | **Routes** | 4 — `/{locale}/privacy/`, `/{locale}/terms/` |
 | **Jurisdiction** | **CONFIRMED — Syria** (project owner, Phase 9) |
-| **Still unresolved** | Legal entity, specific privacy regime, data controller, retention, governing-law clause, liability limitation |
+| **Still unresolved** | Legal entity, specific privacy regime, data controller, retention, data-subject rights, governing-law clause, liability limitation — **all six remain exactly as blocked after Phase 10** as they were after Phase 9; see §11 |
 | **Cookie banner** | **None**, because there are no cookies |
 | **Structured data** | `BreadcrumbList` only |
 
@@ -221,3 +221,52 @@ its own, and this phase makes no inference from either. Server/DNS/TLS configura
 by this document and was not touched — the repository contains no deployment configuration file of
 any kind to update (checked: no `.htaccess`, `nginx.conf`, `vercel.json`, `netlify.toml`, or
 `Dockerfile` exists in this project).
+
+---
+
+## 11. Phase 10 update — audited for new facts, found none; one clarity addition, zero blockers resolved
+
+Phase 10's brief named the same six items §9 already listed as unresolved (legal entity, data
+controller, retention, data-subject rights, governing law, liability) and asked that each be
+resolved "only where authoritative information can actually be established." **No new authoritative
+fact accompanied the Phase 10 request** — unlike Phase 9, which arrived with a project owner's brief
+supplying specific, sourced values. Per the same rule that has governed this file since Phase 7 (an
+unverified value is an absence, and it renders as one), all six items remain **exactly as blocked**
+as `docs/reports/PHASE_9_REPORT.md` left them. None was approximated, defaulted, or inferred from
+the jurisdiction, the domain, or anything else now known. See `docs/PHASE_10_DECISION_LOG.md` for
+the item-by-item reasoning on why each specific blocker cannot be resolved from what is currently
+known, and `docs/reports/PHASE_10_REPORT.md` for the full audit.
+
+### The one addition: what the CONTACT LINKS do, not a resolution of retention or the controller
+
+Phase 9 gave this site its first real, confirmed contact channels (email, phone, Instagram). Before
+that, "what happens to data sent through this site's contact channels" was not yet a meaningful
+question — there was no channel. Now there is, and a privacy-conscious reader visiting a page with
+working `mailto:`/`tel:`/Instagram links might reasonably ask whether this site's own infrastructure
+sees, logs or stores what they send through them.
+
+The honest, verifiable answer is no — those are plain outbound links with a zero-backend site behind
+them (`src/pages/[locale]/contact/index.astro`: no `<form>`, no client JavaScript, nothing posted to
+any endpoint this project controls). That is a **fact about the software**, of exactly the same kind
+as the existing "no tracking," "no cookies," "no client JavaScript" statements in §4 — verifiable by
+reading the build, not a legal conclusion. It was added as a new fact, gated on
+`hasAnyContactChannel()` (`src/lib/trust.ts`) so it disappears automatically if every confirmed
+channel were ever un-confirmed again, exactly like every other data-driven gate in this project.
+
+**What this explicitly does NOT do:** it does not resolve `legalMissingController` or
+`legalMissingRetention`. Those items are about what happens to a message *after* it reaches Zina,
+off this site's infrastructure entirely (how long she keeps an email, who else might see it, what
+rights a sender has over it) — genuine business-practice questions nobody has answered, and none of
+that is inferred from the fact that the site itself does not intercept the message in transit. Both
+blocked-item lists on Privacy (`legalMissingController`, `legalMissingRetention`, plus the still-open
+regime-specifics and rights items) and on Terms (governing law, entity, liability) are **character-
+for-character unchanged** from Phase 9 — verified by `tests/trust.test.mjs`'s Phase 10 regression
+test, which asserts each blocked-item phrase is still present.
+
+### VPS deployment: still out of scope
+
+Phase 10's brief permitted bringing deployment into scope "unless authoritative deployment
+requirements are now provided." None were. The repository still contains no deployment configuration
+of any kind (re-checked: no `.htaccess`, `nginx.conf`, `vercel.json`, `netlify.toml`, or `Dockerfile`
+exists), so this remains untouched, exactly as `docs/DOMAIN_CONFIGURATION.md` §6 described after
+Phase 9.

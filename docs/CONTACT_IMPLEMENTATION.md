@@ -219,3 +219,11 @@ to be honest.
 Management/agency representation, collaboration email, press email — none of these was supplied,
 none is rendered, and the "no channel published" band (§ THE ABSENCE, STATED PLAINLY, above) is
 simply gone from the build because it is no longer true, not because it was removed.
+
+### Phase 10: the "any channel confirmed" check moved to a shared helper
+
+This page's local `hasAnyChannel` condition (`channels.length > 0 || Boolean(phone) ||
+Boolean(instagram)`) was extracted to `hasAnyContactChannel()` in `src/lib/trust.ts`, because Phase
+10 needed the same condition on the legal pages — see `docs/LEGAL_ARCHITECTURE.md` §11. This page's
+behaviour and rendered output are unchanged; only the computation moved to one shared place so the
+two surfaces cannot drift out of sync with each other about what counts as "a channel exists."
