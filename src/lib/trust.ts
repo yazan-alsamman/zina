@@ -124,6 +124,18 @@ export const officialInstagram = (): { handle: string; url: string } | undefined
   return profile ? { handle: profile.handle, url: profile.url } : undefined;
 };
 
+/**
+ * Whether ANY confirmed contact channel exists at all — email, phone or Instagram.
+ *
+ * `hasContactChannel()` above checks only the email channels. This is the broader condition the
+ * Contact page and the legal pages both need: is there at least one real, confirmed way to reach
+ * Zina, of any kind. Added Phase 10 so `LegalDocument.astro` can state, truthfully, what happens
+ * to a message sent through those channels — a statement that was not meaningful before Phase 9
+ * confirmed the first one.
+ */
+export const hasAnyContactChannel = (): boolean =>
+  hasContactChannel() || Boolean(verifiedPhone()) || Boolean(officialInstagram());
+
 /* ------------------------------------------------------------------ editorial standards */
 
 export type StandardKey =

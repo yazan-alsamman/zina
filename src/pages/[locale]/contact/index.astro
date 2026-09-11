@@ -43,7 +43,7 @@
 import type { GetStaticPaths } from "astro";
 import type { Locale } from "../../../../content/schema/types";
 import { LOCALES, IS_INDEXABLE_BUILD, person } from "../../../lib/content";
-import { contactChannels, management, officialInstagram, telHref, verifiedPhone } from "../../../lib/trust";
+import { contactChannels, hasAnyContactChannel, management, officialInstagram, telHref, verifiedPhone } from "../../../lib/trust";
 import { absoluteUrl, path, robotsContent, sectionBreadcrumb } from "../../../lib/routing";
 import { breadcrumbSchema, jsonLd, personSchema, templatedMeta } from "../../../lib/seo";
 import { t } from "../../../lib/ui-strings";
@@ -107,7 +107,7 @@ const schemas = [
 ];
 
 const collaborationBio = person().locales[locale]?.bios?.collaboration ?? "";
-const hasAnyChannel = channels.length > 0 || Boolean(phone) || Boolean(instagram);
+const hasAnyChannel = hasAnyContactChannel();
 ---
 
 <BaseLayout

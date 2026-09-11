@@ -40,9 +40,20 @@
  *
  * Legal architecture must reflect the implementation. If tracking is ever added, `USES_TRACKING`
  * in `src/lib/trust.ts` is the single switch these pages read.
+ *
+ * ============================================================================
+ * PHASE 10 — ONE FACT ADDED, ZERO BLOCKERS RESOLVED
+ * ============================================================================
+ * No new authoritative facts were supplied this phase. Entity, data controller, retention,
+ * data-subject rights, governing law and liability all remain exactly as unresolved as Phase 9
+ * left them — see `docs/reports/PHASE_10_REPORT.md`. The one addition is a fact, not a resolution:
+ * since Phase 9 gave this site its first real, confirmed contact channels, it is now meaningful (and
+ * verifiable by reading the code) to state that those links carry nothing through this site's own
+ * infrastructure. That is a statement about the SOFTWARE, exactly like the tracking/cookie/script
+ * facts above it — not a legal conclusion about what happens to a message after it reaches Zina.
  */
 import type { Locale } from "../../../content/schema/types";
-import { legalIdentity, jurisdictionIsKnown, USES_TRACKING } from "../../lib/trust";
+import { hasAnyContactChannel, legalIdentity, jurisdictionIsKnown, USES_TRACKING } from "../../lib/trust";
 import { t, type UiKey } from "../../lib/ui-strings";
 import { path } from "../../lib/routing";
 
@@ -60,6 +71,17 @@ const { locale, titleKey, introKey, blockedItems } = Astro.props;
 
 const identity = legalIdentity();
 const jurisdictionKnown = jurisdictionIsKnown();
+/**
+ * PHASE 10: a fact about the confirmed contact channels, stated only once at least one exists.
+ * Before Phase 9 there was nothing to say here — no channel was confirmed, so no reader could send
+ * anything through one. Now that email/phone/Instagram links are real, this states what is
+ * verifiably true of them: the site's own infrastructure never receives, logs or stores what is
+ * sent through them, because they are plain `mailto:`/`tel:`/external links with zero backend
+ * behind them (see `src/pages/[locale]/contact/index.astro`). This does NOT resolve the retention
+ * or data-controller blockers below — those are about what happens to a message once it reaches
+ * Zina off-site, which nobody has described — it only states what the SITE does, which is nothing.
+ */
+const hasContact = hasAnyContactChannel();
 /**
  * THE GATE IS COMPLETENESS, NOT JURISDICTION SPECIFICALLY.
  *
@@ -133,6 +155,7 @@ const isComplete = blockedItems.length === 0;
       {!USES_TRACKING && <li>{t(locale, "legalFactNoCookies")}</li>}
       <li>{t(locale, "legalFactNoScripts")}</li>
       <li>{t(locale, "legalFactNoAccounts")}</li>
+      {hasContact && <li>{t(locale, "legalFactContactExternal")}</li>}
       <li>{t(locale, "legalFactFonts")}</li>
     </ul>
   </section>

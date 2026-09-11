@@ -24,6 +24,7 @@ import {
   USES_TRACKING,
   contactChannels,
   editorialStandards,
+  hasAnyContactChannel,
   hasContactChannel,
   jurisdictionIsKnown,
   legalIdentity,
@@ -459,6 +460,38 @@ describe("the legal foundation invents nothing", () => {
   test("the copyright holder is published because it is a fact the project already asserts", () => {
     for (const page of [...surfaces("privacy"), ...surfaces("terms")]) {
       assert.ok(stripTags(page.html).includes("Zina Almokri"), page.route);
+    }
+  });
+
+  test("Phase 10: the contact-channels-are-external fact renders, gated on a confirmed channel existing", () => {
+    // hasAnyContactChannel() is true in THIS build (email/phone/Instagram all confirmed Phase 9),
+    // so the fact must render — and it must not silently resolve the retention/controller blockers.
+    assert.equal(hasAnyContactChannel(), true);
+    for (const page of [...surfaces("privacy"), ...surfaces("terms")]) {
+      const text = stripTags(page.html);
+      assert.ok(
+        text.includes("passes through, is logged by, or is stored by this site") ||
+          text.includes("لا يمر أي شيء يُرسَل عبرها بهذا الموقع"),
+        `${page.route}: missing the Phase 10 contact-externality fact`
+      );
+    }
+  });
+
+  test("Phase 10: the new fact does not shrink the still-open blocked items", () => {
+    // Privacy's controller/retention/rights and Terms' governing-law/entity/liability blockers
+    // must remain named exactly as before — the new fact describes the SITE, not a resolution of
+    // what happens to a message once it reaches Zina off-site.
+    const stillBlocked = {
+      privacy: ["Required from the owner", "data controller", "Retention periods", "data-subject rights"],
+      terms: ["Required from the owner", "governing law", "legal entity publishing", "limitation of liability"],
+    };
+    for (const [segment, phrases] of Object.entries(stillBlocked)) {
+      for (const page of surfaces(segment).filter((p) => p.route.startsWith("/en/"))) {
+        const text = stripTags(page.html);
+        for (const phrase of phrases) {
+          assert.ok(text.includes(phrase), `${page.route}: no longer names "${phrase}" as missing`);
+        }
+      }
     }
   });
 });
