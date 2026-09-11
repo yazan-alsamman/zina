@@ -1,0 +1,407 @@
+---
+/**
+ * BRAND ENTITY — /{locale}/brands/{slug}/
+ *
+ * ============================================================================
+ * WHAT THIS PAGE IS
+ * ============================================================================
+ * An editorial entity page. It answers one question:
+ *
+ *     what documented records involve this entity, and on what terms?
+ *
+ * It is NOT an advertisement, a storefront, a sponsorship page, a company profile or a landing
+ * page. The clearest way to hold that line is negative, so here is what this template deliberately
+ * does not render, none of which exists in the canonical record either:
+ *
+ *   founding year · headquarters · ownership · company history · awards · certifications ·
+ *   revenue · ethics claims · sustainability claims · clinical claims · dermatologist claims ·
+ *   "official partner" language · logos · product shots · buy links · ratings
+ *
+ * `foundedYear` and `originCountry` ARE on the record. They are still not rendered: they are
+ * invented mock values about a fictional company, they are corporate-profile furniture rather than
+ * editorial evidence, and rendering them would make this page a company profile — which is
+ * precisely the thing it must not be.
+ *
+ * ============================================================================
+ * THE RELATIONSHIP GATE
+ * ============================================================================
+ * `relationship.status` is MOCK on every brand, so NO relationship label renders anywhere in this
+ * build. The page says so, in the reader's language, instead of leaving a silence that would read
+ * as independence. See `src/lib/brand.ts` for the full reasoning.
+ *
+ * What the page CAN state honestly is how each documented product was obtained, because that is
+ * recorded per review and verified per review: the disclosure tally.
+ *
+ * ============================================================================
+ * CLAIM vs OBSERVATION
+ * ============================================================================
+ * The brand's `positioning` and `description` are ORIGINAL WRITING BY THE PUBLICATION — the
+ * content model says so explicitly ("Never the brand's own copy"). They are therefore set as
+ * editorial prose, not as a quoted claim.
+ *
+ * No brand marketing claim appears on this page at all. The CLAIM device belongs on a review,
+ * where an observation sits directly beneath it to answer it. A claim with no observation next to
+ * it is an advertisement, so this page carries neither.
+ */
+import type { GetStaticPaths } from "astro";
+import type { Brand, Locale } from "../../../../content/schema/types";
+import { LOCALES, IS_INDEXABLE_BUILD } from "../../../lib/content";
+import {
+  brandIsIndexable,
+  brandJournal,
+  brandReviews,
+  brandWork,
+  disclosureTally,
+  entityBrands,
+  localeName,
+  relationshipLabel,
+} from "../../../lib/brand";
+import {
+  absoluteUrl,
+  path,
+  robotsContent,
+  sectionBreadcrumb,
+  switcherTarget,
+  otherLocale,
+} from "../../../lib/routing";
+import { breadcrumbSchema, detailMeta, jsonLd } from "../../../lib/seo";
+import { t } from "../../../lib/ui-strings";
+import { isolateValue } from "../../../lib/bidi";
+import { formatCount, formatDate } from "../../../lib/format";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
+
+/**
+ * ROUTES ARE GENERATED PER LOCALE FROM THE GATE, not from the brand list.
+ *
+ * `veloura-beauty` earns a page in English and not in Arabic, because its Arabic review coverage
+ * is thinner. That asymmetry is the gate working, not a missing translation: the record exists in
+ * both locales, but the evidence does not.
+ */
+export const getStaticPaths = (() =>
+  LOCALES.flatMap((locale) =>
+    entityBrands(locale).map((brand) => ({
+      params: { locale, brand: brand.slug },
+      props: { brand },
+    }))
+  )) satisfies GetStaticPaths;
+
+const { locale } = Astro.params as { locale: Locale };
+const { brand } = Astro.props as { brand: Brand };
+
+const content = brand.locales[locale]!;
+const name = localeName(brand, locale);
+
+const records = brandReviews(brand, locale);
+const articles = brandJournal(brand, locale);
+const projects = brandWork(brand, locale);
+const disclosures = disclosureTally(brand, locale);
+
+/** Undefined for every brand in this build. Rendered as an explicit absence, never as silence. */
+const relationship = relationshipLabel(brand);
+
+const selfPath = path.brand(locale, brand.slug);
+
+/**
+ * HREFLANG FOLLOWS THE GATE, NOT THE RECORD.
+ *
+ * A counterpart alternate is emitted only where the other locale ALSO generates a page. Pointing
+ * hreflang at a brand page that the gate suppressed would advertise a 404 as a translation.
+ */
+const counterpartLocale = otherLocale(locale);
+const counterpartExists = entityBrands(counterpartLocale).some((b) => b.id === brand.id);
+
+const alternates = [
+  { hreflang: locale, href: absoluteUrl(selfPath) },
+  ...(counterpartExists
+    ? [{ hreflang: counterpartLocale, href: absoluteUrl(path.brand(counterpartLocale, brand.slug)) }]
+    : []),
+  {
+    hreflang: "x-default",
+    href: absoluteUrl(
+      counterpartExists && locale !== "en" ? path.brand("en", brand.slug) : selfPath
+    ),
+  },
+];
+
+/**
+ * The switcher asks "does the counterpart exist?". For a brand the honest answer is the GATE's,
+ * not the record's: the brand record exists in both locales, but a page is only generated where
+ * the evidence threshold is met. So the shape handed to the switcher reflects gate availability,
+ * which is what keeps state 2 (section-fallback) correct for a brand like `veloura-beauty`.
+ */
+const switcher = switcherTarget(
+  counterpartLocale,
+  { locales: counterpartExists ? { [counterpartLocale]: { slug: brand.slug } } : {} },
+  (l, s) => path.brand(l, s),
+  path.brandsIndex,
+  entityBrands(counterpartLocale).length > 0
+);
+
+const meta = detailMeta(content.seo, name, {
+  canonical: absoluteUrl(selfPath),
+  robots: robotsContent(IS_INDEXABLE_BUILD && brandIsIndexable(brand, locale), content.seo?.noindex),
+  locale,
+});
+
+const crumbs = sectionBreadcrumb(
+  locale,
+  { home: t(locale, "home"), section: t(locale, "brands") },
+  name,
+  path.brandsIndex
+);
+
+/**
+ * JSON-LD ENTITY SAFETY — BreadcrumbList ONLY.
+ *
+ * No `Organization`: every fact that would populate it (legal name, founding date, address,
+ * logo, sameAs) is either invented mock data or absent, and an Organization built from invented
+ * data asserts the existence of a company.
+ * No `Brand`: it would need a verified identity to attach to.
+ * No `Product`, `offers`, `aggregateRating`, `review` snippets or `sameAs` — nothing here is
+ * scored, sold, or linked to a verified profile.
+ */
+const schemas = [jsonLd(breadcrumbSchema(crumbs))];
+
+const id = { records: "documented-records", related: "related-reading", terms: "relationship" };
+---
+
+<BaseLayout
+  locale={locale}
+  meta={meta}
+  alternates={alternates}
+  schemas={schemas}
+  switcherHref={switcher.href}
+  switcherState={switcher.state}
+>
+  <div class="container brand">
+    <Breadcrumbs locale={locale} crumbs={crumbs} />
+
+    <p class="meta">
+      <span class="category label">{content.category}</span>
+    </p>
+
+    <h1 class="display-lg title">{name}</h1>
+    {content.positioning && <p class="positioning">{content.positioning}</p>}
+
+    {/* ORIGINAL EDITORIAL WRITING, never the brand's own copy. Set as prose, not as a quote. */}
+    {content.description && <p class="description text-column">{content.description}</p>}
+
+    {/*
+      THE RELATIONSHIP BAND.
+
+      Same surface treatment as the review page's disclosure band and the Method's boundary,
+      deliberately: all three are statements about the limits of what this site can assert.
+
+      It states the disclosure tally — which IS verified, per record — and then states plainly
+      that the commercial relationship itself is not confirmed. Never a <details>, never small
+      print, and never omitted, because an omitted relationship statement reads as independence.
+    */}
+    <section class="terms" aria-labelledby={id.terms}>
+      <h2 class="label terms-label" id={id.terms}>{t(locale, "brandRelationshipHeading")}</h2>
+
+      {
+        disclosures.length > 0 && (
+          <ul class="disclosures plain">
+            {disclosures.map((d) => (
+              <li class="disclosure">
+                <span class="disclosure-count record" set:html={isolateValue(formatCount(d.count, locale))} />
+                <span class="disclosure-label">{d.label}</span>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+
+      {
+        relationship ? (
+          <p class="relationship-type">{relationship}</p>
+        ) : (
+          /* The absence, stated. Not a guess, not "independent", not blank. */
+          <p class="relationship-unconfirmed">{t(locale, "brandRelationshipUnconfirmed")}</p>
+        )
+      }
+    </section>
+
+    <section class="records-section" aria-labelledby={id.records}>
+      <h2 class="section-heading" id={id.records}>{t(locale, "brandRecordsHeading")}</h2>
+
+      {
+        records.length > 0 ? (
+          <ol class="records plain">
+            {records.map((review) => {
+              const r = review.locales[locale]!;
+              return (
+                <li class="record-entry">
+                  <a class="record-link" href={path.review(locale, r.slug!)}>
+                    <h3 class="record-title">{r.title}</h3>
+                  </a>
+                  <p class="record-meta">
+                    <time datetime={review.dates.publishedAt} set:html={isolateValue(formatDate(review.dates.publishedAt, locale))} />
+                    {r.disclosureLabel && (
+                      <>
+                        <span class="sep" aria-hidden="true">·</span>
+                        <span class="record-disclosure label">{r.disclosureLabel}</span>
+                      </>
+                    )}
+                  </p>
+                </li>
+              );
+            })}
+          </ol>
+        ) : (
+          <p class="empty">{t(locale, "brandNoRecords")}</p>
+        )
+      }
+    </section>
+
+    {
+      (articles.length > 0 || projects.length > 0) && (
+        <section class="related" aria-labelledby={id.related}>
+          <h2 class="section-heading" id={id.related}>{t(locale, "brandRelatedHeading")}</h2>
+          <ul class="related-list plain">
+            {articles.map((article) => (
+              <li>
+                <a href={path.journal(locale, article.locales[locale]!.slug!)}>
+                  {article.locales[locale]!.title}
+                </a>
+              </li>
+            ))}
+            {projects.map((project) => (
+              <li>
+                <a href={path.work(locale, project.locales[locale]!.slug!)}>
+                  {project.locales[locale]!.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .brand {
+    padding-block: var(--space-6) var(--space-8);
+  }
+
+  .meta {
+    margin: 0 0 var(--space-1);
+    color: var(--color-text-muted);
+  }
+
+  .title {
+    margin: 0;
+  }
+
+  .positioning {
+    margin: var(--space-2) 0 0;
+    max-width: var(--type-measure-editorial);
+    color: var(--color-text-secondary);
+    font-size: var(--type-body-lg);
+  }
+
+  .description {
+    margin-block: var(--space-4) 0;
+  }
+
+  /* ---------------------------------------------------------------- relationship band */
+
+  .terms {
+    margin-block: var(--space-6);
+    padding: var(--space-3);
+    border-inline-start: var(--border-rule-verdict);
+    background: var(--color-ground-raised);
+  }
+
+  .terms-label {
+    margin: 0 0 var(--space-2);
+    color: var(--color-text-muted);
+  }
+
+  .disclosures {
+    margin: 0 0 var(--space-2);
+  }
+
+  .disclosure {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-1);
+    padding-block: var(--space-0-5);
+  }
+
+  .disclosure-count {
+    color: var(--color-text-primary);
+    font-family: var(--type-family-record);
+  }
+
+  .disclosure-label {
+    color: var(--color-text-primary);
+  }
+
+  .relationship-unconfirmed,
+  .relationship-type {
+    margin: 0;
+    max-width: var(--type-measure-editorial);
+    color: var(--color-text-secondary);
+  }
+
+  /* ---------------------------------------------------------------- records */
+
+  .records-section,
+  .related {
+    margin-block-start: var(--space-7);
+  }
+
+  .section-heading {
+    margin: 0 0 var(--space-3);
+    font-family: var(--type-family-display);
+    font-size: var(--type-display-sm);
+    line-height: var(--type-leading-display-sm);
+    font-weight: var(--type-weight-regular);
+  }
+
+  .record-entry {
+    padding-block: var(--space-3);
+    border-block-start: var(--border-rule-hairline);
+  }
+
+  .record-link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .record-link:hover .record-title,
+  .record-link:focus-visible .record-title {
+    color: var(--color-accent-clay-hover);
+  }
+
+  .record-title {
+    margin: 0;
+    font-family: var(--type-family-display);
+    font-size: var(--type-body-lg);
+    font-weight: var(--type-weight-regular);
+  }
+
+  .record-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1);
+    margin: var(--space-1) 0 0;
+    color: var(--color-text-muted);
+    font-family: var(--type-family-record);
+    font-size: var(--type-record-sm);
+  }
+
+  .empty {
+    margin: 0;
+    color: var(--color-text-secondary);
+  }
+
+  .related-list li {
+    padding-block: var(--space-2);
+    border-block-start: var(--border-rule-hairline);
+  }
+</style>

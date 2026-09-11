@@ -27,7 +27,7 @@ import {
 } from "../../../lib/routing";
 import { breadcrumbSchema, jsonLd, templatedMeta } from "../../../lib/seo";
 import { t } from "../../../lib/ui-strings";
-import { formatCount } from "../../../lib/format";
+import { formatCount, countedNoun } from "../../../lib/format";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
 import JournalEntry from "../../../components/editorial/JournalEntry.astro";
@@ -87,7 +87,7 @@ const switcherHref =
 
     <p class="count record">
       <span class="count-value">{formatCount(articles.length, locale)}</span>
-      <span class="count-label">{t(locale, "articleCount")}</span>
+      <span class="count-label">{countedNoun(articles.length, locale, { one: t(locale, "articleCountOne"), other: t(locale, "articleCount") })}</span>
       <span class="count-label">·</span>
       <span class="count-label">{t(locale, "inThisLocale")}</span>
     </p>

@@ -1,0 +1,377 @@
+---
+/**
+ * WORK DETAIL — /{locale}/work/{slug}/
+ *
+ * ============================================================================
+ * WHAT THIS PAGE IS
+ * ============================================================================
+ * A record of a professional engagement, written the same way a testing record is written: what
+ * the work was, what the role was, what was delivered, and on what terms.
+ *
+ * NOT an agency case study. The case-study form has a fixed rhetorical shape — challenge, insight,
+ * solution, spectacular result — and every part of it is an argument for hiring the author. This
+ * page has no result section unless a result has been verified, which is the whole point.
+ *
+ * ============================================================================
+ * THE RESULTS FIGURE GATE
+ * ============================================================================
+ * The most dangerous content on this site. A figure like "1.2M views" is a claim about a third
+ * party's commercial outcome, attributed to Zina's work, published under her name — and numbers
+ * read as authoritative even when the sentence around them hedges.
+ *
+ * `publishableFigures()` is the ONLY way this template can obtain a figure. It requires both a
+ * CONFIRMED verification and a `source` naming a written origin, because a "confirmed" flag with
+ * no provenance is an assertion, not a verification.
+ *
+ * In this build every figure is blocked. The template therefore renders NO results section at all:
+ * no placeholder, no empty chart, no "results pending", no greyed-out number. A withheld figure
+ * must leave no trace, because an outline where a number would go still tells the reader a number
+ * exists — and invites them to imagine it.
+ */
+import type { GetStaticPaths } from "astro";
+import type { Locale, Work } from "../../../../content/schema/types";
+import { IS_INDEXABLE_BUILD, person } from "../../../lib/content";
+import {
+  publishableFigures,
+  workBrand,
+  workBrandRecord,
+  workIn,
+  workJournal,
+  workReviews,
+} from "../../../lib/work";
+import { localeName } from "../../../lib/brand";
+import {
+  absoluteUrl,
+  alternatesFor,
+  localeSlugPaths,
+  path,
+  robotsContent,
+  sectionBreadcrumb,
+  switcherTarget,
+  otherLocale,
+} from "../../../lib/routing";
+import { breadcrumbSchema, detailMeta, jsonLd, personSchema } from "../../../lib/seo";
+import { t } from "../../../lib/ui-strings";
+import { isolateValue } from "../../../lib/bidi";
+import { formatDate } from "../../../lib/format";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
+
+export const getStaticPaths = (() => {
+  const all = [...workIn("en"), ...workIn("ar")];
+  const unique = Array.from(new Map(all.map((w) => [w.id, w])).values());
+  return localeSlugPaths(unique);
+}) satisfies GetStaticPaths;
+
+const { locale } = Astro.params as { locale: Locale };
+const { record } = Astro.props as { record: Work };
+
+const content = record.locales[locale]!;
+
+/** THE GATE. Empty in this build — see the header. */
+const figures = publishableFigures(record);
+
+const brandRecord = workBrandRecord(record);
+const brandPage = workBrand(record, locale);
+const brandName = brandRecord ? localeName(brandRecord, locale) : content.client;
+
+const relatedReviews = workReviews(record, locale);
+const relatedArticles = workJournal(record, locale);
+
+const selfPath = path.work(locale, content.slug!);
+const alternates = alternatesFor(record, (l, s) => path.work(l, s));
+
+const switcher = switcherTarget(
+  otherLocale(locale),
+  record,
+  (l, s) => path.work(l, s),
+  path.workIndex,
+  workIn(otherLocale(locale)).length > 0
+);
+
+const meta = detailMeta(content.seo, content.title, {
+  canonical: absoluteUrl(selfPath),
+  robots: robotsContent(IS_INDEXABLE_BUILD, content.seo?.noindex),
+  locale,
+});
+
+const crumbs = sectionBreadcrumb(
+  locale,
+  { home: t(locale, "home"), section: t(locale, "work") },
+  content.title,
+  path.workIndex
+);
+
+/**
+ * JSON-LD ENTITY SAFETY — BreadcrumbList and Person reference only.
+ *
+ * No `CreativeWork`: it would assert a published creative artefact with a verifiable identity.
+ * No `Organization` for the client: the client is a fictional mock company, and marking up a
+ * client entity asserts that a company engaged her.
+ * No `ProfessionalService`, no `Offer`, no `aggregateRating`, no result markup of any kind —
+ * marking up a figure the page itself refuses to display would be the exact failure the gate
+ * exists to prevent, moved into a place readers do not look.
+ */
+const schemas = [
+  jsonLd(breadcrumbSchema(crumbs)),
+  jsonLd(personSchema(person(), locale)),
+];
+
+const id = { terms: "engagement-terms", records: "related-records", reading: "related-reading" };
+---
+
+<BaseLayout
+  locale={locale}
+  meta={meta}
+  alternates={alternates}
+  schemas={schemas}
+  switcherHref={switcher.href}
+  switcherState={switcher.state}
+>
+  <article class="work">
+    <div class="container">
+      <Breadcrumbs locale={locale} crumbs={crumbs} />
+
+      <p class="meta">
+        <span class="category label">{record.category}</span>
+        <span class="sep" aria-hidden="true">·</span>
+        <span class="year record" set:html={isolateValue(String(record.year))} />
+      </p>
+
+      <h1 class="display-lg title">{content.title}</h1>
+      {content.summary && <p class="summary">{content.summary}</p>}
+
+      {/*
+        THE ENGAGEMENT TERMS, ABOVE THE DESCRIPTION.
+        Same placement logic as the review's disclosure band: a reader should know the commercial
+        basis of what they are reading BEFORE they read it, not after.
+      */}
+      <section class="terms" aria-labelledby={id.terms}>
+        <h2 class="label terms-label" id={id.terms}>{t(locale, "workTermsHeading")}</h2>
+        <dl class="terms-list">
+          <div class="term">
+            <dt class="label">{t(locale, "workClient")}</dt>
+            <dd>
+              {
+                brandPage ? (
+                  <a href={path.brand(locale, brandPage.slug)}>{brandName}</a>
+                ) : (
+                  brandName
+                )
+              }
+            </dd>
+          </div>
+          <div class="term">
+            <dt class="label">{t(locale, "workRole")}</dt>
+            <dd>{content.role}</dd>
+          </div>
+          {
+            content.disclosure && (
+              <div class="term">
+                <dt class="label">{t(locale, "workDisclosure")}</dt>
+                <dd>{content.disclosure}</dd>
+              </div>
+            )
+          }
+        </dl>
+      </section>
+
+      {content.description && <p class="description text-column">{content.description}</p>}
+
+      {
+        content.deliverables?.length > 0 && (
+          <section class="deliverables" aria-labelledby="deliverables">
+            <h2 class="section-heading" id="deliverables">{t(locale, "workDeliverables")}</h2>
+            <ul class="deliverables-list plain">
+              {content.deliverables.map((item) => (
+                <li class="deliverable">{item}</li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+
+      {/*
+        RESULTS — rendered ONLY when the gate opens. In this build it never does, so this whole
+        section is absent. Not empty: absent. There is deliberately no `else` branch.
+      */}
+      {
+        figures.length > 0 && (
+          <section class="results" aria-labelledby="results">
+            <h2 class="section-heading" id="results">{t(locale, "workResults")}</h2>
+            <dl class="figures">
+              {figures.map((figure) => (
+                <div class="figure">
+                  <dt class="figure-label">{figure.label}</dt>
+                  <dd class="figure-value record" set:html={isolateValue(figure.value)} />
+                  {/* Provenance travels with the number, always. A figure without a visible
+                      source is exactly what the gate refuses. */}
+                  <dd class="figure-source label">{figure.source}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        )
+      }
+
+      {
+        relatedReviews.length > 0 && (
+          <section class="related" aria-labelledby={id.records}>
+            <h2 class="section-heading" id={id.records}>{t(locale, "workRelatedRecords")}</h2>
+            <ul class="related-list plain">
+              {relatedReviews.map((review) => (
+                <li>
+                  <a href={path.review(locale, review.locales[locale]!.slug!)}>
+                    {review.locales[locale]!.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+
+      {
+        relatedArticles.length > 0 && (
+          <section class="related" aria-labelledby={id.reading}>
+            <h2 class="section-heading" id={id.reading}>{t(locale, "brandRelatedHeading")}</h2>
+            <ul class="related-list plain">
+              {relatedArticles.map((article) => (
+                <li>
+                  <a href={path.journal(locale, article.locales[locale]!.slug!)}>
+                    {article.locales[locale]!.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+
+      {/* Work records carry year + month, not a publication date. The record states a period,
+          so the page states a period — it does not synthesise a day that was never recorded. */}
+      <p class="dates record">
+        <span class="label">{t(locale, "workPeriod")}</span>
+        <span set:html={isolateValue(formatDate(record.month, locale))} />
+      </p>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .work {
+    padding-block: var(--space-6) var(--space-8);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1);
+    margin: 0 0 var(--space-1);
+    color: var(--color-text-muted);
+  }
+
+  .title {
+    margin: 0;
+  }
+
+  .summary {
+    margin: var(--space-2) 0 0;
+    max-width: var(--type-measure-editorial);
+    color: var(--color-text-secondary);
+    font-size: var(--type-body-lg);
+  }
+
+  /* ---------------------------------------------------------------- engagement terms */
+
+  .terms {
+    margin-block: var(--space-5);
+    padding: var(--space-3);
+    border-inline-start: var(--border-rule-verdict);
+    background: var(--color-ground-raised);
+  }
+
+  .terms-label {
+    margin: 0 0 var(--space-2);
+    color: var(--color-text-muted);
+  }
+
+  .terms-list {
+    margin: 0;
+  }
+
+  .term {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-2);
+    padding-block: var(--space-1);
+  }
+
+  .term dt {
+    flex: 0 0 auto;
+    min-inline-size: 7rem;
+    color: var(--color-text-muted);
+  }
+
+  .term dd {
+    flex: 1 1 12rem;
+    margin: 0;
+    color: var(--color-text-primary);
+  }
+
+  .description {
+    margin-block: var(--space-4) 0;
+  }
+
+  /* ---------------------------------------------------------------- sections */
+
+  .deliverables,
+  .results,
+  .related {
+    margin-block-start: var(--space-6);
+  }
+
+  .section-heading {
+    margin: 0 0 var(--space-3);
+    font-family: var(--type-family-display);
+    font-size: var(--type-display-sm);
+    line-height: var(--type-leading-display-sm);
+    font-weight: var(--type-weight-regular);
+  }
+
+  .deliverable,
+  .related-list li {
+    padding-block: var(--space-2);
+    border-block-start: var(--border-rule-hairline);
+  }
+
+  .figure {
+    padding-block: var(--space-3);
+    border-block-start: var(--border-rule-hairline);
+  }
+
+  .figure-value {
+    margin: 0;
+    font-family: var(--type-family-record);
+    font-size: var(--type-display-sm);
+  }
+
+  .figure-label,
+  .figure-source {
+    color: var(--color-text-muted);
+  }
+
+  .figure-source {
+    margin: var(--space-0-5) 0 0;
+  }
+
+  .dates {
+    display: flex;
+    gap: var(--space-1);
+    margin-block-start: var(--space-6);
+    color: var(--color-text-muted);
+    font-family: var(--type-family-record);
+    font-size: var(--type-record-sm);
+  }
+</style>

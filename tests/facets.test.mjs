@@ -172,14 +172,35 @@ describe("brand facets — permanently navigation-only", () => {
 });
 
 describe("brandDestination — one helper, so no template can get R-14 wrong", () => {
-  test("never points at an unbuilt brand page, even when the gate passes", () => {
-    // Maison Eclat passes the gate in both locales, but /brands/ is not implemented.
+  /*
+   * PHASE 7 TRANSITION. The brand entity template now exists, so this helper's first branch is
+   * live for the first time. Phase 5 asserted the opposite — that it must NEVER point at
+   * /brands/{slug}/ — because the template was unbuilt and doing so produced a 404.
+   *
+   * The rule itself never changed: link to the entity when the gate passes AND the template
+   * exists; otherwise fall back to the facet. Only the second condition flipped. Both branches are
+   * asserted below so neither can regress.
+   */
+  test("BRANCH 1 — gate passes and the template exists: the entity page is the destination", () => {
     const maison = brandById("mock-brand-maison-eclat");
     for (const locale of ["en", "ar"]) {
-      const destination = brandDestination(maison, locale);
-      assert.ok(!destination.startsWith(`/${locale}/brands/`), `linked to an unbuilt brand page: ${destination}`);
-      assert.equal(destination, path.reviewsByBrand(locale, "maison-eclat"));
+      assert.equal(brandDestination(maison, locale), path.brand(locale, "maison-eclat"));
     }
+  });
+
+  test("BRANCH 2 — the gate fails in this locale: the facet is the destination, never the entity", () => {
+    // Veloura earns an English page and NOT an Arabic one: same record, different evidence.
+    const veloura = brandById("mock-brand-veloura-beauty");
+    assert.equal(brandDestination(veloura, "en"), path.brand("en", "veloura-beauty"));
+    assert.equal(brandDestination(veloura, "ar"), path.reviewsByBrand("ar", "veloura-beauty"));
+  });
+
+  test("locale-specific existence is decided per locale, not per record", () => {
+    // The asymmetry above is the whole reason the gate is evaluated per locale. If this ever
+    // collapses to a single answer for both, a thin Arabic page ships or a good English one is
+    // suppressed.
+    const veloura = brandById("mock-brand-veloura-beauty");
+    assert.notEqual(brandDestination(veloura, "en"), brandDestination(veloura, "ar"));
   });
 
   test("a gated brand resolves to its facet", () => {

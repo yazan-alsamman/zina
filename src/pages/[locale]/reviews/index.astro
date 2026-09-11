@@ -31,7 +31,7 @@ import {
 } from "../../../lib/routing";
 import { breadcrumbSchema, jsonLd, templatedMeta } from "../../../lib/seo";
 import { t } from "../../../lib/ui-strings";
-import { formatCount } from "../../../lib/format";
+import { formatCount, countedNoun } from "../../../lib/format";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
 import ReviewEntry from "../../../components/review/ReviewEntry.astro";
@@ -100,7 +100,7 @@ const [featured, ...rest] = records;
 
     <p class="count record">
       <span class="count-value">{formatCount(records.length, locale)}</span>
-      <span class="count-label">{t(locale, "reviewCount")}</span>
+      <span class="count-label">{countedNoun(records.length, locale, { one: t(locale, "reviewCountOne"), other: t(locale, "reviewCount") })}</span>
       <span class="count-label">·</span>
       <span class="count-label">{t(locale, "inThisLocale")}</span>
     </p>

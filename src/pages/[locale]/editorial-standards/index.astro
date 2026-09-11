@@ -1,0 +1,263 @@
+---
+/**
+ * EDITORIAL STANDARDS — /{locale}/editorial-standards/
+ *
+ * ============================================================================
+ * DISTINCT FROM THE METHOD, AND THE PAGE SAYS SO
+ * ============================================================================
+ *   METHOD              how a product is observed and tested        → /{locale}/method/
+ *   EDITORIAL STANDARDS how this publication handles evidence,      → this page
+ *                       disclosure, corrections and claims
+ *
+ * They are adjacent and they are not the same, which is why they are not merged: a reader
+ * evaluating a single review needs the Method; a reader deciding whether to trust the publication
+ * needs this. Each page links to the other and neither restates the other's content.
+ *
+ * ============================================================================
+ * ONLY PROCESSES THAT ACTUALLY EXIST
+ * ============================================================================
+ * Every statement here comes from `site.json → editorialStandards`. Nothing is composed in this
+ * template, because a standards page that invents its own standards is the exact failure it is
+ * supposed to prevent.
+ *
+ * The record carries `_verification: "MOCK"` with the note: "Proposed standards, not Zina's stated
+ * positions. Each must be approved before publication." So the statements render — a standards page
+ * with no standards would be pointless — under a notice saying they are proposed and unapproved.
+ *
+ * NOT CLAIMED anywhere, because none of it is true: legal compliance, medical review, scientific
+ * or peer review, independent laboratory verification, regulatory approval, accreditation, an
+ * ombudsman, an editorial board, or a named editor.
+ */
+import type { GetStaticPaths } from "astro";
+import type { Locale } from "../../../../content/schema/types";
+import { IS_INDEXABLE_BUILD, LOCALES, method } from "../../../lib/content";
+import { editorialStandards, standardsAreApproved } from "../../../lib/trust";
+import { absoluteUrl, path, robotsContent, sectionBreadcrumb } from "../../../lib/routing";
+import { breadcrumbSchema, jsonLd, templatedMeta } from "../../../lib/seo";
+import { t, type UiKey } from "../../../lib/ui-strings";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
+
+export const getStaticPaths = (() =>
+  LOCALES.map((locale) => ({ params: { locale } }))) satisfies GetStaticPaths;
+
+const { locale } = Astro.params as { locale: Locale };
+
+const standards = editorialStandards(locale);
+const approved = standardsAreApproved();
+
+/** Heading per standard, from the interface vocabulary — the statements come from the record. */
+const HEADING: Record<string, UiKey> = {
+  disclosurePolicy: "standardDisclosure",
+  correctionsPolicy: "standardCorrections",
+  ratingsPolicy: "standardRatings",
+  aiPolicy: "standardAi",
+  medicalBoundary: "standardMedical",
+};
+
+const selfPath = path.editorialStandards(locale);
+const alternates = [
+  ...LOCALES.map((l) => ({ hreflang: l, href: absoluteUrl(path.editorialStandards(l)) })),
+  { hreflang: "x-default", href: absoluteUrl(path.editorialStandards("en")) },
+];
+
+const meta = templatedMeta(t(locale, "editorialStandards"), t(locale, "standardsIntro"), {
+  canonical: absoluteUrl(selfPath),
+  robots: robotsContent(IS_INDEXABLE_BUILD),
+  locale,
+});
+
+const crumbs = sectionBreadcrumb(
+  locale,
+  { home: t(locale, "home"), section: t(locale, "editorialStandards") },
+  undefined,
+  path.editorialStandards
+);
+
+/**
+ * JSON-LD — BreadcrumbList only.
+ *
+ * No `Organization` with a `publishingPrinciples` property: that property asserts a publisher
+ * entity exists and has adopted them. No `NewsMediaOrganization`, no `ethicsPolicy`,
+ * no `correctionsPolicy` markup — every one of those would assert an institution.
+ */
+const schemas = [jsonLd(breadcrumbSchema(crumbs))];
+
+const methodName = method().locales[locale]?.name ?? t(locale, "method");
+---
+
+<BaseLayout
+  locale={locale}
+  meta={meta}
+  alternates={alternates}
+  schemas={schemas}
+  switcherHref={path.editorialStandards(locale === "en" ? "ar" : "en")}
+>
+  <div class="container standards">
+    <Breadcrumbs locale={locale} crumbs={crumbs} />
+
+    <h1 class="display-lg title">{t(locale, "editorialStandards")}</h1>
+    <p class="intro text-column">{t(locale, "standardsIntro")}</p>
+
+    {/*
+      THE DISTINCTION FROM THE METHOD, STATED FIRST.
+      A reader who wants "how do you test?" should leave for the Method immediately rather than
+      read this page and find it answers a different question.
+    */}
+    <section class="distinction" aria-labelledby="distinction">
+      <h2 class="label distinction-label" id="distinction">{t(locale, "standardsVsMethodHeading")}</h2>
+      <p class="distinction-body">{t(locale, "standardsVsMethodBody")}</p>
+      <p class="distinction-link">
+        <a href={path.method(locale)}>{methodName}</a>
+      </p>
+    </section>
+
+    {
+      !approved && (
+        /* The status of these statements, before the statements. */
+        <p class="mock-notice">{t(locale, "standardsUnapprovedNotice")}</p>
+      )
+    }
+
+    <section class="statements" aria-labelledby="statements">
+      <h2 class="section-heading" id="statements">{t(locale, "standardsHeading")}</h2>
+      <dl class="statement-list">
+        {
+          standards.map((standard) => (
+            <div class="statement">
+              <dt class="statement-label">{t(locale, HEADING[standard.key]!)}</dt>
+              <dd class="statement-body">{standard.statement}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </section>
+
+    {/*
+      WHAT THIS PUBLICATION DOES NOT DO.
+      Same weight as the statements above, deliberately — the Method page makes the same move with
+      `doesNotProve`. A sceptic is persuaded by someone volunteering their limits, not by a longer
+      list of commitments.
+    */}
+    <section class="limits" aria-labelledby="limits">
+      <h2 class="section-heading" id="limits">{t(locale, "standardsLimitsHeading")}</h2>
+      <ul class="limits-list plain">
+        <li>{t(locale, "standardsLimitLab")}</li>
+        <li>{t(locale, "standardsLimitPeer")}</li>
+        <li>{t(locale, "standardsLimitMedical")}</li>
+        <li>{t(locale, "standardsLimitSample")}</li>
+      </ul>
+    </section>
+
+    <section class="onward" aria-labelledby="onward">
+      <h2 class="section-heading" id="onward">{t(locale, "standardsOnwardHeading")}</h2>
+      <ul class="onward-list plain">
+        <li>
+          <a href={path.reviewsIndex(locale)}>{t(locale, "reviews")}</a>
+          <span class="note">{t(locale, "standardsOnwardReviews")}</span>
+        </li>
+        <li>
+          <a href={path.method(locale)}>{methodName}</a>
+          <span class="note">{t(locale, "standardsOnwardMethod")}</span>
+        </li>
+      </ul>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .standards {
+    padding-block: var(--space-6) var(--space-8);
+    max-inline-size: 52rem;
+  }
+
+  .title {
+    margin: 0;
+  }
+
+  .intro {
+    margin-block: var(--space-2) var(--space-4);
+    color: var(--color-text-secondary);
+    font-size: var(--type-body-lg);
+  }
+
+  .distinction {
+    margin-block: var(--space-5);
+    padding: var(--space-3);
+    border-inline-start: var(--border-rule-observation);
+    background: var(--color-ground-raised);
+  }
+
+  .distinction-label {
+    margin: 0 0 var(--space-2);
+    color: var(--color-text-muted);
+  }
+
+  .distinction-body {
+    margin: 0;
+    max-width: var(--type-measure-editorial);
+  }
+
+  .distinction-link {
+    margin: var(--space-2) 0 0;
+  }
+
+  .mock-notice {
+    margin-block: var(--space-4);
+    padding: var(--space-2);
+    border-inline-start: var(--border-rule-claim);
+    max-width: var(--type-measure-editorial);
+    color: var(--color-text-muted);
+  }
+
+  .statements,
+  .limits,
+  .onward {
+    margin-block-start: var(--space-7);
+  }
+
+  .section-heading {
+    margin: 0 0 var(--space-3);
+    font-family: var(--type-family-display);
+    font-size: var(--type-display-sm);
+    line-height: var(--type-leading-display-sm);
+    font-weight: var(--type-weight-regular);
+  }
+
+  .statement {
+    padding-block: var(--space-3);
+    border-block-start: var(--border-rule-hairline);
+  }
+
+  .statement-label {
+    font-family: var(--type-family-display);
+    font-size: var(--type-body-lg);
+    color: var(--color-text-primary);
+  }
+
+  .statement-body {
+    margin: var(--space-1) 0 0;
+    max-width: var(--type-measure-editorial);
+    color: var(--color-text-secondary);
+  }
+
+  /* Same size and colour as a statement body. The limits are not smaller than the commitments. */
+  .limits-list li {
+    padding-block: var(--space-2);
+    border-block-start: var(--border-rule-hairline);
+    max-width: var(--type-measure-editorial);
+    color: var(--color-text-secondary);
+  }
+
+  .onward-list li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-2);
+    padding-block: var(--space-2);
+    border-block-start: var(--border-rule-hairline);
+  }
+
+  .note {
+    color: var(--color-text-muted);
+  }
+</style>

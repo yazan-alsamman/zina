@@ -1,0 +1,64 @@
+---
+/**
+ * TERMS — /{locale}/terms/
+ *
+ * Architecture only. The document cannot be written until unknown U-03 (jurisdiction) is resolved
+ * by the owner. See `src/components/trust/LegalDocument.astro` for the full reasoning, and
+ * `docs/LEGAL_ARCHITECTURE.md` for what is blocked and who must supply it.
+ *
+ * This page states what is missing rather than approximating it. Nothing here is legal advice.
+ */
+import type { GetStaticPaths } from "astro";
+import type { Locale } from "../../../../content/schema/types";
+import { IS_INDEXABLE_BUILD, LOCALES } from "../../../lib/content";
+import { absoluteUrl, path, robotsContent, sectionBreadcrumb } from "../../../lib/routing";
+import { breadcrumbSchema, jsonLd, templatedMeta } from "../../../lib/seo";
+import { t } from "../../../lib/ui-strings";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
+import LegalDocument from "../../../components/trust/LegalDocument.astro";
+
+export const getStaticPaths = (() =>
+  LOCALES.map((locale) => ({ params: { locale } }))) satisfies GetStaticPaths;
+
+const { locale } = Astro.params as { locale: Locale };
+
+const selfPath = path.terms(locale);
+const alternates = [
+  ...LOCALES.map((l) => ({ hreflang: l, href: absoluteUrl(path.terms(l)) })),
+  { hreflang: "x-default", href: absoluteUrl(path.terms("en")) },
+];
+
+const meta = templatedMeta(t(locale, "termsTitle"), t(locale, "termsIntro"), {
+  canonical: absoluteUrl(selfPath),
+  robots: robotsContent(IS_INDEXABLE_BUILD),
+  locale,
+});
+
+const crumbs = sectionBreadcrumb(
+  locale,
+  { home: t(locale, "home"), section: t(locale, "termsTitle") },
+  undefined,
+  path.terms
+);
+
+/** BreadcrumbList only. No Organization, no legal entity markup — neither is known. */
+const schemas = [jsonLd(breadcrumbSchema(crumbs))];
+---
+
+<BaseLayout
+  locale={locale}
+  meta={meta}
+  alternates={alternates}
+  schemas={schemas}
+  switcherHref={path.terms(locale === "en" ? "ar" : "en")}
+>
+  <LegalDocument
+    locale={locale}
+    titleKey="termsTitle"
+    introKey="termsIntro"
+    blockedItems={["legalMissingGoverningLaw", "legalMissingEntity", "legalMissingLiability"]}
+  >
+    <Breadcrumbs slot="breadcrumb" locale={locale} crumbs={crumbs} />
+  </LegalDocument>
+</BaseLayout>

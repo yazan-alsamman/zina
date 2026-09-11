@@ -80,9 +80,11 @@ describe("no dead navigation — Phase 5 brief section 20", () => {
   });
 
   test("navigation exposes no route that is not implemented", () => {
-    // `/journal/` left this list in Phase 6 — it is now a built surface. Everything still here is
-    // a route no template emits, so linking to it would strand a reader.
-    const unimplemented = ["/about/", "/work/", "/contact/", "/brands/", "/privacy/", "/terms/", "/editorial-standards/"];
+    // Phase 7 emptied this list: every surface the Phase 1 IA declares is now built. It is kept
+    // rather than deleted because it is the mechanism that catches the NEXT speculative link —
+    // `/press/` and `/brands/{brand}/{product}/` are both declared in site.json routes and both
+    // remain unbuilt (press needs 3 verified mentions; product pages are `status: not-built`).
+    const unimplemented = ["/press/", "/search/", "/shop/", "/newsletter/"];
     for (const page of pages) {
       for (const href of internalHrefs(page.html)) {
         for (const fragment of unimplemented) {
@@ -117,7 +119,35 @@ describe("no dead navigation — Phase 5 brief section 20", () => {
       assert.ok(emitted.has("/en/journal/guides/"), "no journal category archive was emitted");
     }
 
-    for (const key of ["about", "work", "contact", "brand", "brandsIndex"]) {
+    // Phase 7 surfaces. Registered AND built, in both locales.
+    if (IMPLEMENTED_ROUTES.has("brandsIndex")) {
+      assert.ok(emitted.has("/en/brands/"));
+      assert.ok(emitted.has("/ar/brands/"));
+    }
+    if (IMPLEMENTED_ROUTES.has("brand")) {
+      // Gated per locale, so this asserts a specific brand that earns a page in BOTH.
+      assert.ok(emitted.has("/en/brands/maison-eclat/"));
+      assert.ok(emitted.has("/ar/brands/maison-eclat/"));
+    }
+    if (IMPLEMENTED_ROUTES.has("workIndex")) {
+      assert.ok(emitted.has("/en/work/"));
+      assert.ok(emitted.has("/ar/work/"));
+    }
+    if (IMPLEMENTED_ROUTES.has("work")) {
+      assert.ok(
+        [...emitted].some((r) => /^\/en\/work\/[^/]+\/$/.test(r)),
+        "the work template is registered but emitted no page"
+      );
+    }
+    for (const key of ["about", "contact", "editorialStandards", "privacy", "terms"]) {
+      if (!IMPLEMENTED_ROUTES.has(key)) continue;
+      const segment = key === "editorialStandards" ? "editorial-standards" : key;
+      assert.ok(emitted.has(`/en/${segment}/`), `${key} is registered but /en/${segment}/ was not built`);
+      assert.ok(emitted.has(`/ar/${segment}/`), `${key} is registered but /ar/${segment}/ was not built`);
+    }
+
+    // Still unbuilt, and must stay unregistered until they are.
+    for (const key of ["press", "product", "productsIndex"]) {
       assert.ok(!IMPLEMENTED_ROUTES.has(key), `${key} is registered but its template is not built`);
     }
   });

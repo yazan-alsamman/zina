@@ -1,0 +1,245 @@
+---
+/**
+ * CONTACT — /{locale}/contact/
+ *
+ * ============================================================================
+ * THERE IS NO FORM ON THIS PAGE, AND THAT IS THE POINT
+ * ============================================================================
+ * A contact form is a promise: "type here and it reaches a person." Honouring that promise needs
+ * a destination — a mail handler, an endpoint, an inbox. This project has no backend, by explicit
+ * architectural decision, and none is planned for this phase.
+ *
+ * A form without a destination is the worst available option. It looks functional, it accepts a
+ * message someone took time to write, and then it silently discards it. The reader believes they
+ * have made contact; they have not. Every alternative dishonesty is smaller than that one:
+ *
+ *   a disabled form      still advertises a channel and invites a retry
+ *   a "coming soon" form is a form that does not work, with an excuse attached
+ *   a mailto: form       requires an address, and no address is verified (below)
+ *
+ * So the page carries no `<form>`, no inputs, no submit control and no fake success state. When a
+ * real endpoint exists, that is the first genuinely justified place in this project to introduce
+ * client JavaScript — and only if progressive enhancement cannot carry it.
+ *
+ * ============================================================================
+ * AND THERE IS NO ADDRESS EITHER
+ * ============================================================================
+ * All three addresses in `site.json` are MOCK (`@zinaalmokri.example.com`). `contactChannels()`
+ * returns only CONFIRMED values, so it returns nothing, and this page renders the ABSENCE.
+ *
+ * Publishing `hello@zinaalmokri.com` because it is the obvious guess would create a channel that
+ * may belong to nobody, or to somebody else. Mail sent to it would vanish. The reader would
+ * believe they had written to Zina.
+ *
+ * The page is therefore architecturally complete and explicitly not yet operational. It says so.
+ */
+import type { GetStaticPaths } from "astro";
+import type { Locale } from "../../../../content/schema/types";
+import { LOCALES, IS_INDEXABLE_BUILD, person } from "../../../lib/content";
+import { contactChannels, management } from "../../../lib/trust";
+import { absoluteUrl, path, robotsContent, sectionBreadcrumb } from "../../../lib/routing";
+import { breadcrumbSchema, jsonLd, templatedMeta } from "../../../lib/seo";
+import { t } from "../../../lib/ui-strings";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
+
+export const getStaticPaths = (() =>
+  LOCALES.map((locale) => ({ params: { locale } }))) satisfies GetStaticPaths;
+
+const { locale } = Astro.params as { locale: Locale };
+
+/** Empty in this build. Every address in the record is MOCK. */
+const channels = contactChannels();
+const agency = management();
+
+const selfPath = path.contact(locale);
+const alternates = [
+  ...LOCALES.map((l) => ({ hreflang: l, href: absoluteUrl(path.contact(l)) })),
+  { hreflang: "x-default", href: absoluteUrl(path.contact("en")) },
+];
+
+const meta = templatedMeta(t(locale, "collaborate"), t(locale, "contactIntro"), {
+  canonical: absoluteUrl(selfPath),
+  robots: robotsContent(IS_INDEXABLE_BUILD),
+  locale,
+});
+
+const crumbs = sectionBreadcrumb(
+  locale,
+  { home: t(locale, "home"), section: t(locale, "collaborate") },
+  undefined,
+  path.contact
+);
+
+/**
+ * JSON-LD — BreadcrumbList only.
+ *
+ * No `ContactPage` with a `ContactPoint`: a ContactPoint asserts a reachable channel, and there
+ * is none. No `Organization`, no `email`, no `telephone`, no `sameAs`.
+ */
+const schemas = [jsonLd(breadcrumbSchema(crumbs))];
+
+const collaborationBio = person().locales[locale]?.bios?.collaboration ?? "";
+---
+
+<BaseLayout
+  locale={locale}
+  meta={meta}
+  alternates={alternates}
+  schemas={schemas}
+  switcherHref={path.contact(locale === "en" ? "ar" : "en")}
+>
+  <div class="container contact">
+    <Breadcrumbs locale={locale} crumbs={crumbs} />
+
+    <h1 class="display-lg title">{t(locale, "collaborate")}</h1>
+    <p class="intro text-column">{t(locale, "contactIntro")}</p>
+
+    {collaborationBio && <p class="collaboration text-column">{collaborationBio}</p>}
+
+    {
+      channels.length > 0 ? (
+        <section class="channels" aria-labelledby="channels">
+          <h2 class="section-heading" id="channels">{t(locale, "contactChannelsHeading")}</h2>
+          <dl class="channel-list">
+            {channels.map((channel) => (
+              <div class="channel">
+                <dt class="label">
+                  {channel.key === "general" && t(locale, "contactGeneral")}
+                  {channel.key === "collaboration" && t(locale, "contactCollaboration")}
+                  {channel.key === "press" && t(locale, "contactPress")}
+                </dt>
+                <dd>
+                  <a href={`mailto:${channel.address}`}>{channel.address}</a>
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      ) : (
+        /*
+          THE ABSENCE, STATED PLAINLY.
+
+          Same band treatment as the review disclosure and the brand relationship: a statement
+          about the limits of what this site can currently do. Never small print, never a
+          <details>, never omitted — an omitted contact section reads as an oversight, and this
+          is a decision.
+        */
+        <section class="unavailable" aria-labelledby="unavailable">
+          <h2 class="label unavailable-label" id="unavailable">
+            {t(locale, "contactUnavailableHeading")}
+          </h2>
+          <p class="unavailable-statement">{t(locale, "contactUnavailableBody")}</p>
+        </section>
+      )
+    }
+
+    {
+      agency && (
+        <section class="agency" aria-labelledby="agency">
+          <h2 class="section-heading" id="agency">{t(locale, "contactManagement")}</h2>
+          <p>
+            <span>{agency.agencyName}</span>
+            <a href={`mailto:${agency.agencyEmail}`}>{agency.agencyEmail}</a>
+          </p>
+        </section>
+      )
+    }
+
+    {/* Where a reader can go instead — real destinations, not consolation. */}
+    <section class="elsewhere" aria-labelledby="elsewhere">
+      <h2 class="section-heading" id="elsewhere">{t(locale, "contactElsewhereHeading")}</h2>
+      <ul class="elsewhere-list plain">
+        <li>
+          <a href={path.editorialStandards(locale)}>{t(locale, "editorialStandards")}</a>
+          <span class="note">{t(locale, "contactElsewhereStandards")}</span>
+        </li>
+        <li>
+          <a href={path.method(locale)}>{t(locale, "method")}</a>
+          <span class="note">{t(locale, "contactElsewhereMethod")}</span>
+        </li>
+      </ul>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .contact {
+    padding-block: var(--space-6) var(--space-8);
+  }
+
+  .title {
+    margin: 0;
+  }
+
+  .intro {
+    margin-block: var(--space-2) var(--space-3);
+    color: var(--color-text-secondary);
+    font-size: var(--type-body-lg);
+  }
+
+  .collaboration {
+    margin-block: 0 var(--space-4);
+  }
+
+  .unavailable {
+    margin-block: var(--space-5);
+    padding: var(--space-3);
+    border-inline-start: var(--border-rule-verdict);
+    background: var(--color-ground-raised);
+  }
+
+  .unavailable-label {
+    margin: 0 0 var(--space-2);
+    color: var(--color-text-muted);
+  }
+
+  .unavailable-statement {
+    margin: 0;
+    max-width: var(--type-measure-editorial);
+  }
+
+  .channels,
+  .agency,
+  .elsewhere {
+    margin-block-start: var(--space-6);
+  }
+
+  .section-heading {
+    margin: 0 0 var(--space-3);
+    font-family: var(--type-family-display);
+    font-size: var(--type-display-sm);
+    line-height: var(--type-leading-display-sm);
+    font-weight: var(--type-weight-regular);
+  }
+
+  .channel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-2);
+    padding-block: var(--space-2);
+    border-block-start: var(--border-rule-hairline);
+  }
+
+  .channel dt {
+    flex: 0 0 auto;
+    min-inline-size: 8rem;
+    color: var(--color-text-muted);
+  }
+
+  .channel dd {
+    margin: 0;
+  }
+
+  .elsewhere-list li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-2);
+    padding-block: var(--space-2);
+    border-block-start: var(--border-rule-hairline);
+  }
+
+  .note {
+    color: var(--color-text-muted);
+  }
+</style>

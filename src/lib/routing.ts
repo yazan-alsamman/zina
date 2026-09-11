@@ -102,6 +102,15 @@ export const IMPLEMENTED_ROUTES = new Set<string>([
   "journalIndex",
   "journal",
   "journalByCategory",
+  "brandsIndex",
+  "brand",
+  "workIndex",
+  "work",
+  "about",
+  "contact",
+  "editorialStandards",
+  "privacy",
+  "terms",
   "notFound",
 ]);
 

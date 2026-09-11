@@ -37,7 +37,7 @@ import {
 } from "../../../lib/routing";
 import { breadcrumbSchema, jsonLd, templatedMeta } from "../../../lib/seo";
 import { t } from "../../../lib/ui-strings";
-import { formatCount } from "../../../lib/format";
+import { formatCount, countedNoun } from "../../../lib/format";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
 import JournalEntry from "../../../components/editorial/JournalEntry.astro";
@@ -121,7 +121,7 @@ const siblings = journalCategories(locale);
 
     <p class="count record">
       <span class="count-value">{formatCount(facet.count, locale)}</span>
-      <span class="count-label">{t(locale, "articleCount")}</span>
+      <span class="count-label">{countedNoun(facet.count, locale, { one: t(locale, "articleCountOne"), other: t(locale, "articleCount") })}</span>
       {
         /* Stated plainly rather than hidden in a meta tag. */
         !facet.indexable && <span class="count-label nav-only">{t(locale, "navigationOnly")}</span>

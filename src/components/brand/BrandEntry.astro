@@ -1,0 +1,104 @@
+---
+/**
+ * BRAND ENTRY — the index treatment, a third time. Still no Card.
+ *
+ * Hairline, type, and nothing else. The same editorial index vocabulary as ReviewEntry and
+ * JournalEntry, so the archive, the journal and the brand index read as one publication rather
+ * than three products.
+ *
+ * WHAT IT EXPOSES, all derived from the canonical record:
+ *   name             in the reader's locale
+ *   category         the brand's product category key (content-derived, not a marketing tagline)
+ *   positioning      Zina's one-line description of where the brand sits — ORIGINAL WRITING
+ *   record count     how many documented records involve it, in THIS locale
+ *
+ * WHAT IT NEVER EXPOSES:
+ *   the brand's own marketing copy, a logo wall, a relationship label that is not CONFIRMED,
+ *   founding year, headquarters, ownership, ethics or sustainability claims, or any rating.
+ *
+ * The logo is deliberately absent. Every logo path in the corpus points at an asset that does not
+ * exist, and a row of brand logos is the visual grammar of a sponsor page — which is exactly what
+ * this index must not become.
+ */
+import type { Brand, Locale } from "../../../content/schema/types";
+import { path } from "../../lib/routing";
+import { t } from "../../lib/ui-strings";
+import { isolateValue } from "../../lib/bidi";
+import { brandReviews, localeName } from "../../lib/brand";
+import { formatCount, countedNoun } from "../../lib/format";
+
+interface Props {
+  locale: Locale;
+  brand: Brand;
+  /** The caller declares the level, because it is a property of the document outline. */
+  headingLevel?: 2 | 3;
+}
+
+const { locale, brand, headingLevel = 2 } = Astro.props;
+const Heading: "h2" | "h3" = headingLevel === 3 ? "h3" : "h2";
+
+const content = brand.locales[locale]!;
+const records = brandReviews(brand, locale).length;
+---
+
+<article class="entry">
+  <a class="entry-link" href={path.brand(locale, brand.slug)}>
+    <p class="meta">
+      <span class="category label">{content.category}</span>
+    </p>
+
+    <Heading class="title">{localeName(brand, locale)}</Heading>
+    {content.positioning && <p class="positioning">{content.positioning}</p>}
+  </a>
+
+  <p class="records">
+    <span set:html={isolateValue(formatCount(records, locale))} />
+    <span class="count-label">{countedNoun(records, locale, { one: t(locale, "reviewCountOne"), other: t(locale, "reviewCount") })}</span>
+  </p>
+</article>
+
+<style>
+  .entry {
+    /* A hairline and space. No border box, no radius, no shadow, no background. */
+    padding-block: var(--space-4);
+    border-block-start: var(--border-rule-hairline);
+  }
+
+  .entry-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .entry-link:hover .title,
+  .entry-link:focus-visible .title {
+    color: var(--color-accent-clay-hover);
+  }
+
+  .meta {
+    margin: 0 0 var(--space-1);
+    color: var(--color-text-muted);
+  }
+
+  .title {
+    margin: 0;
+    font-family: var(--type-family-display);
+    font-size: var(--type-display-sm);
+    line-height: var(--type-leading-display-sm);
+    font-weight: var(--type-weight-regular);
+  }
+
+  .positioning {
+    margin: var(--space-1) 0 0;
+    max-width: var(--type-measure-narrow);
+    color: var(--color-text-secondary);
+  }
+
+  .records {
+    display: flex;
+    gap: var(--space-0-5);
+    margin: var(--space-2) 0 0;
+    color: var(--color-text-muted);
+    font-size: var(--type-body-sm);
+  }
+</style>

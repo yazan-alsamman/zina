@@ -1,0 +1,132 @@
+---
+/**
+ * BRANDS INDEX — /{locale}/brands/
+ *
+ * The entity index: which companies appear in the archive, and how much is documented about each.
+ *
+ * NOT a logo wall, a partner page or a client list. Those three are the standard visual grammar of
+ * "brands who work with me", and this page is the opposite claim: these are companies whose
+ * products have been TESTED, some of them bought with Zina's own money.
+ *
+ * ============================================================================
+ * THE LIST IS THE GATE'S LIST, NOT THE CORPUS
+ * ============================================================================
+ * Only brands that earn an entity page appear. A gated brand (`terra-sana` in both locales,
+ * `veloura-beauty` in Arabic) is NOT listed here — listing it would either produce a dead link or
+ * require a non-link row that advertises a page the reader cannot reach.
+ *
+ * Its reviews remain fully reachable through `/reviews/` and the brand facet. Gating the entity
+ * page never hides the evidence; it withholds a thin page about the company.
+ */
+import type { GetStaticPaths } from "astro";
+import type { Locale } from "../../../../content/schema/types";
+import { LOCALES, IS_INDEXABLE_BUILD } from "../../../lib/content";
+import { entityBrands } from "../../../lib/brand";
+import { absoluteUrl, path, robotsContent, sectionBreadcrumb } from "../../../lib/routing";
+import { breadcrumbSchema, jsonLd, templatedMeta } from "../../../lib/seo";
+import { t } from "../../../lib/ui-strings";
+import { isolateValue } from "../../../lib/bidi";
+import { formatCount, countedNoun } from "../../../lib/format";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
+import BrandEntry from "../../../components/brand/BrandEntry.astro";
+
+export const getStaticPaths = (() =>
+  LOCALES.map((locale) => ({ params: { locale } }))) satisfies GetStaticPaths;
+
+const { locale } = Astro.params as { locale: Locale };
+
+const listed = entityBrands(locale);
+
+const selfPath = path.brandsIndex(locale);
+
+/** Both locales always generate this index, so the pair is reciprocal by construction. */
+const alternates = [
+  ...LOCALES.map((l) => ({ hreflang: l, href: absoluteUrl(path.brandsIndex(l)) })),
+  { hreflang: "x-default", href: absoluteUrl(path.brandsIndex("en")) },
+];
+
+const meta = templatedMeta(t(locale, "brands"), t(locale, "brandsIndexIntro"), {
+  canonical: absoluteUrl(selfPath),
+  robots: robotsContent(IS_INDEXABLE_BUILD),
+  locale,
+});
+
+const crumbs = sectionBreadcrumb(
+  locale,
+  { home: t(locale, "home"), section: t(locale, "brands") },
+  undefined,
+  path.brandsIndex
+);
+
+const schemas = [jsonLd(breadcrumbSchema(crumbs))];
+---
+
+<BaseLayout
+  locale={locale}
+  meta={meta}
+  alternates={alternates}
+  schemas={schemas}
+  switcherHref={path.brandsIndex(locale === "en" ? "ar" : "en")}
+>
+  <div class="container brands">
+    <Breadcrumbs locale={locale} crumbs={crumbs} />
+
+    <h1 class="display-lg title">{t(locale, "brands")}</h1>
+    <p class="intro text-column">{t(locale, "brandsIndexIntro")}</p>
+
+    {/* The count is of what exists IN THIS LOCALE, never of the whole corpus. */}
+    <p class="count record">
+      <span class="count-value" set:html={isolateValue(formatCount(listed.length, locale))} />
+      <span class="count-label">{countedNoun(listed.length, locale, { one: t(locale, "brandCountOne"), other: t(locale, "brandCount") })}</span>
+      <span class="count-label">·</span>
+      <span class="count-label">{t(locale, "inThisLocale")}</span>
+    </p>
+
+    {
+      listed.length > 0 ? (
+        <div class="entries">
+          {listed.map((brand) => (
+            <BrandEntry locale={locale} brand={brand} headingLevel={2} />
+          ))}
+        </div>
+      ) : (
+        <p class="empty">{t(locale, "brandsNone")}</p>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .brands {
+    padding-block: var(--space-6) var(--space-8);
+  }
+
+  .title {
+    margin: 0;
+  }
+
+  .intro {
+    margin-block: var(--space-2) var(--space-4);
+    color: var(--color-text-secondary);
+    font-size: var(--type-body-lg);
+  }
+
+  .count {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    margin-block: 0 var(--space-5);
+    color: var(--color-text-muted);
+    font-family: var(--type-family-record);
+    font-size: var(--type-record-sm);
+  }
+
+  .entries > :global(.entry:last-child) {
+    border-block-end: var(--border-rule-hairline);
+  }
+
+  .empty {
+    color: var(--color-text-secondary);
+  }
+</style>

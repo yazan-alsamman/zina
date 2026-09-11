@@ -24,7 +24,7 @@ import { brandDestination, brandFacet, brandFacets, facetIndexing } from "../../
 import { absoluteUrl, path, sectionBreadcrumb, otherLocale } from "../../../../lib/routing";
 import { breadcrumbSchema, jsonLd, templatedMeta } from "../../../../lib/seo";
 import { t } from "../../../../lib/ui-strings";
-import { formatCount } from "../../../../lib/format";
+import { formatCount, countedNoun } from "../../../../lib/format";
 import BaseLayout from "../../../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../../../components/shell/Breadcrumbs.astro";
 import ReviewEntry from "../../../../components/review/ReviewEntry.astro";
@@ -92,7 +92,7 @@ const brandPageHref = (() => {
 
     <p class="count record">
       <span class="count-value">{formatCount(facet.count, locale)}</span>
-      <span class="count-label">{t(locale, "reviewCount")}</span>
+      <span class="count-label">{countedNoun(facet.count, locale, { one: t(locale, "reviewCountOne"), other: t(locale, "reviewCount") })}</span>
       <span class="count-label">·</span>
       <span class="count-label nav-only">{t(locale, "navigationOnly")}</span>
     </p>

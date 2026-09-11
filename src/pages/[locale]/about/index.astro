@@ -1,0 +1,265 @@
+---
+/**
+ * ABOUT — /{locale}/about/
+ *
+ * ============================================================================
+ * THE ONLY VERIFIED FACT ON THIS PAGE IS THE NAME
+ * ============================================================================
+ * `person.json` is explicit: `name._verification` is CONFIRMED and everything else — bios,
+ * location, expertise, philosophy — is MOCK. So this page renders the bios as editorial copy
+ * under a visible mock notice, and renders NOTHING that would function as a credential.
+ *
+ * Deliberately absent, and absent from the record too:
+ *
+ *   degrees · licences · certifications · dermatologist or medical status · years of experience ·
+ *   awards · press · publications · follower counts · client lists · brand partnerships ·
+ *   "as seen in" · testimonials · a location
+ *
+ * `location` IS on the record ("Dubai, United Arab Emirates") and is NOT rendered. It is MOCK, and
+ * the record's own note explains why it matters: location drives Arabic dialect targeting, hreflang
+ * region, and any climate-based testing claim. A wrong city would quietly justify claims about
+ * testing in heat and humidity that nobody made.
+ *
+ * ============================================================================
+ * WHAT AN ABOUT PAGE IS FOR HERE
+ * ============================================================================
+ * Not a resume, not a media kit, not a credential wall. It answers: who is doing this, why does the
+ * archive exist, and how should a reader read it. Authority comes from the method being visible and
+ * the limits being stated — which is why the page's two outbound links are the Method and the
+ * Editorial Standards, not a follower count.
+ *
+ * The Testing Room language is used LIGHTLY here: no plate, no conditions well, no disclosure band.
+ * Those devices belong to evidence. This page is a person talking.
+ */
+import type { GetStaticPaths } from "astro";
+import type { Locale } from "../../../../content/schema/types";
+import { IS_INDEXABLE_BUILD, IS_MOCK_SOURCE, LOCALES, method, person } from "../../../lib/content";
+import { absoluteUrl, path, robotsContent, sectionBreadcrumb } from "../../../lib/routing";
+import { breadcrumbSchema, jsonLd, personSchema, templatedMeta } from "../../../lib/seo";
+import { t } from "../../../lib/ui-strings";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
+
+export const getStaticPaths = (() =>
+  LOCALES.map((locale) => ({ params: { locale } }))) satisfies GetStaticPaths;
+
+const { locale } = Astro.params as { locale: Locale };
+
+const record = person();
+const content = record.locales[locale];
+if (!content) {
+  throw new Error(`person has no ${locale} content but a route was generated`);
+}
+
+/** CONFIRMED. The one fact on this page that is not mock. */
+const name = record.name.display;
+
+const selfPath = path.about(locale);
+const alternates = [
+  ...LOCALES.map((l) => ({ hreflang: l, href: absoluteUrl(path.about(l)) })),
+  { hreflang: "x-default", href: absoluteUrl(path.about("en")) },
+];
+
+const meta = templatedMeta(name, content.tagline, {
+  canonical: absoluteUrl(selfPath),
+  robots: robotsContent(IS_INDEXABLE_BUILD, content.seo?.noindex),
+  locale,
+});
+
+const crumbs = sectionBreadcrumb(
+  locale,
+  { home: t(locale, "home"), section: t(locale, "about") },
+  undefined,
+  path.about
+);
+
+/**
+ * Person JSON-LD — the canonical definition of the entity, which every other page references by
+ * `@id`. `personSchema()` already refuses `sameAs` (no profile is `sameAsEligible`) and the
+ * unverified location. No `alumniOf`, `hasCredential`, `award` or `worksFor` is emitted, because
+ * none exists.
+ */
+const schemas = [
+  jsonLd(breadcrumbSchema(crumbs)),
+  jsonLd(personSchema(record, locale)),
+];
+
+const methodRecord = method();
+const methodName = methodRecord.locales[locale]?.name ?? t(locale, "method");
+---
+
+<BaseLayout
+  locale={locale}
+  meta={meta}
+  alternates={alternates}
+  schemas={schemas}
+  switcherHref={path.about(locale === "en" ? "ar" : "en")}
+>
+  <div class="container about">
+    <Breadcrumbs locale={locale} crumbs={crumbs} />
+
+    <h1 class="display-lg title">{name}</h1>
+    <p class="professional-title label">{content.professionalTitle}</p>
+    <p class="tagline">{content.tagline}</p>
+
+    {
+      IS_MOCK_SOURCE && (
+        /* The biography is placeholder copy. Said once, above it, not in a footnote. */
+        <p class="mock-notice">{t(locale, "aboutMockNotice")}</p>
+      )
+    }
+
+    <div class="bio text-column">
+      {content.bios.long.split("\n\n").map((para) => <p>{para}</p>)}
+    </div>
+
+    {
+      content.philosophy?.statement && (
+        <section class="philosophy" aria-labelledby="philosophy">
+          <h2 class="section-heading" id="philosophy">{t(locale, "aboutPhilosophy")}</h2>
+          <p class="statement text-column">{content.philosophy.statement}</p>
+          {content.philosophy.principles?.length > 0 && (
+            <ul class="principles plain">
+              {content.philosophy.principles.map((principle) => (
+                <li class="principle">{principle}</li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )
+    }
+
+    {/*
+      WHAT SHE DOES, not what she is qualified as. `expertise` is a list of practices with a
+      detail each — it is never rendered as a credential, a skill bar, a percentage or a years
+      count, and the record contains no such field to render.
+    */}
+    {
+      content.expertise?.length > 0 && (
+        <section class="expertise" aria-labelledby="expertise">
+          <h2 class="section-heading" id="expertise">{t(locale, "aboutExpertise")}</h2>
+          <dl class="expertise-list">
+            {content.expertise.map((item) => (
+              <div class="expertise-item">
+                <dt class="expertise-label">{item.label}</dt>
+                <dd class="expertise-detail">{item.detail}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )
+    }
+
+    {/*
+      THE TWO LINKS THAT CARRY THE AUTHORITY CLAIM.
+      Not social profiles, not press, not a follower count: the method she uses and the standards
+      she holds the publication to. Both are real pages a reader can check.
+    */}
+    <section class="onward" aria-labelledby="onward">
+      <h2 class="section-heading" id="onward">{t(locale, "aboutOnwardHeading")}</h2>
+      <ul class="onward-list plain">
+        <li>
+          <a href={path.method(locale)}>{methodName}</a>
+          <span class="note">{t(locale, "aboutOnwardMethod")}</span>
+        </li>
+        <li>
+          <a href={path.editorialStandards(locale)}>{t(locale, "editorialStandards")}</a>
+          <span class="note">{t(locale, "aboutOnwardStandards")}</span>
+        </li>
+      </ul>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .about {
+    padding-block: var(--space-6) var(--space-8);
+    /* Lighter than the evidence surfaces: a narrower column and more air. */
+    max-inline-size: 52rem;
+  }
+
+  .title {
+    margin: 0;
+  }
+
+  .professional-title {
+    margin: var(--space-1) 0 0;
+    color: var(--color-text-muted);
+  }
+
+  .tagline {
+    margin: var(--space-3) 0 0;
+    max-width: var(--type-measure-editorial);
+    font-family: var(--type-family-display);
+    font-size: var(--type-display-sm);
+    line-height: var(--type-leading-display-sm);
+    color: var(--color-text-primary);
+  }
+
+  .mock-notice {
+    margin-block: var(--space-4) 0;
+    padding: var(--space-2);
+    border-inline-start: var(--border-rule-claim);
+    max-width: var(--type-measure-editorial);
+    color: var(--color-text-muted);
+  }
+
+  .bio {
+    margin-block-start: var(--space-4);
+  }
+
+  .philosophy,
+  .expertise,
+  .onward {
+    margin-block-start: var(--space-7);
+  }
+
+  .section-heading {
+    margin: 0 0 var(--space-3);
+    font-family: var(--type-family-display);
+    font-size: var(--type-display-sm);
+    line-height: var(--type-leading-display-sm);
+    font-weight: var(--type-weight-regular);
+  }
+
+  .statement {
+    margin: 0;
+  }
+
+  .principles {
+    margin-block-start: var(--space-3);
+  }
+
+  .principle {
+    padding-block: var(--space-2);
+    border-block-start: var(--border-rule-hairline);
+    max-width: var(--type-measure-editorial);
+  }
+
+  .expertise-item {
+    padding-block: var(--space-3);
+    border-block-start: var(--border-rule-hairline);
+  }
+
+  .expertise-label {
+    color: var(--color-text-primary);
+  }
+
+  .expertise-detail {
+    margin: var(--space-1) 0 0;
+    max-width: var(--type-measure-editorial);
+    color: var(--color-text-secondary);
+  }
+
+  .onward-list li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-2);
+    padding-block: var(--space-2);
+    border-block-start: var(--border-rule-hairline);
+  }
+
+  .note {
+    color: var(--color-text-muted);
+  }
+</style>

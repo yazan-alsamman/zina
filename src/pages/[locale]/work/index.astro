@@ -1,0 +1,190 @@
+---
+/**
+ * WORK INDEX — /{locale}/work/
+ *
+ * Documented professional engagements. NOT a portfolio grid, a client logo wall, a showreel or a
+ * media kit — each of those is a device for making quantity look like authority, and this corpus
+ * is four projects.
+ *
+ * So it uses the same index treatment as every other archive on this site: hairline, type, and
+ * the terms of the engagement stated on the row itself. A reader scanning this list learns who the
+ * client was and what the role was before they click, which is the information that actually
+ * matters about professional work.
+ *
+ * NO RESULTS APPEAR HERE, ever — not even where the gate would allow them. A figure needs its
+ * source beside it to be honest, and an index row has no room for provenance. See
+ * `src/lib/work.ts`.
+ */
+import type { GetStaticPaths } from "astro";
+import type { Locale } from "../../../../content/schema/types";
+import { LOCALES, IS_INDEXABLE_BUILD } from "../../../lib/content";
+import { workBrandRecord, workIn } from "../../../lib/work";
+import { localeName } from "../../../lib/brand";
+import { absoluteUrl, path, robotsContent, sectionBreadcrumb } from "../../../lib/routing";
+import { breadcrumbSchema, jsonLd, templatedMeta } from "../../../lib/seo";
+import { t } from "../../../lib/ui-strings";
+import { isolateValue } from "../../../lib/bidi";
+import { formatCount, countedNoun } from "../../../lib/format";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
+
+export const getStaticPaths = (() =>
+  LOCALES.map((locale) => ({ params: { locale } }))) satisfies GetStaticPaths;
+
+const { locale } = Astro.params as { locale: Locale };
+
+const projects = workIn(locale);
+
+const selfPath = path.workIndex(locale);
+const alternates = [
+  ...LOCALES.map((l) => ({ hreflang: l, href: absoluteUrl(path.workIndex(l)) })),
+  { hreflang: "x-default", href: absoluteUrl(path.workIndex("en")) },
+];
+
+const meta = templatedMeta(t(locale, "work"), t(locale, "workIndexIntro"), {
+  canonical: absoluteUrl(selfPath),
+  robots: robotsContent(IS_INDEXABLE_BUILD),
+  locale,
+});
+
+const crumbs = sectionBreadcrumb(
+  locale,
+  { home: t(locale, "home"), section: t(locale, "work") },
+  undefined,
+  path.workIndex
+);
+
+const schemas = [jsonLd(breadcrumbSchema(crumbs))];
+---
+
+<BaseLayout
+  locale={locale}
+  meta={meta}
+  alternates={alternates}
+  schemas={schemas}
+  switcherHref={path.workIndex(locale === "en" ? "ar" : "en")}
+>
+  <div class="container work-index">
+    <Breadcrumbs locale={locale} crumbs={crumbs} />
+
+    <h1 class="display-lg title">{t(locale, "work")}</h1>
+    <p class="intro text-column">{t(locale, "workIndexIntro")}</p>
+
+    <p class="count record">
+      <span class="count-value" set:html={isolateValue(formatCount(projects.length, locale))} />
+      <span class="count-label">{countedNoun(projects.length, locale, { one: t(locale, "workCountOne"), other: t(locale, "workCount") })}</span>
+      <span class="count-label">·</span>
+      <span class="count-label">{t(locale, "inThisLocale")}</span>
+    </p>
+
+    {
+      projects.length > 0 ? (
+        <div class="entries">
+          {projects.map((project) => {
+            const c = project.locales[locale]!;
+            const brandRecord = workBrandRecord(project);
+            const client = brandRecord ? localeName(brandRecord, locale) : c.client;
+            return (
+              <article class="entry">
+                <a class="entry-link" href={path.work(locale, c.slug!)}>
+                  <p class="entry-meta">
+                    <span class="category label">{project.category}</span>
+                    <span class="sep" aria-hidden="true">·</span>
+                    <span class="year record" set:html={isolateValue(String(project.year))} />
+                  </p>
+                  <h2 class="entry-title">{c.title}</h2>
+                  {c.summary && <p class="entry-summary">{c.summary}</p>}
+                </a>
+                <p class="entry-terms">
+                  <span class="label">{client}</span>
+                  <span class="sep" aria-hidden="true">·</span>
+                  <span class="label">{c.role}</span>
+                </p>
+              </article>
+            );
+          })}
+        </div>
+      ) : (
+        <p class="empty">{t(locale, "workNone")}</p>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .work-index {
+    padding-block: var(--space-6) var(--space-8);
+  }
+
+  .title {
+    margin: 0;
+  }
+
+  .intro {
+    margin-block: var(--space-2) var(--space-4);
+    color: var(--color-text-secondary);
+    font-size: var(--type-body-lg);
+  }
+
+  .count {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    margin-block: 0 var(--space-5);
+    color: var(--color-text-muted);
+    font-family: var(--type-family-record);
+    font-size: var(--type-record-sm);
+  }
+
+  .entry {
+    padding-block: var(--space-4);
+    border-block-start: var(--border-rule-hairline);
+  }
+
+  .entries > .entry:last-child {
+    border-block-end: var(--border-rule-hairline);
+  }
+
+  .entry-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .entry-link:hover .entry-title,
+  .entry-link:focus-visible .entry-title {
+    color: var(--color-accent-clay-hover);
+  }
+
+  .entry-meta,
+  .entry-terms {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1);
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+
+  .entry-terms {
+    margin-block-start: var(--space-2);
+  }
+
+  .entry-title {
+    margin: var(--space-1) 0 0;
+    font-family: var(--type-family-display);
+    font-size: var(--type-display-sm);
+    line-height: var(--type-leading-display-sm);
+    font-weight: var(--type-weight-regular);
+  }
+
+  .entry-summary {
+    margin: var(--space-1) 0 0;
+    max-width: var(--type-measure-editorial);
+    color: var(--color-text-secondary);
+  }
+
+  .empty {
+    color: var(--color-text-secondary);
+  }
+</style>

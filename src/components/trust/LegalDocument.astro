@@ -1,0 +1,247 @@
+---
+/**
+ * LEGAL DOCUMENT — the shared shell for /privacy/ and /terms/.
+ *
+ * ============================================================================
+ * THESE PAGES ARE ARCHITECTURE, NOT LEGAL TEXT
+ * ============================================================================
+ * Unknown U-03 is unresolved: `site.json → legal.jurisdiction` is null and NEEDS_VERIFICATION, and
+ * so is `legal.entityName`. Without a jurisdiction this project cannot know which privacy regime
+ * applies, which consent behaviour is required, what retention periods are lawful, or what a terms
+ * document must contain.
+ *
+ * So these routes exist and state, precisely, what is missing and who must supply it. They do NOT:
+ *
+ *   claim compliance with GDPR, CCPA, PDPL or any other regime
+ *   name a legal entity, company number, registered address or governing law
+ *   invent a data controller, a DPO, a processor list or a retention schedule
+ *   describe a cookie policy — see below
+ *   present themselves as final legal text or as legal advice
+ *
+ * The factual sections that CAN be written honestly are written: what this build actually does
+ * with data, which is nothing. That is not a legal position, it is an observation about the
+ * software, and it is asserted by a test rather than by a lawyer.
+ *
+ * ============================================================================
+ * WHY THERE IS NO COOKIE BANNER
+ * ============================================================================
+ * The site sets no non-essential cookie, ships zero client JavaScript, loads no analytics, no tag
+ * manager, no embed and no third-party request of any kind. A consent banner would therefore ask
+ * permission for something that does not happen — which trains readers to dismiss consent UI and
+ * implies tracking that is not occurring.
+ *
+ * Legal architecture must reflect the implementation. If tracking is ever added, `USES_TRACKING`
+ * in `src/lib/trust.ts` is the single switch these pages read.
+ */
+import type { Locale } from "../../../content/schema/types";
+import { legalIdentity, jurisdictionIsKnown, USES_TRACKING } from "../../lib/trust";
+import { t, type UiKey } from "../../lib/ui-strings";
+import { path } from "../../lib/routing";
+
+interface Props {
+  locale: Locale;
+  /** The document's own title and lead, from the interface vocabulary. */
+  titleKey: UiKey;
+  introKey: UiKey;
+  /** What this specific document cannot state until U-03 is resolved. */
+  blockedItems: UiKey[];
+}
+
+const { locale, titleKey, introKey, blockedItems } = Astro.props;
+
+const identity = legalIdentity();
+const jurisdictionKnown = jurisdictionIsKnown();
+---
+
+<div class="container legal">
+  <slot name="breadcrumb" />
+
+  <h1 class="display-lg title">{t(locale, titleKey)}</h1>
+  <p class="intro text-column">{t(locale, introKey)}</p>
+
+  {/*
+    THE STATUS BAND, FIRST.
+    A reader arriving at a legal page needs to know immediately whether it is operative. Putting
+    this below the content would let someone read a paragraph and believe it binds.
+  */}
+  {
+    !jurisdictionKnown && (
+      <section class="pending" aria-labelledby="legal-status">
+        <h2 class="label pending-label" id="legal-status">{t(locale, "legalPendingHeading")}</h2>
+        <p class="pending-statement">{t(locale, "legalPendingBody")}</p>
+
+        <h3 class="label pending-subhead">{t(locale, "legalMissingHeading")}</h3>
+        <ul class="missing plain">
+          {blockedItems.map((key) => (
+            <li class="missing-item">{t(locale, key)}</li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  {/*
+    WHAT IS TRUE REGARDLESS OF JURISDICTION.
+    Statements about what the software does, not about what the law requires. These are verifiable
+    by reading the build, and `tests/trust.test.mjs` asserts each one against dist/.
+  */}
+  <section class="factual" aria-labelledby="what-this-site-does">
+    <h2 class="section-heading" id="what-this-site-does">{t(locale, "legalFactualHeading")}</h2>
+    <ul class="facts plain">
+      {!USES_TRACKING && <li>{t(locale, "legalFactNoTracking")}</li>}
+      {!USES_TRACKING && <li>{t(locale, "legalFactNoCookies")}</li>}
+      <li>{t(locale, "legalFactNoScripts")}</li>
+      <li>{t(locale, "legalFactNoAccounts")}</li>
+      <li>{t(locale, "legalFactFonts")}</li>
+    </ul>
+  </section>
+
+  <section class="identity" aria-labelledby="who">
+    <h2 class="section-heading" id="who">{t(locale, "legalIdentityHeading")}</h2>
+    <dl class="identity-list">
+      <div class="identity-row">
+        <dt class="label">{t(locale, "legalCopyrightHolder")}</dt>
+        <dd>{identity.copyrightHolder}</dd>
+      </div>
+      {
+        identity.entityName && (
+          <div class="identity-row">
+            <dt class="label">{t(locale, "legalEntity")}</dt>
+            <dd>{identity.entityName}</dd>
+          </div>
+        )
+      }
+      {
+        identity.jurisdiction && (
+          <div class="identity-row">
+            <dt class="label">{t(locale, "legalJurisdiction")}</dt>
+            <dd>{identity.jurisdiction}</dd>
+          </div>
+        )
+      }
+    </dl>
+    {
+      !identity.entityName && (
+        <p class="identity-note">{t(locale, "legalEntityUnknown")}</p>
+      )
+    }
+  </section>
+
+  <section class="onward" aria-labelledby="legal-onward">
+    <h2 class="section-heading" id="legal-onward">{t(locale, "legalOnwardHeading")}</h2>
+    <ul class="onward-list plain">
+      <li>
+        <a href={path.editorialStandards(locale)}>{t(locale, "editorialStandards")}</a>
+        <span class="note">{t(locale, "legalOnwardStandards")}</span>
+      </li>
+      <li>
+        <a href={path.contact(locale)}>{t(locale, "collaborate")}</a>
+        <span class="note">{t(locale, "legalOnwardContact")}</span>
+      </li>
+    </ul>
+  </section>
+</div>
+
+<style>
+  .legal {
+    padding-block: var(--space-6) var(--space-8);
+    max-inline-size: 52rem;
+  }
+
+  .title {
+    margin: 0;
+  }
+
+  .intro {
+    margin-block: var(--space-2) var(--space-4);
+    color: var(--color-text-secondary);
+    font-size: var(--type-body-lg);
+  }
+
+  .pending {
+    margin-block: var(--space-5);
+    padding: var(--space-3);
+    border-inline-start: var(--border-rule-verdict);
+    background: var(--color-ground-raised);
+  }
+
+  .pending-label {
+    margin: 0 0 var(--space-2);
+    color: var(--color-text-muted);
+  }
+
+  .pending-statement {
+    margin: 0;
+    max-width: var(--type-measure-editorial);
+  }
+
+  .pending-subhead {
+    margin: var(--space-3) 0 var(--space-1);
+    color: var(--color-text-muted);
+  }
+
+  .missing-item,
+  .facts li {
+    padding-block: var(--space-1);
+    max-width: var(--type-measure-editorial);
+  }
+
+  .missing-item {
+    color: var(--color-text-secondary);
+  }
+
+  .factual,
+  .identity,
+  .onward {
+    margin-block-start: var(--space-6);
+  }
+
+  .section-heading {
+    margin: 0 0 var(--space-3);
+    font-family: var(--type-family-display);
+    font-size: var(--type-display-sm);
+    line-height: var(--type-leading-display-sm);
+    font-weight: var(--type-weight-regular);
+  }
+
+  .facts li {
+    padding-block: var(--space-2);
+    border-block-start: var(--border-rule-hairline);
+  }
+
+  .identity-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-2);
+    padding-block: var(--space-2);
+    border-block-start: var(--border-rule-hairline);
+  }
+
+  .identity-row dt {
+    flex: 0 0 auto;
+    min-inline-size: 9rem;
+    color: var(--color-text-muted);
+  }
+
+  .identity-row dd {
+    margin: 0;
+  }
+
+  .identity-note {
+    margin: var(--space-2) 0 0;
+    max-width: var(--type-measure-editorial);
+    color: var(--color-text-muted);
+  }
+
+  .onward-list li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-2);
+    padding-block: var(--space-2);
+    border-block-start: var(--border-rule-hairline);
+  }
+
+  .note {
+    color: var(--color-text-muted);
+  }
+</style>
