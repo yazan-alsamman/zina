@@ -58,14 +58,23 @@ const internalHrefs = (html) =>
 
 /* ================================================================= dead navigation */
 
+/**
+ * A link to a real FILE (Phase 8: RSS autodiscovery, /sitemap.xml, /robots.txt) is not an
+ * `index.html`-based route, so it is never a member of `routes()`. It is dead by exactly the same
+ * definition as a broken page link, though: no file exists at that path. Checked directly against
+ * disk rather than added to `routes()`, so `routes()` keeps its existing meaning everywhere else
+ * in this file — the set of human-navigable pages.
+ */
+const isRealFile = (href) => /\.[a-z0-9]+$/i.test(href) && existsSync(join(dist, href));
+
 describe("no dead navigation — Phase 5 brief section 20", () => {
-  test("every internal link resolves to a page that was actually emitted", () => {
+  test("every internal link resolves to a page or a file that was actually emitted", () => {
     const emitted = routes();
     const dead = new Map();
 
     for (const page of pages) {
       for (const href of internalHrefs(page.html)) {
-        if (!emitted.has(href)) {
+        if (!emitted.has(href) && !isRealFile(href)) {
           if (!dead.has(href)) dead.set(href, []);
           dead.get(href).push(page.route);
         }
@@ -157,10 +166,16 @@ describe("no dead navigation — Phase 5 brief section 20", () => {
 
 describe("the site origin is configuration-driven", () => {
   test("no template or library contains a domain literal", () => {
+    // Excluded hosts are XML/RDF NAMESPACE URIs, not site origins — sitemaps.org, w3.org and
+    // purl.org identify a vocabulary (sitemap protocol, XHTML, Atom, Dublin Core), the same role
+    // schema.org already played here for JSON-LD. Every one is required verbatim by its spec and
+    // is identical in every sitemap/RSS file that has ever existed; none of them is a fact about
+    // THIS site, so none of them is a Phase 8 domain literal.
+    const NAMESPACE_HOSTS = /https:\/\/schema\.org|http:\/\/www\.sitemaps\.org|http:\/\/www\.w3\.org|http:\/\/purl\.org/g;
     for (const { file, text } of sources) {
       if (file.replace(/\\/g, "/").endsWith("src/config/site.ts")) continue;
       assert.ok(
-        !/https?:\/\/(?!schema\.org)[a-z0-9.-]+\.[a-z]{2,}/i.test(text.replace(/https:\/\/schema\.org/g, "")),
+        !/https?:\/\/(?!schema\.org)[a-z0-9.-]+\.[a-z]{2,}/i.test(text.replace(NAMESPACE_HOSTS, "")),
         `${file} contains a hard-coded origin`
       );
     }

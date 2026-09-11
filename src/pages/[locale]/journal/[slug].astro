@@ -39,6 +39,7 @@ import {
   absoluteUrl,
   alternatesFor,
   localeSlugPaths,
+  machinePath,
   path,
   robotsContent,
   sectionBreadcrumb,
@@ -157,6 +158,8 @@ const id = { toc: "contents", references: "referenced-records", related: "relate
   schemas={schemas}
   switcherHref={switcher.href}
   switcherState={switcher.state}
+  feedHref={absoluteUrl(machinePath.journalRss(locale))}
+  feedTitle={t(locale, "journalIndexTitle")}
 >
   <article class="article">
     <div class="container">

@@ -27,9 +27,25 @@ interface Props {
   /** The counterpart URL for this document, resolved by the caller. */
   switcherHref: string;
   switcherState?: "counterpart" | "section-fallback" | "home-fallback";
+  /**
+   * RSS autodiscovery (Phase 8). Absolute URL of this locale's journal feed. Optional and passed
+   * only by journal surfaces — most pages have nothing to syndicate, and a feed link on every
+   * page would be noise rather than discovery.
+   */
+  feedHref?: string;
+  feedTitle?: string;
 }
 
-const { locale, meta, alternates = [], schemas = [], switcherHref, switcherState } = Astro.props;
+const {
+  locale,
+  meta,
+  alternates = [],
+  schemas = [],
+  switcherHref,
+  switcherState,
+  feedHref,
+  feedTitle,
+} = Astro.props;
 const config = localeConfig(locale);
 const dir = config.dir;
 ---
@@ -51,6 +67,12 @@ const dir = config.dir;
       alternates.map((alt) => (
         <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />
       ))
+    }
+
+    {
+      feedHref && (
+        <link rel="alternate" type="application/rss+xml" title={feedTitle} href={feedHref} />
+      )
     }
 
     <meta property="og:type" content={meta.ogType} />

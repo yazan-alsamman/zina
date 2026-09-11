@@ -62,6 +62,20 @@ export const path = {
 } as const;
 
 /**
+ * MACHINE ENDPOINTS — files, not documents. `withSlashes()` always appends a trailing slash,
+ * which is correct for every human-navigable route above and wrong for a file with an extension:
+ * `/journal/rss.xml/` is not a valid feed URL. These five paths are built without it, matching
+ * `trailingSlash: "always"` in astro.config.ts, which — correctly — only governs extensionless
+ * page routes; Astro does not append a slash to a route with a file extension either way.
+ */
+export const machinePath = {
+  sitemapIndex: (): string => "/sitemap.xml",
+  sitemapLocale: (locale: Locale): string => `/sitemap-${locale}.xml`,
+  robotsTxt: (): string => "/robots.txt",
+  journalRss: (locale: Locale): string => `/${locale}/journal/rss.xml`,
+} as const;
+
+/**
  * Routes that are NOT implemented yet.
  *
  * Phase 5 added home, reviews index, review facets and method. What remains is listed here so

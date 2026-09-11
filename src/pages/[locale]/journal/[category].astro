@@ -30,6 +30,7 @@ import { categoryLabel } from "../../../lib/journal-labels";
 import { facetIndexing } from "../../../lib/facets";
 import {
   absoluteUrl,
+  machinePath,
   path,
   robotsContent,
   sectionBreadcrumb,
@@ -112,6 +113,8 @@ const siblings = journalCategories(locale);
   alternates={alternates}
   schemas={schemas}
   switcherHref={switcherHref}
+  feedHref={absoluteUrl(machinePath.journalRss(locale))}
+  feedTitle={t(locale, "journalIndexTitle")}
 >
   <div class="container archive">
     <Breadcrumbs locale={locale} crumbs={crumbs} />

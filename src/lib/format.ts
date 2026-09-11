@@ -14,6 +14,13 @@ import type { Locale } from "../../content/schema/types.ts";
 
 const LOCALE_TAG: Record<Locale, string> = { en: "en-GB", ar: "ar" };
 
+/**
+ * The same locale tag used for date/number formatting, exposed for anything else that needs a
+ * real RFC-tag rather than a second, competing mapping — the RSS feed's `<language>` element,
+ * for instance. One mapping, reused, never redeclared.
+ */
+export const localeTag = (locale: Locale): string => LOCALE_TAG[locale];
+
 const monthYear = (locale: Locale) =>
   new Intl.DateTimeFormat(LOCALE_TAG[locale], {
     year: "numeric",
