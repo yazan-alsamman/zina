@@ -2,11 +2,14 @@
 /**
  * TERMS — /{locale}/terms/
  *
- * Architecture only. The document cannot be written until unknown U-03 (jurisdiction) is resolved
- * by the owner. See `src/components/trust/LegalDocument.astro` for the full reasoning, and
- * `docs/LEGAL_ARCHITECTURE.md` for what is blocked and who must supply it.
+ * Architecture, still not final legal text. U-03 is PARTIALLY resolved (Phase 9): the jurisdiction
+ * is confirmed as Syria; a governing-law clause, a registered legal entity and a liability
+ * limitation remain unsupplied, and none is inferred from the jurisdiction alone. See
+ * `src/components/trust/LegalDocument.astro` for the full reasoning, and
+ * `docs/LEGAL_ARCHITECTURE.md` for what remains blocked and who must supply it.
  *
- * This page states what is missing rather than approximating it. Nothing here is legal advice.
+ * This page states what is known and what is still missing rather than approximating either.
+ * Nothing here is legal advice.
  */
 import type { GetStaticPaths } from "astro";
 import type { Locale } from "../../../../content/schema/types";

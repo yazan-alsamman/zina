@@ -19,18 +19,27 @@
  * `_verification` is not CONFIRMED, the caller gets nothing and must say so.
  *
  * ============================================================================
- * WHAT THIS MEANS IN THE CURRENT BUILD
+ * WHAT THIS MEANS IN THE CURRENT BUILD — updated Phase 9
  * ============================================================================
- *   contact emails   all three are MOCK (`@zinaalmokri.example.com`) -> NONE render
- *   phone            null, NEEDS_VERIFICATION                        -> absent
- *   management       represented: false, NEEDS_VERIFICATION          -> absent
- *   legal entity     null, NEEDS_VERIFICATION                        -> absent
- *   jurisdiction     null, NEEDS_VERIFICATION (unknown U-03)         -> absent, and BLOCKING
- *   social profiles  every one has `sameAsEligible: false`           -> NONE render anywhere
+ *   general email    CONFIRMED (contact@zinaalmokri.com, project owner)     -> renders
+ *   collab / press   still MOCK (`@zinaalmokri.example.com`)                -> absent
+ *   phone            CONFIRMED (0989 000 009, project owner)                -> renders
+ *   management       represented: false, NEEDS_VERIFICATION                -> absent
+ *   legal entity     null, NEEDS_VERIFICATION                              -> absent
+ *   jurisdiction     CONFIRMED (Syria, project owner) — U-03 resolved      -> renders
+ *   Instagram        CONFIRMED, sameAsEligible                             -> renders, sameAs
+ *   other socials    still MOCK, `sameAsEligible: false`                   -> absent
+ *
+ * The gates did not change. Only the DATA changed — each value above moved from
+ * `NEEDS_VERIFICATION`/`MOCK` to `CONFIRMED` in `content/mock/site.json` or
+ * `content/mock/social-profiles.json`, and every function below started rendering it
+ * automatically. That is the whole point of the Phase 7 architecture: "future verification can
+ * happen through explicit data rather than code hacks." Nothing in this file changed to make that
+ * true; it was already true.
  */
 
 import type { Locale } from "../../content/schema/types.ts";
-import { site, verified } from "./content.ts";
+import { eligibleSocialProfiles, site, verified } from "./content.ts";
 
 /* ------------------------------------------------------------------ contact */
 
@@ -83,6 +92,36 @@ export const management = (): { agencyName: string; agencyEmail: string } | unde
   return m.agencyName && m.agencyEmail
     ? { agencyName: m.agencyName, agencyEmail: m.agencyEmail }
     : undefined;
+};
+
+/**
+ * The verified phone number, exactly as supplied — only when CONFIRMED.
+ *
+ * Rendered verbatim in visible text ("0989 000 009"). A normalised, spaceless digit string is
+ * produced only by `telHref()` below, for the `tel:` URI itself — the one case the Phase 9 brief
+ * explicitly names as a "technically equivalent normalised representation": a `tel:` scheme with
+ * spaces in it is not a functioning link on most platforms, so the href needs the digits alone
+ * while the text a reader sees stays exactly what was supplied.
+ */
+export const verifiedPhone = (): string | undefined => {
+  const contact = site().contact as Record<string, unknown> | undefined;
+  return verified(contact?.["phone"] as VerifiableString) ?? undefined;
+};
+
+/** The digits-only form of `verifiedPhone()`, for a `tel:` href. Never used as display text. */
+export const telHref = (phone: string): string => `tel:${phone.replace(/[^\d+]/g, "")}`;
+
+/**
+ * The official Instagram profile, only when the account has been confirmed official
+ * (`sameAsEligible: true` — the same gate `personSchema()`'s `sameAs` already reads).
+ *
+ * `content/mock/social-profiles.json` holds five platforms; Phase 9 confirmed exactly one.
+ * TikTok, YouTube, Snapchat and Pinterest remain `sameAsEligible: false` and this returns nothing
+ * for them — there is no second function that could accidentally surface an unconfirmed one.
+ */
+export const officialInstagram = (): { handle: string; url: string } | undefined => {
+  const profile = eligibleSocialProfiles().find((p) => p.platform === "Instagram");
+  return profile ? { handle: profile.handle, url: profile.url } : undefined;
 };
 
 /* ------------------------------------------------------------------ editorial standards */

@@ -22,24 +22,32 @@
  * client JavaScript — and only if progressive enhancement cannot carry it.
  *
  * ============================================================================
- * AND THERE IS NO ADDRESS EITHER
+ * CONTACT CHANNELS — updated Phase 9
  * ============================================================================
- * All three addresses in `site.json` are MOCK (`@zinaalmokri.example.com`). `contactChannels()`
- * returns only CONFIRMED values, so it returns nothing, and this page renders the ABSENCE.
+ * The project owner supplied three verified channels, now CONFIRMED in `content/mock/site.json`
+ * and `content/mock/social-profiles.json`: a general email, a phone number, and Zina's official
+ * Instagram. `collaborationEmail` and `pressEmail` remain MOCK (`@zinaalmokri.example.com`) —
+ * only the channels actually supplied render; the other two stay exactly as absent as before.
  *
- * Publishing `hello@zinaalmokri.com` because it is the obvious guess would create a channel that
- * may belong to nobody, or to somebody else. Mail sent to it would vanish. The reader would
- * believe they had written to Zina.
+ * `contactChannels()`, `verifiedPhone()` and `officialInstagram()` each independently gate on
+ * `_verification === "CONFIRMED"` / `sameAsEligible === true`. Nothing here decides what counts
+ * as verified — that gate lives in `src/lib/trust.ts`, unchanged since Phase 7. The page renders
+ * whatever it is handed and nothing else; the "no channel published" band that used to render
+ * unconditionally now shows only if every channel is ever un-confirmed again.
  *
- * The page is therefore architecturally complete and explicitly not yet operational. It says so.
+ * The phone number is rendered exactly as supplied ("0989 000 009") in the visible text; the
+ * `tel:` href is a digits-only normalisation of that same value (`telHref()`), because a `tel:`
+ * URI containing spaces is not a working link on most platforms. Display and href always derive
+ * from the one stored value — there is no second, independently-typed phone number anywhere.
  */
 import type { GetStaticPaths } from "astro";
 import type { Locale } from "../../../../content/schema/types";
 import { LOCALES, IS_INDEXABLE_BUILD, person } from "../../../lib/content";
-import { contactChannels, management } from "../../../lib/trust";
+import { contactChannels, management, officialInstagram, telHref, verifiedPhone } from "../../../lib/trust";
 import { absoluteUrl, path, robotsContent, sectionBreadcrumb } from "../../../lib/routing";
-import { breadcrumbSchema, jsonLd, templatedMeta } from "../../../lib/seo";
+import { breadcrumbSchema, jsonLd, personSchema, templatedMeta } from "../../../lib/seo";
 import { t } from "../../../lib/ui-strings";
+import { isolateValue } from "../../../lib/bidi";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
 
@@ -48,8 +56,10 @@ export const getStaticPaths = (() =>
 
 const { locale } = Astro.params as { locale: Locale };
 
-/** Empty in this build. Every address in the record is MOCK. */
+/** The general email channel, when confirmed. Collaboration/press remain unconfirmed and absent. */
 const channels = contactChannels();
+const phone = verifiedPhone();
+const instagram = officialInstagram();
 const agency = management();
 
 const selfPath = path.contact(locale);
@@ -72,14 +82,32 @@ const crumbs = sectionBreadcrumb(
 );
 
 /**
- * JSON-LD — BreadcrumbList only.
+ * JSON-LD — BreadcrumbList, plus Person with the confirmed contact fields.
  *
- * No `ContactPage` with a `ContactPoint`: a ContactPoint asserts a reachable channel, and there
- * is none. No `Organization`, no `email`, no `telephone`, no `sameAs`.
+ * Still no `ContactPage`/`ContactPoint` and still no `Organization`: no legal entity exists
+ * (`legalIdentity().entityName` is unconfirmed), and a `ContactPoint` conventionally belongs to
+ * one. Zina is modelled as a `Person` everywhere else on the site; `email`/`telephone` are
+ * schema.org properties directly on `Person`, so this is the same entity every other page's
+ * structured data already describes, not a new one.
+ *
+ * `email`/`telephone` are passed here, and ONLY here — `personSchema()` defaults to omitting
+ * them, and every other caller (home, about, review, journal, work) still gets none, because
+ * this is the only page where the values are also visible text (rule 4, src/lib/seo.ts). `sameAs`
+ * needs no such option: it already renders wherever `personSchema()` is called, because a link to
+ * an external profile does not need to be repeated as on-page text to be honest.
  */
-const schemas = [jsonLd(breadcrumbSchema(crumbs))];
+const schemas = [
+  jsonLd(breadcrumbSchema(crumbs)),
+  jsonLd(
+    personSchema(person(), locale, {
+      ...(channels.find((c) => c.key === "general") ? { email: channels.find((c) => c.key === "general")!.address } : {}),
+      ...(phone ? { telephone: phone } : {}),
+    })
+  ),
+];
 
 const collaborationBio = person().locales[locale]?.bios?.collaboration ?? "";
+const hasAnyChannel = channels.length > 0 || Boolean(phone) || Boolean(instagram);
 ---
 
 <BaseLayout
@@ -98,7 +126,7 @@ const collaborationBio = person().locales[locale]?.bios?.collaboration ?? "";
     {collaborationBio && <p class="collaboration text-column">{collaborationBio}</p>}
 
     {
-      channels.length > 0 ? (
+      hasAnyChannel ? (
         <section class="channels" aria-labelledby="channels">
           <h2 class="section-heading" id="channels">{t(locale, "contactChannelsHeading")}</h2>
           <dl class="channel-list">
@@ -114,6 +142,27 @@ const collaborationBio = person().locales[locale]?.bios?.collaboration ?? "";
                 </dd>
               </div>
             ))}
+            {phone && (
+              <div class="channel">
+                <dt class="label">{t(locale, "contactPhone")}</dt>
+                <dd>
+                  <a href={telHref(phone)} set:html={isolateValue(phone)} />
+                </dd>
+              </div>
+            )}
+            {instagram && (
+              <div class="channel">
+                <dt class="label">{t(locale, "contactInstagram")}</dt>
+                <dd>
+                  {/* rel="me" — IndieWeb identity verification: this asserts "this external
+                      profile and this page are the same entity", which is the opposite claim
+                      nofollow makes ("I do not vouch for this"). It is the correct relation for a
+                      confirmed sameAs link and is never used on a brand's own site. Matches the
+                      footer's own social row exactly (src/components/shell/SiteFooter.astro). */}
+                  <a href={instagram.url} rel="me noopener" target="_blank">@{instagram.handle}</a>
+                </dd>
+              </div>
+            )}
           </dl>
         </section>
       ) : (

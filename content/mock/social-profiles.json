@@ -6,21 +6,23 @@
   "items": [
     {
       "id": "mock-social-instagram",
-      "_mock": true,
-      "status": "mock",
-      "_verification": "MOCK",
+      "_mock": false,
+      "_note": "Record id is left unchanged even though the account itself is now confirmed real — ids are stable identifiers, not verification flags (same precedent as person.json's id, whose name field went CONFIRMED without a rename in Phase 7).",
+      "status": "published",
+      "_verification": "CONFIRMED",
+      "_source": "Project owner, Phase 9",
       "platform": "Instagram",
-      "handle": "@zina.almokri.mock",
-      "url": "https://www.instagram.com/zina.almokri.mock",
+      "handle": "zina.almokri",
+      "url": "https://www.instagram.com/zina.almokri?stkn=MTI4aHRmMGZ0bDdibw==",
       "primary": true,
-      "sameAsEligible": false,
-      "role": "Primary visual channel. Short-form reviews, shade swatches, wear-test check-ins.",
+      "sameAsEligible": true,
+      "role": "Zina's official Instagram. Product testing is filmed and published here: she records herself using a product and posts that, then follows up over the next several days with her evaluation.",
       "followers": {
         "value": 428000,
         "display": "428K",
         "asOf": "2026-08-01",
         "_verification": "MOCK",
-        "_note": "INVENTED NUMBER. Never render without a verified source and an as-of date."
+        "_note": "INVENTED NUMBER, unchanged by Phase 9 — no follower count was supplied. Never render without a verified source and an as-of date. Confirming the account as official does not confirm this figure."
       }
     },
     {

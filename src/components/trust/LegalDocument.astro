@@ -5,12 +5,20 @@
  * ============================================================================
  * THESE PAGES ARE ARCHITECTURE, NOT LEGAL TEXT
  * ============================================================================
- * Unknown U-03 is unresolved: `site.json → legal.jurisdiction` is null and NEEDS_VERIFICATION, and
- * so is `legal.entityName`. Without a jurisdiction this project cannot know which privacy regime
- * applies, which consent behaviour is required, what retention periods are lawful, or what a terms
- * document must contain.
+ * U-03 is PARTIALLY resolved (Phase 9): `site.json → legal.jurisdiction` is CONFIRMED as "Syria",
+ * the project owner's stated primary jurisdiction. `legal.entityName` remains unconfirmed — no
+ * legal entity, registration, address, controller or governing-law clause has been supplied.
+ * Knowing WHERE the site is based does not by itself supply WHO the data controller is, WHAT
+ * specific statute applies, WHAT the retention schedule is, or WHAT law governs a dispute; those
+ * remain genuinely open, and none of them is inferred from the jurisdiction alone.
  *
- * So these routes exist and state, precisely, what is missing and who must supply it. They do NOT:
+ * The audience is explicitly GLOBAL. That is not read as "every visitor's own jurisdiction is
+ * Syria" — it states where the site is legally based, not what governs every reader everywhere it
+ * is read from. Nothing here claims compliance with GDPR, CCPA, PDPL or any other regime a global
+ * audience might individually be subject to.
+ *
+ * So these routes exist and state, precisely, what IS known, what is STILL missing, and who must
+ * supply the rest. They do NOT:
  *
  *   claim compliance with GDPR, CCPA, PDPL or any other regime
  *   name a legal entity, company number, registered address or governing law
@@ -43,7 +51,8 @@ interface Props {
   /** The document's own title and lead, from the interface vocabulary. */
   titleKey: UiKey;
   introKey: UiKey;
-  /** What this specific document cannot state until U-03 is resolved. */
+  /** What this specific document still cannot state. Emptying this array is what would let the
+   *  status band disappear entirely — nothing else does. */
   blockedItems: UiKey[];
 }
 
@@ -51,6 +60,16 @@ const { locale, titleKey, introKey, blockedItems } = Astro.props;
 
 const identity = legalIdentity();
 const jurisdictionKnown = jurisdictionIsKnown();
+/**
+ * THE GATE IS COMPLETENESS, NOT JURISDICTION SPECIFICALLY.
+ *
+ * Before Phase 9 the two were the same fact — jurisdiction was the only thing known or unknown, so
+ * gating on it alone was correct. Now jurisdiction is confirmed while other items remain missing,
+ * so the gate is the more general (and more correct) condition: are there STILL blocked items,
+ * regardless of which ones. A document with zero blocked items would correctly show no status band
+ * at all — this project has not reached that state for either page yet.
+ */
+const isComplete = blockedItems.length === 0;
 ---
 
 <div class="container legal">
@@ -63,12 +82,34 @@ const jurisdictionKnown = jurisdictionIsKnown();
     THE STATUS BAND, FIRST.
     A reader arriving at a legal page needs to know immediately whether it is operative. Putting
     this below the content would let someone read a paragraph and believe it binds.
+
+    TWO DISTINCT MESSAGES, not one collapsed into the other:
+      jurisdiction unknown   "this document is not yet operative at all" (legalPendingHeading)
+      jurisdiction known,    "this document is partially resolved; here is what is confirmed and
+      items still missing    what is still required" (legalPartialHeading)
+    Claiming the first once jurisdiction is confirmed would be as dishonest as claiming the second
+    before it was — each states exactly what is currently true.
   */}
   {
-    !jurisdictionKnown && (
+    !isComplete && !jurisdictionKnown && (
       <section class="pending" aria-labelledby="legal-status">
         <h2 class="label pending-label" id="legal-status">{t(locale, "legalPendingHeading")}</h2>
         <p class="pending-statement">{t(locale, "legalPendingBody")}</p>
+
+        <h3 class="label pending-subhead">{t(locale, "legalMissingHeading")}</h3>
+        <ul class="missing plain">
+          {blockedItems.map((key) => (
+            <li class="missing-item">{t(locale, key)}</li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+  {
+    !isComplete && jurisdictionKnown && (
+      <section class="pending" aria-labelledby="legal-status">
+        <h2 class="label pending-label" id="legal-status">{t(locale, "legalPartialHeading")}</h2>
+        <p class="pending-statement">{t(locale, "legalPartialBody")}</p>
 
         <h3 class="label pending-subhead">{t(locale, "legalMissingHeading")}</h3>
         <ul class="missing plain">

@@ -206,8 +206,14 @@ describe("journal category gate — 3 per locale, none qualifies today", () => {
 });
 
 describe("the four hard render gates", () => {
-  test("no social profile is sameAs-eligible, so the footer row does not exist", () => {
-    assert.equal(eligibleSocialProfiles().length, 0);
+  test("exactly one social profile is sameAs-eligible (Phase 9: Instagram), the rest stay gated", () => {
+    const eligible = eligibleSocialProfiles();
+    assert.equal(eligible.length, 1);
+    assert.equal(eligible[0].platform, "Instagram");
+    // TikTok, YouTube, Snapchat and Pinterest were never confirmed and remain ineligible.
+    for (const platform of ["TikTok", "YouTube", "Snapchat", "Pinterest"]) {
+      assert.ok(!eligible.some((p) => p.platform === platform), `${platform} became eligible unexpectedly`);
+    }
   });
 
   test("no testimonial has an approval on file", () => {

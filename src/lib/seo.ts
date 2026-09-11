@@ -23,8 +23,14 @@
  *
  * 4. EVERYTHING MARKED UP IS VISIBLE ON THE PAGE. Nothing is emitted for crawlers alone.
  *
- * 5. `sameAs` is gated on `sameAsEligible`, which is false for every profile today. So no
- *    `sameAs` is emitted at all, rather than a plausible-looking guess.
+ * 5. `sameAs` is gated on `sameAsEligible`. Phase 9 confirmed exactly one profile (Instagram);
+ *    the rest stay ineligible and stay omitted, never a plausible-looking guess.
+ *
+ * 6. `email`/`telephone` are gated on `includeContact` (Phase 9) — opt-in, defaulting to false —
+ *    because rule 4 above still applies to them specifically: they may be emitted only on a page
+ *    that also shows them as visible text. Every existing caller (home, about, review, journal,
+ *    work) omits the option and keeps getting a Person block with no contact fields; the Contact
+ *    page passes it, because it is the one page where a mailto:/tel: link is actually on screen.
  */
 
 import type { JournalArticle, Locale, Person, Product, Review, SeoFields } from "../../content/schema/types.ts";
@@ -104,10 +110,17 @@ export function breadcrumbSchema(crumbs: Crumb[]): JsonLd {
 }
 
 /**
- * The Person entity. `sameAs` is emitted ONLY from profiles confirmed official in writing.
- * Today that is none, so the key is omitted entirely rather than emitted empty.
+ * The Person entity. `sameAs` is emitted ONLY from profiles confirmed official in writing —
+ * Instagram, since Phase 9. `email`/`telephone` are emitted ONLY when the caller opts in via
+ * `contact`, and ONLY with values the caller itself already resolved as CONFIRMED — this function
+ * does not reach into `site.json` itself, so there is exactly one place (`src/lib/trust.ts`)
+ * responsible for the verification gate on contact facts.
  */
-export function personSchema(personRecord: Person, locale: Locale): JsonLd {
+export function personSchema(
+  personRecord: Person,
+  locale: Locale,
+  contact?: { email?: string; telephone?: string }
+): JsonLd {
   const localeBlock = personRecord.locales[locale];
   const profiles = eligibleSocialProfiles();
   const location = verified(personRecord.location);
@@ -121,6 +134,8 @@ export function personSchema(personRecord: Person, locale: Locale): JsonLd {
     ...(localeBlock?.bios?.short ? { description: localeBlock.bios.short } : {}),
     ...(location ? { address: location } : {}),
     ...(profiles.length > 0 ? { sameAs: profiles.map((p) => p.url) } : {}),
+    ...(contact?.email ? { email: `mailto:${contact.email}` } : {}),
+    ...(contact?.telephone ? { telephone: contact.telephone } : {}),
   };
 }
 

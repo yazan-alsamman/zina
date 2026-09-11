@@ -122,6 +122,21 @@ const bio = person().locales[locale]?.bios?.editorialByline ?? "";
     <h1 class="display-lg title">{content.name}</h1>
     <p class="tagline">{content.tagline}</p>
 
+    {/*
+      THE REAL PROCESS, FIRST — Phase 9.
+      Confirmed by the project owner, and placed ahead of the six-stage framework below because
+      it is the more important, more true fact: this is what actually happens, not a proposal.
+      Own heading, own ordered list, own boundary statement — never merged into the six-stage
+      copy that follows, so a reader can never mistake one for a restatement of the other.
+    */}
+    <section class="actual-process" aria-labelledby="actual-process-heading">
+      <h2 class="section-heading" id="actual-process-heading">{content.actualProcess.heading}</h2>
+      <ol class="process-steps">
+        {content.actualProcess.steps.map((step) => <li>{step}</li>)}
+      </ol>
+      <p class="boundary-statement">{content.actualProcess.boundary}</p>
+    </section>
+
     <div class="intro text-column">
       {content.introduction.split("\n\n").map((para) => <p>{para}</p>)}
     </div>
@@ -130,6 +145,11 @@ const bio = person().locales[locale]?.bios?.editorialByline ?? "";
       THE BOUNDARY, ABOVE THE STAGES.
       Same surface treatment as the review page's disclosure band, deliberately: both are
       statements about the limits of authority. Never a <details>, never small print.
+
+      This band and its mock-notice describe the SIX-STAGE FRAMEWORK specifically — its own
+      granular mechanics (timed check-ins, logged conditions, a controlled comparison protocol)
+      remain unconfirmed, distinct from the real process stated above, which the project owner
+      has confirmed. Neither statement is stale: each is true of the thing it describes.
     */}
     <section class="boundary" aria-labelledby="boundary-heading">
       <h2 class="label boundary-label" id="boundary-heading">{t(locale, "methodIntroLabel")}</h2>
@@ -236,8 +256,29 @@ const bio = person().locales[locale]?.bios?.editorialByline ?? "";
     color: var(--color-text-secondary);
   }
 
-  .intro {
+  /* The real, confirmed process — plain, first, and deliberately undecorated: no numbered
+     record-index tiles like the six-stage list below, because this is not a device for
+     "structured testing", it is a short factual account of what happens. */
+  .actual-process {
     margin-block-start: var(--space-6);
+  }
+
+  .process-steps {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-4);
+    max-width: var(--type-measure-editorial);
+    font-size: calc(var(--type-body-lg) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-body-lg) * var(--type-arabic-leading-factor));
+    padding-inline-start: 1.4em;
+  }
+
+  .process-steps li {
+    padding-inline-start: var(--space-1);
+  }
+
+  .intro {
+    margin-block-start: var(--space-8);
     display: grid;
     gap: var(--space-2);
     font-size: calc(var(--type-body-lg) * var(--type-arabic-size-factor));

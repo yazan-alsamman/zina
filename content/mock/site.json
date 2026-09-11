@@ -105,11 +105,12 @@
         "themeColor": "#0E0E0F"
       },
       "contact": {
-        "generalEmail": { "value": "hello@zinaalmokri.example.com", "_verification": "MOCK" },
+        "generalEmail": { "value": "contact@zinaalmokri.com", "_verification": "CONFIRMED", "_source": "Project owner, Phase 9" },
         "collaborationEmail": { "value": "collaborations@zinaalmokri.example.com", "_verification": "MOCK" },
         "pressEmail": { "value": "press@zinaalmokri.example.com", "_verification": "MOCK" },
         "management": { "represented": false, "agencyName": null, "agencyEmail": null, "_verification": "NEEDS_VERIFICATION" },
-        "phone": { "value": null, "_verification": "NEEDS_VERIFICATION", "_note": "Deliberately null. A public phone number is an explicit client decision, not a default." },
+        "phone": { "value": "0989 000 009", "_verification": "CONFIRMED", "_source": "Project owner, Phase 9", "_note": "Supplied verbatim. Rendered as-is; a normalised digits-only form is used only inside the tel: URI itself, never in the displayed text." },
+        "instagram": { "value": "https://www.instagram.com/zina.almokri?stkn=MTI4aHRmMGZ0bDdibw==", "_verification": "CONFIRMED", "_source": "Project owner, Phase 9", "_note": "Also mirrored onto the matching record in social-profiles.json, which is what drives sameAsEligible / JSON-LD sameAs. This copy is the one the Contact page reads directly." },
         "inquiryTypes": [
           { "value": "collaboration", "label": { "en": "Brand collaboration", "ar": "تعاون مع علامة" } },
           { "value": "product-testing", "label": { "en": "Product testing request", "ar": "طلب تجربة منتج" } },
@@ -120,7 +121,7 @@
       },
       "legal": {
         "entityName": { "value": null, "_verification": "NEEDS_VERIFICATION" },
-        "jurisdiction": { "value": null, "_verification": "NEEDS_VERIFICATION", "_note": "Determines the applicable privacy regime and therefore the required consent behaviour. Blocking for analytics. Unknown U-03." },
+        "jurisdiction": { "value": "Syria", "_verification": "CONFIRMED", "_source": "Project owner, Phase 9", "_note": "Primary jurisdiction. Resolves the U-03 blocker on WHICH jurisdiction applies; it does not by itself resolve the specific statute, the data controller, retention periods, data-subject rights, governing-law clause wording, or entity/liability details, none of which have been supplied. The audience is global — this states where the site is legally based, not that every visitor's own jurisdiction is Syria." },
         "copyrightHolder": "Zina Almokri"
       },
       "editorialStandards": {

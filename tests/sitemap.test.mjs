@@ -15,6 +15,7 @@
  */
 
 import { test, describe, before } from "node:test";
+import { SITE_URL } from "../src/config/site.ts";
 import assert from "node:assert/strict";
 import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
@@ -64,8 +65,8 @@ describe("the current build is honestly empty — nothing is indexable while the
   test("dist/sitemap.xml is a valid index pointing at two locale files", () => {
     const xml = readFileSync(join(dist, "sitemap.xml"), "utf8");
     assertWellFormedXml(xml, "sitemap.xml");
-    assert.match(xml, /<loc>https:\/\/example\.invalid\/sitemap-en\.xml<\/loc>/);
-    assert.match(xml, /<loc>https:\/\/example\.invalid\/sitemap-ar\.xml<\/loc>/);
+    assert.ok(xml.includes(`<loc>${SITE_URL}/sitemap-en.xml</loc>`));
+    assert.ok(xml.includes(`<loc>${SITE_URL}/sitemap-ar.xml</loc>`));
   });
 
   test("dist/sitemap-en.xml and sitemap-ar.xml are valid, empty <urlset> documents", () => {
@@ -240,7 +241,7 @@ describe("rendering — real corpus data, parsed and cross-checked", () => {
     const xml = renderLocaleSitemapXml(discoverableUrlsFor("en", true));
     const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
     assert.ok(locs.length > 0);
-    for (const loc of locs) assert.ok(loc.startsWith("https://example.invalid/"), loc);
+    for (const loc of locs) assert.ok(loc.startsWith(`${SITE_URL}/`), loc);
   });
 
   test("renderSitemapIndexXml is well-formed and self-consistent with machinePath", () => {
@@ -266,7 +267,7 @@ describe("every URL discoverableUrls() would list corresponds to a real, self-ca
 
   test("every forced URL's route exists in the actual build", () => {
     for (const url of forced) {
-      const route = url.loc.replace("https://example.invalid", "");
+      const route = url.loc.replace(SITE_URL, "");
       const page = pageFor(route);
       assert.ok(page, `${url.loc}: no page was built at this route`);
     }
@@ -276,7 +277,7 @@ describe("every URL discoverableUrls() would list corresponds to a real, self-ca
     // A sitemap must never list a URL whose own canonical points elsewhere — the facet/category
     // families already only include self-canonical entries, so this proves that holds for real.
     for (const url of forced) {
-      const route = url.loc.replace("https://example.invalid", "");
+      const route = url.loc.replace(SITE_URL, "");
       const page = pageFor(route);
       const canonical = page.html.match(/<link rel="canonical" href="([^"]+)"/)[1];
       assert.equal(canonical, url.loc, `${route}: canonicalises to ${canonical}, not itself`);
@@ -287,7 +288,7 @@ describe("every URL discoverableUrls() would list corresponds to a real, self-ca
     // The explicit requirement from docs/MULTILINGUAL_SEO_ARCHITECTURE.md section 8: "sitemap and
     // head-level hreflang must agree." Checked here against the real, rendered <head>.
     for (const url of forced) {
-      const route = url.loc.replace("https://example.invalid", "");
+      const route = url.loc.replace(SITE_URL, "");
       const page = pageFor(route);
       const rendered = [...page.html.matchAll(/<link rel="alternate" hreflang="([^"]+)" href="([^"]+)"/g)]
         .map((m) => `${m[1]}::${m[2]}`)

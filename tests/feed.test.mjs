@@ -8,6 +8,7 @@
  */
 
 import { test, describe, before } from "node:test";
+import { SITE_URL } from "../src/config/site.ts";
 import assert from "node:assert/strict";
 import { readFileSync, existsSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
@@ -88,7 +89,7 @@ describe("item building — proven against the REAL corpus, override forced true
     const channel = journalFeed("en", true);
     for (const item of channel.items) {
       assert.equal(item.guid, item.link);
-      assert.ok(item.link.startsWith("https://example.invalid/en/journal/"));
+      assert.ok(item.link.startsWith(`${SITE_URL}/en/journal/`));
     }
   });
 

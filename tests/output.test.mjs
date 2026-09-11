@@ -14,6 +14,7 @@ import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { reservedReviewSegments } from "../src/lib/facets.ts";
 import { reservedJournalSegments } from "../src/lib/journal.ts";
+import { eligibleSocialProfiles } from "../src/lib/content.ts";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "dist");
@@ -239,10 +240,13 @@ describe("structured data — nothing fabricated", () => {
     }
   });
 
-  test("no sameAs is emitted, because no profile is verified", () => {
+  test("sameAs, where emitted, is exactly the one confirmed profile — never a guess", () => {
+    // Phase 9 confirmed Instagram. Every other profile is still unconfirmed and must never appear.
+    const eligible = eligibleSocialProfiles().map((p) => p.url);
     for (const page of reviewPages()) {
       const person = schemasOf(page.html).find((s) => s["@type"] === "Person");
-      assert.ok(!("sameAs" in person), `${page.path} emits an unverified sameAs`);
+      if (!("sameAs" in person)) continue;
+      assert.deepEqual(person.sameAs, eligible, `${page.path}: sameAs disagrees with the confirmed set`);
     }
   });
 

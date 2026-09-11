@@ -13,6 +13,7 @@ import { fileURLToPath } from "node:url";
 
 import { SITE_URL, SITE_URL_IS_PLACEHOLDER } from "../src/config/site.ts";
 import { IMPLEMENTED_ROUTES } from "../src/lib/routing.ts";
+import { eligibleSocialProfiles } from "../src/lib/content.ts";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "dist");
@@ -207,18 +208,33 @@ describe("the site origin is configuration-driven", () => {
   });
 
   test("outbound brand links are marked nofollow and are never our origin", () => {
+    // ONE precise exception (Phase 9): a link to a CONFIRMED, sameAsEligible social profile —
+    // Zina's own official Instagram — carries rel="me" instead of nofollow. That is the correct
+    // relation for a verified self-identity link (it asserts "this is the same entity", the
+    // opposite of nofollow's "I do not vouch for this"), and the exception is scoped to the exact
+    // eligible profile URLs, not to rel="me" appearing anywhere — a brand's own site could not
+    // satisfy this check by adding rel="me" to itself.
+    const eligibleUrls = new Set(eligibleSocialProfiles().map((p) => p.url));
     for (const page of pages) {
       for (const m of page.html.matchAll(/<a[^>]*href="(https?:\/\/[^"]+)"[^>]*>/g)) {
         const [tag, url] = [m[0], m[1]];
         if (url.startsWith(SITE_URL)) continue;
+        if (eligibleUrls.has(url)) {
+          // "me" as its own token in the rel value — the footer's row carries rel="me noopener".
+          assert.ok(/rel="[^"]*\bme\b[^"]*"/.test(tag), `${page.route}: verified profile link without rel="me": ${url}`);
+          continue;
+        }
         assert.ok(/rel="[^"]*nofollow/.test(tag), `${page.route}: outbound link without nofollow: ${url}`);
       }
     }
   });
 
-  test("the placeholder origin is still flagged as blocking", () => {
-    // When a real domain is supplied this flips, and the Phase 5 report's blocker clears.
-    assert.equal(SITE_URL_IS_PLACEHOLDER, true, "SITE_URL changed — update the report");
+  test("U-01 is resolved — the origin is the real production domain, not the placeholder", () => {
+    // Phase 9: the project owner supplied the real domain. This is the tripwire's other side —
+    // it fired exactly as designed when src/config/site.ts changed, which is what sent this test
+    // to docs/reports/PHASE_9_REPORT.md to get updated rather than silently going stale.
+    assert.equal(SITE_URL_IS_PLACEHOLDER, false, "SITE_URL still looks like a placeholder");
+    assert.equal(SITE_URL, "https://zinaalmokri.com");
   });
 });
 
@@ -411,10 +427,25 @@ describe("content safety across every page", () => {
     }
   });
 
-  test("no fabricated entity: no sameAs, no Organization, no award", () => {
+  test("no fabricated entity: Organization, award and MedicalEntity never appear", () => {
     for (const page of pages) {
-      for (const forbidden of ['"sameAs"', '"Organization"', '"award"', '"MedicalEntity"']) {
+      for (const forbidden of ['"Organization"', '"award"', '"MedicalEntity"']) {
         assert.ok(!page.html.includes(forbidden), `${page.route} emits ${forbidden}`);
+      }
+    }
+  });
+
+  test("sameAs, where it appears, is EXACTLY the one confirmed profile — never a fabricated one", () => {
+    // Phase 9 confirmed Instagram. sameAs now legitimately appears wherever personSchema() is
+    // called. This asserts what it may never become: a second, invented profile URL.
+    const eligible = eligibleSocialProfiles().map((p) => p.url);
+    assert.deepEqual(eligible, ["https://www.instagram.com/zina.almokri?stkn=MTI4aHRmMGZ0bDdibw=="]);
+    for (const page of pages) {
+      for (const m of page.html.matchAll(/"sameAs"\s*:\s*\[([^\]]*)\]/g)) {
+        const urls = [...m[1].matchAll(/"([^"]+)"/g)].map((x) => x[1]);
+        for (const url of urls) {
+          assert.ok(eligible.includes(url), `${page.route}: sameAs carries an unconfirmed URL: ${url}`);
+        }
       }
     }
   });

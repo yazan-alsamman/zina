@@ -2,7 +2,7 @@
   "__MOCK_DATA__": true,
   "collection": "method",
   "schemaVersion": "1.0.0",
-  "notice": "FICTIONAL MOCK CONTENT. This testing protocol was invented during Phase 0. It is a proposal for how Zina Almokri could structure her testing, NOT a description of how she actually works. If she already has her own method, hers replaces this entirely. LANGUAGE RULE: every stage describes structured personal testing by one person on one face. No stage may be described as clinical, dermatological, laboratory or scientifically validated. The doesNotProve field on each stage exists to make that boundary explicit and is a required field, not an optional caveat.",
+  "notice": "The six-stage protocol below (stages / stageOrder / whatThisCannotTell) is FICTIONAL MOCK CONTENT invented during Phase 0 as a proposal for how testing could be structured — it remains unconfirmed in its specific granular mechanics (timed check-ins, logged temperature, a controlled comparison protocol) and stays MOCK. LANGUAGE RULE for it, unchanged: every stage describes structured personal testing by one person on one face. No stage may be described as clinical, dermatological, laboratory or scientifically validated. The doesNotProve field on each stage exists to make that boundary explicit and is a required field, not an optional caveat. Phase 9 added `actualProcess` on each locale block SEPARATELY: the real, simpler process the project owner supplied and confirmed. It does not replace the six-stage framework, which still structures the (still mock) review corpus; it states what actually happens, alongside it.",
   "items": [
     {
       "id": "mock-method-six-stage",
@@ -25,6 +25,19 @@
           "tagline": "Same six stages, every product, so that any two reviews can be read against each other.",
           "introduction": "Most beauty reviews are written from memory. Someone uses a product for a while, forms an impression, and writes the impression down. That is not worthless, but it is not comparable: two reviews written that way cannot be placed side by side, because neither one tells you what was held constant.\n\nEverything reviewed on this site goes through the same six stages. The stages are not there to make the testing sound rigorous. They are there so that when I say one foundation lasted longer than another, you can check what I actually did.",
           "boundaryStatement": "This is structured personal testing, not clinical testing. One person, one face, no control group, no laboratory. It can tell you how a product behaved on my skin under conditions I have written down. It cannot tell you what a product will do to your skin, and nothing on this site is medical, dermatological or scientific advice.",
+          "actualProcess": {
+            "_verification": "CONFIRMED",
+            "_source": "Project owner, Phase 9",
+            "heading": "How this actually works",
+            "steps": [
+              "The product arrives.",
+              "Zina uses it herself, on her own skin.",
+              "She records herself using it, and publishes that on Instagram.",
+              "She continues using and watching the product over the days that follow.",
+              "She publishes her evaluation: whether, in her own experience, the product did what it claims to do."
+            ],
+            "boundary": "This is Zina's own, first-hand experience with a product — not a laboratory test, a clinical trial, a dermatological assessment, or an independent scientific study. It does not guarantee the same result for anyone else, and it is not a claim that a product suits every skin type."
+          },
           "stages": [
             {
               "key": "baseline",
@@ -145,6 +158,19 @@
           "tagline": "ست مراحل ثابتة لكل منتج، حتى تتمكني من مقارنة أي مراجعتين ببعضهما.",
           "introduction": "معظم مراجعات التجميل تُكتب من الذاكرة. تستخدم إحداهن منتجا لفترة، وتتكون لديها انطباع، ثم تكتب الانطباع. هذا ليس بلا قيمة، لكنه غير قابل للمقارنة: مراجعتان مكتوبتان بهذه الطريقة لا يمكن وضعهما جنبا إلى جنب، لأن أيا منهما لا تخبرك بما ثُبّت وما تغيّر.\n\nكل منتج يُراجع على هذا الموقع يمر بالمراحل الست نفسها. هذه المراحل ليست موجودة لتجعل الاختبار يبدو دقيقا، بل لتتمكني من التحقق مما فعلته فعلا عندما أقول إن كريم أساس ثبت أطول من غيره.",
           "boundaryStatement": "هذا اختبار شخصي منظم، وليس اختبارا سريريا. شخص واحد، وجه واحد، بلا مجموعة ضابطة وبلا مختبر. يمكنه أن يخبرك كيف تصرّف المنتج على بشرتي في ظروف كتبتها ونشرتها. لا يمكنه أن يخبرك ماذا سيفعل المنتج ببشرتك، ولا شيء على هذا الموقع يُعد استشارة طبية أو جلدية أو علمية.",
+          "actualProcess": {
+            "_verification": "CONFIRMED",
+            "_source": "Project owner, Phase 9",
+            "heading": "كيف يجري هذا فعليا",
+            "steps": [
+              "يصل المنتج إليها.",
+              "تستخدمه زينا بنفسها، على بشرتها.",
+              "تُسجّل نفسها وهي تستخدمه، وتنشر ذلك على إنستغرام.",
+              "تواصل استخدام المنتج ومراقبته خلال الأيام التالية.",
+              "تنشر تقييمها: هل حقق المنتج، في تجربتها الشخصية، ما يدّعيه."
+            ],
+            "boundary": "هذه تجربة زينا الشخصية والمباشرة مع المنتج — وليست اختبارا مخبريا، ولا تجربة سريرية، ولا تقييما جلديا، ولا دراسة علمية مستقلة. لا تضمن النتيجة نفسها لأي شخص آخر، ولا تعني أن المنتج يناسب كل أنواع البشرة."
+          },
           "stages": [
             {
               "key": "baseline",

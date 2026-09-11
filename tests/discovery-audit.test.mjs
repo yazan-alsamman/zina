@@ -15,6 +15,7 @@
  */
 
 import { test, describe, before } from "node:test";
+import { SITE_URL } from "../src/config/site.ts";
 import assert from "node:assert/strict";
 import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
@@ -48,7 +49,7 @@ before(() => {
 
 const isIndexable = (html) => /<meta name="robots" content="index, ?follow"/.test(html);
 const sitemapRoutes = () =>
-  new Set(discoverableUrls().map((u) => u.loc.replace("https://example.invalid", "")));
+  new Set(discoverableUrls().map((u) => u.loc.replace(SITE_URL, "")));
 
 /* ================================================================= bidirectional membership */
 
@@ -64,7 +65,7 @@ describe("indexable-page set and sitemap set are IDENTICAL, in both directions",
 
   test("every sitemap entry's page is actually marked index,follow", () => {
     for (const url of discoverableUrls()) {
-      const route = url.loc.replace("https://example.invalid", "");
+      const route = url.loc.replace(SITE_URL, "");
       const page = pages.find((p) => p.route === route);
       assert.ok(page, `${route}: sitemap lists a page that was not built`);
       assert.ok(isIndexable(page.html), `${route}: in the sitemap but not marked index,follow`);
@@ -115,7 +116,7 @@ describe("RSS autodiscovery appears only where it should", () => {
     for (const page of pages) {
       const match = page.html.match(/<link rel="alternate" type="application\/rss\+xml"[^>]+href="([^"]+)"/);
       if (!match) continue;
-      const localPath = match[1].replace("https://example.invalid", "");
+      const localPath = match[1].replace(SITE_URL, "");
       assert.ok(existsSync(join(dist, localPath)), `${page.route}: feed link ${match[1]} does not exist`);
     }
   });

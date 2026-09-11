@@ -2,11 +2,14 @@
 /**
  * PRIVACY — /{locale}/privacy/
  *
- * Architecture only. The document cannot be written until unknown U-03 (jurisdiction) is resolved
- * by the owner. See `src/components/trust/LegalDocument.astro` for the full reasoning, and
- * `docs/LEGAL_ARCHITECTURE.md` for what is blocked and who must supply it.
+ * Architecture, still not final legal text. U-03 is PARTIALLY resolved (Phase 9): the jurisdiction
+ * is confirmed as Syria; the specific privacy regime, a registered data controller, retention
+ * periods and data-subject rights remain unsupplied. See
+ * `src/components/trust/LegalDocument.astro` for the full reasoning, and
+ * `docs/LEGAL_ARCHITECTURE.md` for what remains blocked and who must supply it.
  *
- * This page states what is missing rather than approximating it. Nothing here is legal advice.
+ * This page states what is known and what is still missing rather than approximating either.
+ * Nothing here is legal advice.
  */
 import type { GetStaticPaths } from "astro";
 import type { Locale } from "../../../../content/schema/types";
@@ -57,7 +60,7 @@ const schemas = [jsonLd(breadcrumbSchema(crumbs))];
     locale={locale}
     titleKey="privacyTitle"
     introKey="privacyIntro"
-    blockedItems={["legalMissingRegime", "legalMissingController", "legalMissingRetention", "legalMissingRights"]}
+    blockedItems={["legalMissingRegimeSpecifics", "legalMissingController", "legalMissingRetention", "legalMissingRights"]}
   >
     <Breadcrumbs slot="breadcrumb" locale={locale} crumbs={crumbs} />
   </LegalDocument>

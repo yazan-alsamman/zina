@@ -48,6 +48,7 @@ const textOf = (html) =>
     .replace(/<[^>]+>/g, " ");
 
 import { reservedReviewSegments } from "../src/lib/facets.ts";
+import { eligibleSocialProfiles } from "../src/lib/content.ts";
 
 const hrefsIn = (html) => [...html.matchAll(/href="(\/[^"#?]*)"/g)].map((m) => m[1]);
 
@@ -369,14 +370,22 @@ describe("homepage", () => {
   });
 
   test("no fabricated proof of any kind", () => {
+    // sameAs is checked separately below, precisely — everything else here must never appear.
+    const eligible = eligibleSocialProfiles().map((p) => p.url);
     for (const locale of ["en", "ar"]) {
       const text = textOf(page(`/${locale}/`)).toLowerCase();
       for (const phrase of ["followers", "as seen in", "award", "testimonial", "trusted by", "clients say", "5-star"]) {
         assert.ok(!text.includes(phrase), `${locale} homepage contains "${phrase}"`);
       }
       const html = page(`/${locale}/`);
-      for (const type of ["Organization", "AggregateRating", "Review\"", "sameAs"]) {
+      for (const type of ["Organization", "AggregateRating", "Review\""]) {
         assert.ok(!html.includes(`"${type}`), `${locale} homepage emits ${type}`);
+      }
+      for (const m of html.matchAll(/"sameAs"\s*:\s*\[([^\]]*)\]/g)) {
+        const urls = [...m[1].matchAll(/"([^"]+)"/g)].map((x) => x[1]);
+        for (const url of urls) {
+          assert.ok(eligible.includes(url), `${locale} homepage sameAs carries an unconfirmed URL: ${url}`);
+        }
       }
     }
   });

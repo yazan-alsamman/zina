@@ -28,7 +28,7 @@ import {
   workJournal,
   workReviews,
 } from "../src/lib/work.ts";
-import { workById } from "../src/lib/content.ts";
+import { eligibleSocialProfiles, workById } from "../src/lib/content.ts";
 import { path } from "../src/lib/routing.ts";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -317,16 +317,24 @@ describe("a work page claims no outcome it cannot evidence", () => {
   });
 
   test("JSON-LD asserts no client entity and no creative work", () => {
+    const eligible = eligibleSocialProfiles().map((p) => p.url);
     for (const page of workPages()) {
       const blocks = [...page.html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
         .map((m) => JSON.parse(m[1]));
       const types = blocks.map((b) => b["@type"]).sort();
       assert.deepEqual(types, ["BreadcrumbList", "Person"], `${page.route}: ${types}`);
 
+      // sameAs is legitimate (Phase 9: Instagram) and checked precisely below; everything else
+      // here must never appear.
       const json = JSON.stringify(blocks);
       for (const forbidden of ["CreativeWork", "Organization", "ProfessionalService",
-        "aggregateRating", "offers", "sameAs", "interactionStatistic"]) {
+        "aggregateRating", "offers", "interactionStatistic"]) {
         assert.ok(!json.includes(forbidden), `${page.route}: emitted ${forbidden}`);
+      }
+
+      const person = blocks.find((b) => b["@type"] === "Person");
+      if ("sameAs" in person) {
+        assert.deepEqual(person.sameAs, eligible, `${page.route}: sameAs disagrees with the confirmed set`);
       }
     }
   });

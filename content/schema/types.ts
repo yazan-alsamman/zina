@@ -124,6 +124,24 @@ export interface MethodLocale extends LocaleBlock {
   boundaryStatement: string;
   stages: MethodStage[];
   whatThisCannotTell: string[];
+  /**
+   * THE REAL PROCESS — supplied and confirmed by the project owner (Phase 9), distinct from
+   * `stages`/`whatThisCannotTell` above, which remain an internal six-stage framework invented in
+   * Phase 0 to structure each (still mock) review's write-up, unconfirmed in their specific
+   * granular mechanics (timed check-ins, logged temperature, a controlled comparison protocol).
+   *
+   * `steps` describes, in order, what actually happens: the product arrives, she uses it on her
+   * own skin, she records and publishes that on Instagram, she continues observing it over the
+   * following days, she publishes an evaluation. `boundary` states plainly what this is not —
+   * not a laboratory test, not a clinical trial, not a guarantee for anyone else's skin.
+   */
+  actualProcess: {
+    _verification: Verification;
+    _source?: string;
+    heading: string;
+    steps: string[];
+    boundary: string;
+  };
   seo: SeoFields;
 }
 

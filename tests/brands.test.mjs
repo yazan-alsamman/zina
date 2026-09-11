@@ -285,16 +285,24 @@ describe("a brand page states nothing the record cannot support", () => {
   });
 
   test("no logo, no commerce control, no outbound brand URL", () => {
+    // Scoped to the page's OWN content, excluding the shared site footer. Since Phase 9 the
+    // footer carries one legitimate outbound link — Zina's own confirmed Instagram — on every
+    // page site-wide; that is sitewide chrome, not brand-page content, and is asserted correct
+    // elsewhere (tests/global.test.mjs, tests/trust.test.mjs). This test's job is the BRAND
+    // PAGE'S OWN markup: it must never itself add a second outbound link, a logo, or a buy button.
+    const ownContent = (html) => html.replace(/<footer[\s\S]*?<\/footer>/, "");
+
     for (const page of brandPages()) {
-      assert.ok(!/<img[^>]+logo/i.test(page.html), `${page.route}: rendered a logo`);
-      assert.ok(!/example\.com/.test(page.html), `${page.route}: linked the brand's own site`);
+      const body = ownContent(page.html);
+      assert.ok(!/<img[^>]+logo/i.test(body), `${page.route}: rendered a logo`);
+      assert.ok(!/example\.com/.test(body), `${page.route}: linked the brand's own site`);
 
       // Commerce is a LINK or a CONTROL, not a word. "harder to shop online" is editorial prose in
       // the description, and is exactly the kind of observation this site exists to publish.
-      assert.ok(!/<a[^>]+href="https?:\/\//.test(page.html), `${page.route}: outbound link`);
-      assert.ok(!/<(button|form)\b/.test(page.html), `${page.route}: interactive commerce control`);
+      assert.ok(!/<a[^>]+href="https?:\/\//.test(body), `${page.route}: outbound link`);
+      assert.ok(!/<(button|form)\b/.test(body), `${page.route}: interactive commerce control`);
       assert.ok(
-        !/add to (cart|bag)|buy now|shop now/i.test(stripTags(page.html)),
+        !/add to (cart|bag)|buy now|shop now/i.test(stripTags(body)),
         `${page.route}: commerce call to action`
       );
     }

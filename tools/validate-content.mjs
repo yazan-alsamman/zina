@@ -115,9 +115,40 @@ const localesOf = (where, item, { requireSlug = true } = {}) => {
 const SAFE_HOST = /^https:\/\/[a-z0-9.-]*(example\.com|\.mock)(\/|$)/i;
 const SAFE_SOCIAL = /\.mock\/?$|\.mock[/?]|@[a-z0-9.]*\.mock/i;
 
+/**
+ * INDIVIDUALLY CONFIRMED FIELDS — Phase 9.
+ *
+ * This whole file exists to catch an ACCIDENT: a plausible-looking real URL sitting unmarked in
+ * mock content, about to leak. It does not exist to forbid a DELIBERATE, owner-supplied fact from
+ * ever being represented — the project's own architecture (`person.name._verification`,
+ * `site.contact.generalEmail._verification`, `site.legal.jurisdiction._verification`) has treated
+ * `_verification: "CONFIRMED"` as the authoritative "this is real" signal since Phase 7, at the
+ * FIELD level, inside records whose surrounding envelope stays mock. This check had simply never
+ * needed to reason about a field escalating that far — sameAs, a schema.org output — until now.
+ *
+ * The bar is deliberately high and requires BOTH:
+ *   `_verification === "CONFIRMED"`   the same signal already trusted everywhere else
+ *   a non-empty `_source`             WHO confirmed it, so a bare flag flip proves nothing
+ *
+ * A field or record satisfying both is a fact the project owner supplied, not a leak. Everything
+ * that does NOT satisfy both — including every field on every one of the 41 other mock records —
+ * remains checked exactly as before, with the same blocking failure. This is not a general
+ * loosening: `brands[].relationship.status === "CONFIRMED"` a few lines below, for instance, is
+ * still an unconditional failure, because no brand relationship has been confirmed by anyone.
+ */
+const isConfirmed = (node) =>
+  Boolean(node) &&
+  typeof node === "object" &&
+  node._verification === "CONFIRMED" &&
+  typeof node._source === "string" &&
+  node._source.length > 0;
+
 const urlFieldsOf = (obj, path = "") => {
   const out = [];
   if (obj === null || typeof obj !== "object") return out;
+  // A VerifiableValue-shaped {value, _verification, _source} node that is individually confirmed
+  // is a deliberate fact, not a placeholder violation — skip it and everything nested under it.
+  if (isConfirmed(obj)) return out;
   for (const [k, v] of Object.entries(obj)) {
     const p = path ? `${path}.${k}` : k;
     if (typeof v === "string" && /^https?:\/\//i.test(v)) out.push([p, v]);
@@ -129,14 +160,22 @@ const urlFieldsOf = (obj, path = "") => {
 for (const [name, c] of Object.entries(collections)) {
   for (const item of c.items) {
     const where = `${name} [${item.id}]`;
-    if (item._mock !== true) fail(where, "missing record-level marker _mock: true");
-    if (item.status !== "mock")
-      fail(where, `status must be "mock" while in the mock content layer (got ${item.status})`);
+    // A record individually confirmed AT ITS OWN TOP LEVEL (not a nested field — the record
+    // itself) is exempt from the mock-envelope checks. Phase 9's only example: the one social
+    // profile the project owner confirmed official, where the record's own _mock/status/
+    // sameAsEligible must legitimately differ from every other still-fictional profile.
+    const recordConfirmed = isConfirmed(item);
+    if (!recordConfirmed) {
+      if (item._mock !== true) fail(where, "missing record-level marker _mock: true");
+      if (item.status !== "mock")
+        fail(where, `status must be "mock" while in the mock content layer (got ${item.status})`);
+    }
     if (!item.id?.startsWith("mock-")) fail(where, `id must start with "mock-" while in mock mode`);
     if (!["CONFIRMED", "NEEDS_VERIFICATION", "MOCK"].includes(item._verification))
       fail(where, `_verification must be CONFIRMED, NEEDS_VERIFICATION or MOCK (got ${item._verification})`);
     for (const [path, url] of urlFieldsOf(item)) {
       if (SAFE_HOST.test(url) || SAFE_SOCIAL.test(url)) continue;
+      if (recordConfirmed) continue;
       fail(where, `URL at ${path} is not a recognised placeholder and may point at a real property: ${url}`);
     }
   }
@@ -212,7 +251,10 @@ for (const item of has("person")) {
 for (const item of has("socialProfiles")) {
   const where = `socialProfiles [${item.id}]`;
   require_(where, item, ["platform", "handle", "url", "followers.asOf", "followers.value"]);
-  if (item.sameAsEligible !== false)
+  // sameAsEligible may be true ONLY on a record individually confirmed per isConfirmed() above
+  // (Phase 9: exactly the Instagram record). Every other profile — still fictional — must stay
+  // false: a mock URL must never reach schema.org sameAs.
+  if (item.sameAsEligible !== false && !isConfirmed(item))
     fail(where, "sameAsEligible must be false for every mock profile: a mock URL must never reach schema.org sameAs");
 }
 

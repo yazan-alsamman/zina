@@ -28,7 +28,10 @@ import {
   jurisdictionIsKnown,
   legalIdentity,
   management,
+  officialInstagram,
   standardsAreApproved,
+  telHref,
+  verifiedPhone,
 } from "../src/lib/trust.ts";
 import { eligibleSocialProfiles, person, site, verified } from "../src/lib/content.ts";
 
@@ -60,27 +63,41 @@ const stripTags = (html) => html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").t
 
 /* ================================================================= contact */
 
-describe("contact publishes no channel it cannot honour", () => {
-  test("every address in the record is unverified, so none is published", () => {
-    assert.deepEqual(contactChannels(), []);
-    assert.equal(hasContactChannel(), false);
-    assert.equal(management(), undefined);
+describe("contact publishes exactly the channels the project owner confirmed, nothing else", () => {
+  test("general email and phone are CONFIRMED (Phase 9); collaboration/press/management remain unconfirmed", () => {
+    assert.deepEqual(contactChannels(), [{ key: "general", address: "contact@zinaalmokri.com" }]);
+    assert.equal(hasContactChannel(), true);
+    assert.equal(verifiedPhone(), "0989 000 009");
+    assert.equal(management(), undefined, "management/agency representation was never supplied");
   });
 
-  test("no email address of any shape appears on the contact pages", () => {
+  test("telHref() normalises the phone to digits only — the display text is never altered", () => {
+    assert.equal(telHref(verifiedPhone()), "tel:0989000009");
+  });
+
+  test("officialInstagram() returns exactly the supplied URL and handle, verbatim", () => {
+    assert.deepEqual(officialInstagram(), {
+      handle: "zina.almokri",
+      url: "https://www.instagram.com/zina.almokri?stkn=MTI4aHRmMGZ0bDdibw==",
+    });
+  });
+
+  test("the confirmed general address appears on the contact pages; collaboration/press do not", () => {
     for (const page of surfaces("contact")) {
-      const text = stripTags(page.html);
-      assert.ok(!/[\w.+-]+@[\w-]+\.[\w.]+/.test(text), `${page.route}: published an address`);
-      assert.ok(!/mailto:/.test(page.html), `${page.route}: published a mailto link`);
+      assert.ok(page.html.includes('mailto:contact@zinaalmokri.com'), `${page.route}: missing the confirmed address`);
+      for (const unconfirmed of ["collaborations@zinaalmokri", "press@zinaalmokri"]) {
+        assert.ok(!page.html.includes(unconfirmed), `${page.route}: published an unconfirmed address`);
+      }
     }
   });
 
-  test("the guessable address is nowhere in the build", () => {
-    // The obvious guess is the dangerous one: it may belong to nobody, or to someone else.
+  test("no OTHER guessable address is anywhere in the build", () => {
+    // The confirmed address is real; every OTHER plausible guess remains exactly as dangerous as
+    // before — it may belong to nobody, or to someone else.
     for (const page of pages) {
-      for (const guess of ["hello@zinaalmokri", "contact@zinaalmokri", "info@zinaalmokri",
-        "press@zinaalmokri", "collaborations@zinaalmokri"]) {
-        assert.ok(!page.html.includes(guess), `${page.route}: contains "${guess}"`);
+      for (const guess of ["hello@zinaalmokri", "info@zinaalmokri", "team@zinaalmokri",
+        "support@zinaalmokri", "collaborations@zinaalmokri", "press@zinaalmokri"]) {
+        assert.ok(!page.html.includes(guess), `${page.route}: contains unconfirmed guess "${guess}"`);
       }
     }
   });
@@ -128,13 +145,16 @@ describe("contact publishes no channel it cannot honour", () => {
     }
   });
 
-  test("the absence is STATED, in both locales", () => {
+  test("the channels are rendered, not the absence band — the gate flipped honestly", () => {
+    // Phase 7's "unavailable" band existed for exactly this scenario's opposite: it must now be
+    // GONE, because a channel is genuinely confirmed. If it ever reappears, contactChannels()
+    // and/or verifiedPhone()/officialInstagram() silently stopped returning confirmed data.
     for (const page of surfaces("contact")) {
+      assert.ok(/class="channels"/.test(page.html), `${page.route}: the channels section is missing`);
       assert.ok(
-        /class="unavailable"/.test(page.html),
-        `${page.route}: does not state that no channel is published`
+        !/class="unavailable"/.test(page.html),
+        `${page.route}: still shows the "no channel published" band despite confirmed contacts`
       );
-      assert.ok(stripTags(page.html).length > 400, `${page.route}: page is essentially empty`);
     }
   });
 
@@ -192,12 +212,24 @@ describe("about asserts no credential", () => {
     }
   });
 
-  test("NO social profile is linked, because none is verified", () => {
-    assert.deepEqual(eligibleSocialProfiles(), []);
+  test("exactly Instagram is linked (Phase 9, confirmed) — every other platform stays absent", () => {
+    const eligible = eligibleSocialProfiles();
+    assert.equal(eligible.length, 1);
+    assert.equal(eligible[0].platform, "Instagram");
     for (const page of pages) {
-      for (const host of ["instagram.com", "tiktok.com", "youtube.com", "snapchat.com",
+      for (const host of ["tiktok.com", "youtube.com", "snapchat.com",
         "pinterest.com", "twitter.com", "x.com", "facebook.com"]) {
-        assert.ok(!page.html.includes(host), `${page.route}: linked ${host}`);
+        assert.ok(!page.html.includes(host), `${page.route}: linked unconfirmed platform ${host}`);
+      }
+    }
+    // Instagram DOES now appear — in the shared footer's social row on every page, and on the
+    // Contact page's own channel list. Verified as the exact confirmed URL, never a variant.
+    const confirmedUrl = "https://www.instagram.com/zina.almokri?stkn=MTI4aHRmMGZ0bDdibw==";
+    const anyPage = pages.find((p) => p.html.includes("instagram.com"));
+    assert.ok(anyPage, "Instagram never appears anywhere in the build");
+    for (const page of pages) {
+      for (const m of page.html.matchAll(/href="(https:\/\/www\.instagram\.com\/[^"]*)"/g)) {
+        assert.equal(m[1], confirmedUrl, `${page.route}: an Instagram link does not match the confirmed URL`);
       }
     }
   });
@@ -208,14 +240,20 @@ describe("about asserts no credential", () => {
     }
   });
 
-  test("Person JSON-LD carries no sameAs, credential or address", () => {
+  test("Person JSON-LD carries no credential or address; sameAs is exactly the confirmed profile", () => {
     for (const page of surfaces("about")) {
       const blocks = [...page.html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
         .map((m) => JSON.parse(m[1]));
       const personBlock = blocks.find((b) => b["@type"] === "Person");
       assert.ok(personBlock, `${page.route}: no Person schema`);
+
+      assert.deepEqual(personBlock.sameAs, eligibleSocialProfiles().map((p) => p.url));
+      // About never opts personSchema() into contact fields — that is Contact's job alone.
+      assert.ok(!("email" in personBlock), `${page.route}: About emits email — that belongs to Contact`);
+      assert.ok(!("telephone" in personBlock), `${page.route}: About emits telephone — that belongs to Contact`);
+
       const json = JSON.stringify(personBlock);
-      for (const forbidden of ["sameAs", "hasCredential", "alumniOf", "award", "address",
+      for (const forbidden of ["hasCredential", "alumniOf", "award", "address",
         "homeLocation", "worksFor", "interactionStatistic"]) {
         assert.ok(!json.includes(forbidden), `${page.route}: Person carries ${forbidden}`);
       }
@@ -319,12 +357,29 @@ describe("editorial standards is distinct from the Method and claims no institut
 /* ================================================================= legal */
 
 describe("the legal foundation invents nothing", () => {
-  test("jurisdiction and legal entity are both unknown", () => {
-    assert.equal(jurisdictionIsKnown(), false);
+  test("jurisdiction is CONFIRMED (Phase 9: Syria); legal entity remains unknown", () => {
+    assert.equal(jurisdictionIsKnown(), true);
     const identity = legalIdentity();
-    assert.equal(identity.jurisdiction, undefined);
-    assert.equal(identity.entityName, undefined);
+    assert.equal(identity.jurisdiction, "Syria");
+    assert.equal(identity.entityName, undefined, "no legal entity was ever supplied — must stay absent");
     assert.equal(identity.copyrightHolder, "Zina Almokri");
+  });
+
+  test("the confirmed jurisdiction renders on both legal pages, in both locales", () => {
+    for (const page of [...surfaces("privacy"), ...surfaces("terms")]) {
+      assert.ok(stripTags(page.html).includes("Syria"), `${page.route}: jurisdiction not rendered`);
+    }
+  });
+
+  test("no legal ENTITY is named, even though the jurisdiction now is", () => {
+    // The two facts are independent. Confirming Syria as the jurisdiction must never be read as
+    // confirming a registered company, address or registration number — none of that was supplied.
+    for (const page of [...surfaces("privacy"), ...surfaces("terms")]) {
+      assert.ok(
+        /class="identity-note"/.test(page.html),
+        `${page.route}: no longer states that the legal entity is unknown`
+      );
+    }
   });
 
   test("both legal routes exist in both locales", () => {

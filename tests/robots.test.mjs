@@ -7,6 +7,7 @@
  */
 
 import { test, describe, before } from "node:test";
+import { SITE_URL } from "../src/config/site.ts";
 import assert from "node:assert/strict";
 import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
@@ -73,15 +74,17 @@ describe("the sitemap reference", () => {
 
   test("the referenced URL is not the mock/invented site.json domain", () => {
     // site.json -> domain.value is "https://zinaalmokri.example.com", explicitly marked MOCK and
-    // invented (U-01). robots.txt must use the real SITE_URL constant, never that field.
+    // invented — robots.txt must use the real SITE_URL constant, never that field. U-01 is
+    // resolved (Phase 9): SITE_URL is now the real production domain, not a placeholder.
     assert.ok(!robotsTxtContent().includes("zinaalmokri.example.com"));
-    assert.ok(robotsTxtContent().includes("example.invalid"));
+    assert.ok(robotsTxtContent().includes(SITE_URL));
+    assert.ok(!SITE_URL.endsWith(".invalid"), "SITE_URL still looks like the Phase 8 placeholder");
   });
 
   test("the sitemap URL in the BUILT file resolves to a file that was actually emitted", () => {
     const match = builtContent.match(/^Sitemap:\s*(\S+)$/m);
     assert.ok(match, "no Sitemap: line in the built robots.txt");
-    const localPath = match[1].replace("https://example.invalid", "");
+    const localPath = match[1].replace(SITE_URL, "");
     assert.ok(existsSync(join(dist, localPath)), `${match[1]} does not correspond to a real file`);
   });
 });
@@ -95,7 +98,7 @@ describe("consistency with the sitemap's own indexability decisions", () => {
     const content = robotsTxtContent();
     const disallowed = [...content.matchAll(/^Disallow:\s*(\S+)$/gm)].map((m) => m[1]);
     for (const url of forced) {
-      const localPath = url.loc.replace("https://example.invalid", "");
+      const localPath = url.loc.replace(SITE_URL, "");
       for (const rule of disallowed) {
         assert.ok(
           !localPath.startsWith(rule),
