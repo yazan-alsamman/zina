@@ -85,13 +85,17 @@ const aspect = ratio ?? `${width} / ${height}`;
     inline-size: 100%;
     block-size: auto;
     object-fit: cover;
-    /* Radius 0 everywhere. No frame, no border, no shadow. Images sit flush to the grid. */
-    border-radius: var(--radius-none);
+    /* Phase 11: evidence frames take the card radius of the beauty identity. */
+    border-radius: var(--radius-card);
   }
 
   .frame--placeholder {
-    background: var(--color-ground-raised);
-    /* No icon, no glyph, no label. An honest gap. */
+    /* Still no icon, no glyph, no label — an honest gap — but a lit, tonal surface rather than a
+       flat block, and never taller than a reader's screen. */
+    max-block-size: min(30rem, 70vh);
+    background:
+      radial-gradient(60% 60% at 30% 25%, rgb(255 250 247 / 80%), rgb(255 250 247 / 0%) 70%),
+      linear-gradient(160deg, var(--palette-blush), var(--palette-powder));
   }
 
   /* Decode fade on lazy images only. Evidence images never move; a fade on load is a load

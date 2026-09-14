@@ -9,6 +9,7 @@
 
 import { test, describe, before } from "node:test";
 import assert from "node:assert/strict";
+import { assertOnlyCosmeticsLoader, assertChunksCollectNothing } from "./helpers/client-js.mjs";
 import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -121,11 +122,12 @@ describe("reviews index", () => {
     }
   });
 
-  test("ships no JavaScript — discovery works with scripting disabled", () => {
+  test("discovery works with scripting disabled — the only script is the decorative 3D loader", () => {
     for (const locale of ["en", "ar"]) {
       const html = page(`/${locale}/reviews/`);
-      const scripts = [...html.matchAll(/<script(?![^>]*application\/ld\+json)[^>]*>/g)];
-      assert.equal(scripts.length, 0);
+      assertOnlyCosmeticsLoader(assert, html, `/${locale}/reviews/`);
+      // Every record is a real link in the HTML itself, not something a script renders.
+      assert.ok((html.match(/class="entry-link"/g) ?? []).length > 0, `${locale}: no entries in the static HTML`);
     }
   });
 
@@ -345,18 +347,25 @@ describe("homepage", () => {
     }
   });
 
-  test("STATE B — no photography exists, so no image and no placeholder is rendered", () => {
+  test("STATE A — real photography exists, so the portrait composition renders honestly", () => {
+    // Phase 11: the project owner supplied photographs of Zina (src/assets/photography/), so the
+    // homepage moved from State B to State A. What must still hold: the portrait is a REAL,
+    // optimised asset with descriptive alt text, it is the one high-priority image, and no
+    // placeholder or nonexistent asset appears.
     for (const locale of ["en", "ar"]) {
       const html = page(`/${locale}/`);
-      // Astro bundles a component's CSS whenever the page IMPORTS it, even if the component
-      // never renders. The assertion must therefore be about MARKUP, not about the stylesheet.
       const markup = html.replace(/<style[\s\S]*?<\/style>/g, " ");
-      assert.ok(!markup.includes("opening--portrait"), "State A rendered without a real portrait");
-      assert.ok(markup.includes("opening--typographic"), "expected the State B composition");
+      assert.ok(markup.includes("opening--portrait"), "expected the State A composition");
+      assert.ok(!markup.includes("opening--typographic"), "State B rendered although photography exists");
       assert.ok(!markup.includes("frame--placeholder"), "a grey placeholder was rendered");
       assert.ok(!markup.includes("/mock-media/"), "referenced an asset that does not exist");
-      assert.ok(!/<img[\s>]/.test(markup), "an image was rendered with no photography available");
       assert.ok(!/role="img"/.test(markup), "a placeholder image role was rendered");
+
+      const priority = [...markup.matchAll(/<img[^>]*fetchpriority="high"[^>]*>/g)].map((m) => m[0]);
+      assert.equal(priority.length, 1, `${locale}: expected exactly one high-priority image`);
+      assert.match(priority[0], /src="\/_astro\/[^"]+"/, "the portrait is not a build-optimised asset");
+      assert.match(priority[0], /alt="[^"]{20,}"/, "the portrait has no descriptive alt text");
+      assert.match(priority[0], /width="\d+" height="\d+"/, "the portrait reserves no intrinsic size");
     }
   });
 
@@ -390,10 +399,9 @@ describe("homepage", () => {
     }
   });
 
-  test("ships no JavaScript", () => {
+  test("ships no script beyond the decorative 3D loader", () => {
     for (const locale of ["en", "ar"]) {
-      const scripts = [...page(`/${locale}/`).matchAll(/<script(?![^>]*application\/ld\+json)[^>]*>/g)];
-      assert.equal(scripts.length, 0);
+      assertOnlyCosmeticsLoader(assert, page(`/${locale}/`), `/${locale}/`);
     }
   });
 });

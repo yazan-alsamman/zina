@@ -1,0 +1,85 @@
+---
+/**
+ * FLOATING COSMETIC — a slot for one 3D product.
+ *
+ * This element is only a RECTANGLE IN THE LAYOUT. The shared WebGL scene
+ * (src/scripts/cosmetics/scene.ts) finds every `[data-cosmetic]` and draws the product into that
+ * rectangle, so position, size and responsive behaviour are ordinary CSS set by the caller.
+ *
+ * Without WebGL, with Save-Data on, or before the scene has loaded, the slot shows only a soft
+ * blush glow — decorative, never an empty box, never a broken-image state. Every slot is
+ * aria-hidden: the products are atmosphere, not content, and nothing on the page depends on them.
+ *
+ * The packaging is ORIGINAL and generic (see models.ts). A slot never implies a specific reviewed
+ * product, brand or a product line of Zina's own.
+ */
+import type { CosmeticKind, CosmeticTint } from "../../scripts/cosmetics/models";
+
+interface Props {
+  kind: CosmeticKind;
+  tint?: CosmeticTint;
+  /** 0 (far, subtle parallax) to 1 (near, stronger parallax and cursor response). */
+  depth?: number;
+  /** Resting yaw in radians — which way the label faces. */
+  yaw?: number;
+  /** Resting roll in radians. */
+  tilt?: number;
+  /** Hidden below 768px, where the composition carries fewer products. */
+  desktopOnly?: boolean;
+  class?: string;
+  style?: string;
+}
+
+const {
+  kind,
+  tint = "blush",
+  depth = 0.5,
+  yaw = -0.45,
+  tilt = 0,
+  desktopOnly = false,
+  class: className,
+  style,
+  ...rest
+} = Astro.props;
+/* `rest` carries the caller's forwarded `data-astro-cid-*` attribute, so a page's scoped CSS
+   can position this slot by the class it passed in. */
+---
+
+<div
+  {...rest}
+  class:list={["cosmetic", desktopOnly && "cosmetic--desktop", className]}
+  data-cosmetic={kind}
+  data-tint={tint}
+  data-depth={depth}
+  data-yaw={yaw}
+  data-tilt={tilt}
+  style={style}
+  aria-hidden="true"
+>
+  <span class="cosmetic-glow"></span>
+</div>
+
+<style>
+  /* Zero specificity so a caller's layout class always wins (see EditorialImage). */
+  :global(:where(.cosmetic)) {
+    position: absolute;
+    z-index: 2;
+    pointer-events: none;
+    aspect-ratio: 1;
+  }
+
+  .cosmetic-glow {
+    position: absolute;
+    inset: 8%;
+    border-radius: 50%;
+    /* A gradient only — a blur filter here was clipped to a hard-edged layer box. */
+    background: var(--gradient-glow);
+    opacity: 0.75;
+  }
+
+  @media (max-width: 767px) {
+    .cosmetic--desktop {
+      display: none;
+    }
+  }
+</style>

@@ -27,6 +27,7 @@ import { isolateValue } from "../../../lib/bidi";
 import { formatCount, countedNoun } from "../../../lib/format";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
+import PageHero from "../../../components/beauty/PageHero.astro";
 
 export const getStaticPaths = (() =>
   LOCALES.map((locale) => ({ params: { locale } }))) satisfies GetStaticPaths;
@@ -64,7 +65,7 @@ const schemas = [jsonLd(breadcrumbSchema(crumbs))];
   schemas={schemas}
   switcherHref={path.workIndex(locale === "en" ? "ar" : "en")}
 >
-  <div class="container work-index">
+  <PageHero locale={locale} photo="studioWarmSeated" tone="champagne" cosmetics={[{ kind: "perfume", tint: "wine" }, { kind: "compact", tint: "blush" }]}>
     <Breadcrumbs locale={locale} crumbs={crumbs} />
 
     <h1 class="display-lg title">{t(locale, "work")}</h1>
@@ -76,6 +77,9 @@ const schemas = [jsonLd(breadcrumbSchema(crumbs))];
       <span class="count-label">·</span>
       <span class="count-label">{t(locale, "inThisLocale")}</span>
     </p>
+  </PageHero>
+
+  <div class="container work-index">
 
     {
       projects.length > 0 ? (

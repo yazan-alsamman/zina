@@ -2,57 +2,52 @@
 /**
  * THE HOMEPAGE — /{locale}/
  *
- * Built LAST, deliberately. It introduces an editorial system that already exists rather than
- * promising one: every link on this page goes to a route implemented in Phase 4 or Phase 5, and
- * every section is populated from real records. Nothing is reserved, teased or coming soon.
- *
  * ============================================================================
- * STATE A / STATE B — the photography dependency, severed
+ * PHASE 11 — STATE A, WITH REAL PHOTOGRAPHY
  * ============================================================================
- * Phase 3 identified the homepage's dependency on photography that does not exist as its central
- * weakness. The resolution is not a placeholder: it is that the ARGUMENT of the page is carried
- * by type and record, and photography only ever carried its ATMOSPHERE.
+ * Phase 5 composed this page for State B (no photography existed). The project owner has since
+ * supplied photographs of Zina, so the page now opens in State A: an editorial campaign
+ * composition with her portrait at the centre, and the ARGUMENT of the page — real testing, real
+ * conditions, a verdict in her own words — still carried entirely by real records.
  *
- *   STATE A  a portrait exists  -> asymmetric composition, statement beside the portrait
- *   STATE B  no portrait        -> the statement widens and takes the space; NO tone field,
- *                                  NO grey rectangle, NO "coming soon", NO stock photograph
+ * Visual hierarchy, in order: Zina · her voice · her testing · her reviews · the products.
+ * The 3D products are atmosphere around her, never the subject.
  *
- * The state is chosen from whether the asset actually resolves, not from a flag someone sets.
- * TODAY THE SITE IS IN STATE B, and it is composed for it rather than degraded into it.
+ * SECTIONS
+ *   1 opening      tagline as the h1, portrait under an arch, floating products, record count
+ *   2 marquee      the categories actually present in this locale's records
+ *   3 story        the featured record told as PRODUCT → TESTED → EXPERIENCE → RESULT → VERDICT
+ *                  (still exactly one conditions block and one observation on this page)
+ *   4 ritual       the Method's six stages, with the boundary statement travelling with them
+ *   5 recent       three review cards
+ *   6 meet         Zina: the short bio and what the work involves, linked to About
+ *   7 closing      the philosophy statement on the wine ground
  *
- * Note that in State B the proof block sits HIGHER on the page than in State A. The photography
- * adds warmth and costs vertical space; it is not a straight upgrade.
- *
- * ============================================================================
- * THE FIRST VIEWPORT, in order (Phase 5 brief section 17)
- * ============================================================================
- *   1 who she is           the name, small, beneath the claim
- *   2 what she does        the claim itself, as the h1
- *   3 what is distinctive  the Method line — "Six stages, the same six every time"
- *   4 what to explore      the record count, and the proof block beginning within one screen
- *   5 why the Method matters   the boundary, stated in one clause, linked
- *
- * THE CLAIM IS THE HEADLINE; THE NAME IS SMALL. A homepage whose largest element is the person's
- * name is a business card.
+ * Every link goes to an implemented route. No section is a teaser for something that does not exist.
  */
 import type { GetStaticPaths } from "astro";
 import type { Locale } from "../../../content/schema/types";
 import {
   LOCALES,
   IS_INDEXABLE_BUILD,
+  brandById,
   featuredReviews,
   method,
   person,
   reviews as reviewsIn,
 } from "../../lib/content";
-import { absoluteUrl, path, robotsContent } from "../../lib/routing";
+import { absoluteUrl, isImplemented, path, robotsContent } from "../../lib/routing";
 import { jsonLd, personSchema, templatedMeta } from "../../lib/seo";
 import { t } from "../../lib/ui-strings";
-import { isolateValue } from "../../lib/bidi";
-import { formatCount } from "../../lib/format";
+import { isolateIdentifier, isolateValue } from "../../lib/bidi";
+import { countedNoun, formatCount } from "../../lib/format";
+import { cosmeticForCategory } from "../../lib/cosmetic-kinds";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ReviewEntry from "../../components/review/ReviewEntry.astro";
-import Frame from "../../components/media/Frame.astro";
+import EditorialImage from "../../components/beauty/EditorialImage.astro";
+import FloatingCosmetic from "../../components/beauty/FloatingCosmetic.astro";
+import BeautyButton from "../../components/beauty/BeautyButton.astro";
+import VerdictSeal from "../../components/beauty/VerdictSeal.astro";
 
 export const getStaticPaths = (() =>
   LOCALES.map((locale) => ({ params: { locale } }))) satisfies GetStaticPaths;
@@ -68,24 +63,34 @@ const records = reviewsIn(locale);
 const featured = featuredReviews(locale)[0] ?? records[0];
 const recent = records.filter((r) => r.id !== featured?.id).slice(0, 3);
 
-/**
- * STATE DETECTION. A `/mock-media/` path is a path to a file that was never created, so it is
- * treated as absent — the same rule `Frame` applies. No flag, no toggle: the state is a fact
- * about the assets.
- */
-const portrait = personRecord.images?.["portrait"] ?? personRecord.images?.["hero"];
-const portraitExists = Boolean(portrait?.src) && !portrait!.src.startsWith("/mock-media/");
-const stateA = portraitExists;
-
 const featuredContent = featured?.locales[locale];
-// At most three conditions from what the featured review actually published. Never padded.
 const conditions = (featuredContent?.conditions ?? []).slice(0, 3);
-// One observation. The homepage carries ONE evidence moment; a second would make it a dashboard.
 const observation = featuredContent?.observations?.[0];
+const strength = featuredContent?.strengths?.[0];
+const limitation = featuredContent?.limitations?.[0];
+const verdict = (featuredContent as { verdict?: { summary?: string; wouldRepurchase?: string } } | undefined)?.verdict;
+const featuredBrand = featured ? brandById(featured.entity.brandId) : undefined;
+const featuredBrandName = featuredBrand?.locales?.[locale]?.name ?? featuredBrand?.slug;
+const featuredCosmetic = cosmeticForCategory(featured?.entity.category);
 
 const stages = methodRecord.stageOrder
   .map((key) => methodLocale.stages.find((s) => s.key === key))
   .filter((s): s is NonNullable<typeof s> => Boolean(s));
+
+/** The categories this locale's records actually cover — never a padded list. */
+const categories = [...new Set(records.map((r) => r.entity.category))];
+
+/**
+ * The h1 is Zina's own tagline, split at its first clause so the second half can be set in the
+ * italic accent. Splitting on the comma works for both scripts (Latin "," and Arabic "،").
+ */
+const tagline = personLocale.tagline;
+const splitAt = tagline.search(/[,،]/);
+const taglineHead = splitAt > 0 ? tagline.slice(0, splitAt + 1) : tagline;
+const taglineTail = splitAt > 0 ? tagline.slice(splitAt + 1).trim() : "";
+
+const name = personRecord.name[locale === "ar" ? "arabic" : "latin"];
+const expertise = (personLocale.expertise ?? []).slice(0, 5);
 
 const selfPath = path.home(locale);
 const meta = templatedMeta(personLocale.professionalTitle, personLocale.bios.short, {
@@ -99,11 +104,7 @@ const alternates = [
   { hreflang: "x-default", href: absoluteUrl(path.home("en")) },
 ];
 
-/**
- * Person only. No Organization (there is no verified organisation), no sameAs (no profile is
- * verified), no award, no credential, no location (unverified). The homepage must not manufacture
- * professional credentials.
- */
+/** Person only — no Organization, no award, no credential, no unverified location. */
 const schemas = [jsonLd(personSchema(personRecord, locale))];
 ---
 
@@ -114,261 +115,879 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
   schemas={schemas}
   switcherHref={path.home(locale === "en" ? "ar" : "en")}
 >
-  {/* ---------------------------------------------------------------- 1 · the claim */}
-  <section class:list={["opening", stateA ? "opening--portrait" : "opening--typographic"]}>
-    <div class="container opening-inner">
+  {/* ================================================================ 1 · opening */}
+  <section class="opening opening--portrait" aria-labelledby="hero-title">
+    <div class="opening-atmosphere" aria-hidden="true">
+      <span class="organic organic--glow opening-glow"></span>
+      <span class="organic organic--champagne opening-glow-2"></span>
+    </div>
+
+    <div class="container container--wide opening-inner">
       <div class="statement-block">
-        <h1 class="statement">{personLocale.bios.homepageIntro}</h1>
+        <p class="eyebrow enter">{personLocale.professionalTitle}</p>
 
-        <p class="attribution">
-          <span class="name">{personRecord.name[locale === "ar" ? "arabic" : "latin"]}</span>
-          <span class="role label">{personLocale.professionalTitle}</span>
-        </p>
+        <h1 class="statement" id="hero-title">
+          <span class="statement-head enter" style="--enter-step: 1">{taglineHead}</span>
+          {taglineTail && <span class="statement-tail accent enter" style="--enter-step: 2">{taglineTail}</span>}
+        </h1>
 
-        {/* What makes the work distinctive — on screen one, not screen three. */}
-        <p class="method-line">
-          {t(locale, "homeMethodLead")}{" "}
-          <a href={path.method(locale)}>{t(locale, "readTheMethod")}</a>
+        <p class="hero-intro enter" style="--enter-step: 3">{personLocale.bios.homepageIntro}</p>
+
+        <div class="hero-actions enter" style="--enter-step: 4">
+          <BeautyButton href={path.reviewsIndex(locale)}>{t(locale, "exploreReviews")}</BeautyButton>
+          <BeautyButton href={path.method(locale)} variant="quiet">{t(locale, "howITest")}</BeautyButton>
+        </div>
+
+        <p class="attribution enter" style="--enter-step: 5">
+          <span class="name">{name}</span>
+          <span class="method-line">{t(locale, "homeMethodLead")}</span>
         </p>
       </div>
 
-      {
-        stateA && (
-          <div class="portrait">
-            <Frame
-              src={portrait!.src}
-              alt={portrait!.alt}
-              width={portrait!.width}
-              height={portrait!.height}
-              ratio="4 / 5"
-              priority={true}
-            />
-          </div>
-        )
-      }
+      <div class="portrait enter-fade" style="--enter-step: 1">
+        <span class="portrait-arch" aria-hidden="true"></span>
+        <span class="organic organic--ring portrait-ring" aria-hidden="true"></span>
+        <span class="organic organic--petal organic--drift portrait-petal" aria-hidden="true"></span>
+
+        <EditorialImage
+          photo="portraitGlow"
+          locale={locale}
+          mask="arch"
+          ratio="4 / 5.3"
+          priority={true}
+          sizes="(min-width: 1024px) 34vw, (min-width: 768px) 55vw, 82vw"
+          widths={[420, 640, 860, 1080]}
+          class="portrait-image"
+        />
+
+        <p class="portrait-caption">
+          <span class="caption-count" set:html={isolateValue(formatCount(records.length, locale))} />
+          <span class="caption-text">
+            <span class="label">{countedNoun(records.length, locale, { one: t(locale, "reviewCountOne"), other: t(locale, "reviewCount") })}</span>
+            <span class="caption-sub">{t(locale, "inThisLocale")}</span>
+          </span>
+        </p>
+
+        <FloatingCosmetic kind="serum" tint="rose" depth={0.9} yaw={-0.6} tilt={0.12} class="hero-cosmetic hero-cosmetic--serum" />
+        <FloatingCosmetic kind="jar" tint="blush" depth={1} yaw={-0.3} class="hero-cosmetic hero-cosmetic--jar" />
+        <FloatingCosmetic kind="lipstick" tint="rose" depth={0.6} yaw={0.4} tilt={-0.25} class="hero-cosmetic hero-cosmetic--lipstick" />
+        <FloatingCosmetic kind="perfume" tint="blush" depth={0.35} yaw={0.55} desktopOnly class="hero-cosmetic hero-cosmetic--perfume" />
+        <FloatingCosmetic kind="compact" tint="blush" depth={0.7} yaw={0.2} desktopOnly class="hero-cosmetic hero-cosmetic--compact" />
+      </div>
     </div>
+
+    <p class="scroll-cue" aria-hidden="true"><span>{t(locale, "scrollCue")}</span></p>
   </section>
 
-  {/* ---------------------------------------------------------------- 2 · the proof */}
+  {/* ================================================================ 2 · marquee */}
+  {
+    categories.length > 0 && (
+      <section class="marquee" aria-label={t(locale, "categoriesTested")}>
+        {/* Two IDENTICAL tracks so the loop is seamless. Only the first list is exposed to
+            assistive technology; every repetition exists for the eye alone. */}
+        {[0, 1].map((track) => (
+          <div class="marquee-track" aria-hidden={track === 1 ? "true" : undefined}>
+            {[0, 1, 2].map((copy) => (
+              <ul class="marquee-list plain" aria-hidden={track === 0 && copy === 0 ? undefined : "true"}>
+                {categories.map((category) => (
+                  <li class="marquee-item">{category}</li>
+                ))}
+              </ul>
+            ))}
+          </div>
+        ))}
+      </section>
+    )
+  }
+
+  {/* ================================================================ 3 · the story (the proof) */}
   {
     featured && featuredContent && (
-      <section class="featured" aria-labelledby="featured-heading">
-        <div class="container">
-          <h2 class="section-heading" id="featured-heading">{t(locale, "featuredReview")}</h2>
+      <section class="featured story" aria-labelledby="featured-heading">
+        <span class="organic organic--glow story-glow" aria-hidden="true" />
+        <div class="container container--wide story-inner">
+          <div class="story-visual">
+            <div class="story-visual-sticky">
+              <EditorialImage
+                photo="closeupComplexion"
+                locale={locale}
+                mask="pebble"
+                ratio="4 / 5"
+                parallax={true}
+                sizes="(min-width: 1024px) 36vw, 88vw"
+                class="story-image reveal-fade"
+              />
+              <FloatingCosmetic
+                kind={featuredCosmetic.kind}
+                tint={featuredCosmetic.tint}
+                depth={0.9}
+                yaw={-0.5}
+                class="story-cosmetic"
+              />
+              <p class="story-chip">
+                <span class="label">{t(locale, "storyTested")}</span>
+                <span class="story-chip-text">{featuredContent.subtitle}</span>
+              </p>
+            </div>
+          </div>
 
-          <p class="label disclosure">{featuredContent.disclosureLabel}</p>
+          <div class="story-copy">
+            <p class="eyebrow reveal">{t(locale, "featuredReview")}</p>
+            <h2 class="section-title reveal" id="featured-heading">{t(locale, "storyHeading")}</h2>
 
-          <a class="featured-title-link" href={path.review(locale, featuredContent.slug!)}>
-            <span class="featured-title display-md">{featuredContent.title}</span>
-          </a>
-          <p class="featured-subtitle">{featuredContent.subtitle}</p>
-
-          {/* The site's only homepage instance of record density. */}
-          {conditions.length > 0 && (
-            <dl class="conditions">
-              {conditions.map((condition) => (
-                <div class="condition">
-                  <dt class="label">{condition.label}</dt>
-                  <dd class="record" set:html={isolateValue(condition.value)} />
+            <ol class="story-steps plain">
+              <li class="step reveal">
+                <span class="step-number" aria-hidden="true">01</span>
+                <div class="step-body">
+                  <h3 class="step-title">{t(locale, "storyProduct")}</h3>
+                  <p class="label disclosure">{featuredContent.disclosureLabel}</p>
+                  <a class="featured-title-link" href={path.review(locale, featuredContent.slug!)}>
+                    <span class="featured-title">{featuredContent.title}</span>
+                  </a>
+                  <p class="featured-identity">
+                    {featuredBrandName && <Fragment set:html={isolateIdentifier(featuredBrandName, locale)} />}
+                    <span aria-hidden="true"> · </span>
+                    <span>{featured.entity.productType ?? featured.entity.category}</span>
+                  </p>
                 </div>
-              ))}
-            </dl>
-          )}
+              </li>
 
-          {observation && (
-            <blockquote class="observation">
-              <p>{observation.note}</p>
-            </blockquote>
-          )}
+              <li class="step reveal">
+                <span class="step-number" aria-hidden="true">02</span>
+                <div class="step-body">
+                  <h3 class="step-title">{t(locale, "storyTested")}</h3>
+                  {featuredContent.testingContext && <p class="step-text">{featuredContent.testingContext}</p>}
+                  {conditions.length > 0 && (
+                    <dl class="conditions">
+                      {conditions.map((condition) => (
+                        <div class="condition">
+                          <dt class="label">{condition.label}</dt>
+                          <dd class="record" set:html={isolateValue(condition.value)} />
+                        </div>
+                      ))}
+                    </dl>
+                  )}
+                </div>
+              </li>
 
-          <p class="featured-link">
-            <a href={path.review(locale, featuredContent.slug!)}>{t(locale, "readTheReview")}</a>
-          </p>
+              {observation && (
+                <li class="step reveal">
+                  <span class="step-number" aria-hidden="true">03</span>
+                  <div class="step-body">
+                    <h3 class="step-title">{t(locale, "storyExperience")}</h3>
+                    <blockquote class="observation">
+                      <p class="observation-when label">
+                        <span set:html={isolateValue(observation.at)} /> · {observation.aspect}
+                      </p>
+                      <p>{observation.note}</p>
+                    </blockquote>
+                  </div>
+                </li>
+              )}
+
+              {(strength || limitation) && (
+                <li class="step reveal">
+                  <span class="step-number" aria-hidden="true">04</span>
+                  <div class="step-body">
+                    <h3 class="step-title">{t(locale, "storyResult")}</h3>
+                    <dl class="result-pair">
+                      {strength && (
+                        <div class="result result--plus">
+                          <dt class="label">{t(locale, "strengths")}</dt>
+                          <dd>{strength}</dd>
+                        </div>
+                      )}
+                      {limitation && (
+                        <div class="result result--minus">
+                          <dt class="label">{t(locale, "limitations")}</dt>
+                          <dd>{limitation}</dd>
+                        </div>
+                      )}
+                    </dl>
+                  </div>
+                </li>
+              )}
+
+              {verdict?.summary && (
+                <li class="step step--verdict reveal">
+                  <span class="step-number" aria-hidden="true">05</span>
+                  <div class="step-body">
+                    <h3 class="step-title">{t(locale, "storyVerdict")}</h3>
+                    <p class="verdict-summary">{verdict.summary}</p>
+                    <VerdictSeal locale={locale} value={verdict.wouldRepurchase} />
+                  </div>
+                </li>
+              )}
+            </ol>
+
+            <p class="featured-link reveal">
+              <BeautyButton href={path.review(locale, featuredContent.slug!)}>{t(locale, "readMyVerdict")}</BeautyButton>
+            </p>
+          </div>
         </div>
       </section>
     )
   }
 
-  {/* ---------------------------------------------------------------- 3 · the method */}
+  {/* ================================================================ 4 · the ritual (method) */}
   <section class="method-well" aria-labelledby="method-heading">
-    <div class="container">
-      <h2 class="section-heading" id="method-heading">{methodLocale.name}</h2>
+    <div class="container container--wide method-inner">
+      <div class="method-visual reveal-fade">
+        <EditorialImage
+          photo="studioMonochrome"
+          locale={locale}
+          mask="arch"
+          ratio="3 / 4"
+          parallax={true}
+          sizes="(min-width: 1024px) 28vw, 70vw"
+          class="method-image"
+        />
+        <span class="organic organic--ring method-ring" aria-hidden="true"></span>
+        <FloatingCosmetic kind="compact" tint="blush" depth={0.7} yaw={0.1} class="method-cosmetic" />
+      </div>
 
-      {/* Six names and six numbers, set like an index. NOT six icons, not a diagram,
-          not a funnel, not a progress bar. */}
-      <ol class="stages plain">
-        {
-          stages.map((stage, index) => (
-            <li class="stage">
-              <span class="stage-number record" set:html={isolateValue(String(index + 1).padStart(2, "0"))} />
-              <a class="stage-name" href={`${path.method(locale)}#${stage.key}`}>{stage.name}</a>
-            </li>
-          ))
-        }
-      </ol>
+      <div class="method-copy">
+        <p class="eyebrow reveal">{t(locale, "methodEyebrow")}</p>
+        <h2 class="section-title reveal" id="method-heading">{methodLocale.name}</h2>
 
-      {/* The boundary travels with the method, everywhere it appears. */}
-      <p class="boundary-line">{methodLocale.boundaryStatement}</p>
+        <ol class="stages plain">
+          {
+            stages.map((stage, index) => (
+              <li class="stage reveal">
+                <span class="stage-number" set:html={isolateValue(String(index + 1).padStart(2, "0"))} />
+                <a class="stage-name" href={`${path.method(locale)}#${stage.key}`}>{stage.name}</a>
+              </li>
+            ))
+          }
+        </ol>
 
-      <p class="method-cta">
-        <a href={path.method(locale)}>{methodLocale.tagline}</a>
-      </p>
+        {/* The boundary travels with the method, everywhere it appears. */}
+        <p class="boundary-line reveal">{methodLocale.boundaryStatement}</p>
+
+        <p class="method-cta reveal">
+          <BeautyButton href={path.method(locale)} variant="outline">{methodLocale.tagline}</BeautyButton>
+        </p>
+      </div>
     </div>
   </section>
 
-  {/* ---------------------------------------------------------------- 4 · the corpus */}
+  {/* ================================================================ 5 · recent reviews */}
   {
     recent.length > 0 && (
       <section class="recent" aria-labelledby="recent-heading">
-        <div class="container">
-          <h2 class="section-heading" id="recent-heading">{t(locale, "recentReviews")}</h2>
+        <div class="container container--wide">
+          <div class="recent-head">
+            <div>
+              <p class="eyebrow reveal">{t(locale, "reviews")}</p>
+              <h2 class="section-title reveal" id="recent-heading">{t(locale, "recentReviews")}</h2>
+            </div>
+            <p class="all-link reveal">
+              <a class="link-quiet" href={path.reviewsIndex(locale)}>
+                {t(locale, "viewAllReviews")}
+                <span class="count record">
+                  <Fragment set:html={isolateValue(formatCount(records.length, locale))} />
+                </span>
+              </a>
+            </p>
+          </div>
 
           <div class="entries">
             {recent.map((review) => <ReviewEntry locale={locale} review={review} headingLevel={3} />)}
           </div>
-
-          <p class="all-link">
-            <a href={path.reviewsIndex(locale)}>
-              {t(locale, "viewAllReviews")}
-              <span class="count record">
-                <Fragment set:html={isolateValue(formatCount(records.length, locale))} />
-              </span>
-            </a>
-          </p>
         </div>
       </section>
     )
   }
 
-  {/*
-    NO further sections. Journal, Work, Brands, Contact and About are not implemented, so they
-    are not presented — not as teasers, not as empty blocks, not as "coming soon". A homepage
-    that advertises pages that do not exist is a homepage that lies about the site.
-  */}
+  {/* ================================================================ 6 · meet Zina */}
+  {
+    isImplemented("about") && (
+      <section class="meet" aria-labelledby="meet-heading">
+        <div class="container container--wide meet-inner">
+          <div class="meet-collage">
+            <span class="organic organic--petal organic--drift meet-petal" aria-hidden="true" />
+            <EditorialImage
+              photo="editorialRed"
+              locale={locale}
+              mask="arch"
+              ratio="4 / 5.2"
+              sizes="(min-width: 1024px) 30vw, 72vw"
+              class="meet-image meet-image--main reveal-fade"
+            />
+            <EditorialImage
+              photo="portraitRadiant"
+              locale={locale}
+              mask="circle"
+              sizes="(min-width: 1024px) 14vw, 36vw"
+              widths={[240, 360, 480]}
+              class="meet-image meet-image--inset reveal"
+            />
+            <FloatingCosmetic kind="lipstick" tint="wine" depth={0.8} yaw={-0.2} tilt={0.3} class="meet-cosmetic" />
+          </div>
+
+          <div class="meet-copy">
+            <p class="eyebrow reveal">{t(locale, "meetZina")}</p>
+            <h2 class="section-title reveal" id="meet-heading">{name}</h2>
+            <p class="meet-bio reveal">{personLocale.bios.short}</p>
+
+            {expertise.length > 0 && (
+              <ul class="expertise plain reveal">
+                {expertise.map((item) => (
+                  <li>{item.label}</li>
+                ))}
+              </ul>
+            )}
+
+            <div class="meet-actions reveal">
+              <BeautyButton href={path.about(locale)}>{t(locale, "discoverApproach")}</BeautyButton>
+              {isImplemented("contact") && (
+                <BeautyButton href={path.contact(locale)} variant="quiet">{t(locale, "collaborate")}</BeautyButton>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  {/* ================================================================ 7 · closing statement */}
+  {
+    personLocale.philosophy?.statement && (
+      <section class="closing tone-wine" aria-label={t(locale, "aboutPhilosophy")}>
+        <span class="organic organic--glow closing-glow" aria-hidden="true" />
+        <FloatingCosmetic kind="perfume" tint="rose" depth={0.6} yaw={-0.5} class="closing-cosmetic closing-cosmetic--a" />
+        <FloatingCosmetic kind="serum" tint="blush" depth={0.3} yaw={0.6} tilt={-0.15} desktopOnly class="closing-cosmetic closing-cosmetic--b" />
+        <div class="container closing-inner">
+          <p class="eyebrow reveal">{t(locale, "aboutPhilosophy")}</p>
+          <blockquote class="closing-quote reveal">
+            <p>{personLocale.philosophy.statement}</p>
+          </blockquote>
+          <p class="closing-sign reveal">— {name}</p>
+        </div>
+      </section>
+    )
+  }
 </BaseLayout>
 
 <style>
-  /* ---------------------------------------------------------------- opening */
+  /* ================================================================ shared */
+
+  .section-title {
+    margin-block-start: var(--space-2);
+    font-size: calc(var(--type-display-lg) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-display-lg) * var(--type-arabic-leading-factor));
+    max-inline-size: 16ch;
+  }
+
+  /* ================================================================ 1 · opening */
 
   .opening {
-    padding-block: var(--space-8) var(--space-9);
-    border-block-end: var(--border-rule-hairline);
+    position: relative;
+    overflow: clip;
+    background: var(--gradient-hero);
+    padding-block: var(--space-4) var(--space-10);
+  }
+
+  .opening-atmosphere {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .opening-glow {
+    inline-size: 46rem;
+    block-size: 46rem;
+    inset-block-start: -10rem;
+    inset-inline-end: -12rem;
+  }
+
+  .opening-glow-2 {
+    inline-size: 30rem;
+    block-size: 30rem;
+    inset-block-end: -10rem;
+    inset-inline-start: -10rem;
+  }
+
+  .opening-watermark {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: -0.12em;
+    text-align: center;
+    font-family: var(--type-family-display);
+    font-size: clamp(5rem, 1rem + 17vw, 20rem);
+    line-height: 1;
+    letter-spacing: var(--type-tracking-display);
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: transparent;
+    -webkit-text-stroke: 1px rgb(156 53 86 / 12%);
+    user-select: none;
   }
 
   .opening-inner {
+    position: relative;
+    z-index: 1;
     display: grid;
-    gap: var(--space-6);
+    gap: var(--space-8);
+  }
+
+  .statement-block {
+    position: relative;
+    z-index: 3;
+    align-self: center;
   }
 
   .statement {
-    /* THE CLAIM IS THE HEADLINE. */
-    font-family: var(--type-family-display);
-    font-size: calc(var(--type-display-xl) * var(--type-arabic-size-factor));
-    line-height: calc(var(--type-leading-display-xl) * var(--type-arabic-leading-factor));
-    letter-spacing: var(--type-tracking-display);
-    font-weight: var(--type-weight-regular);
-    text-align: start;
-    max-width: 22ch;
+    margin-block-start: var(--space-3);
+    display: grid;
+    gap: 0.1em;
   }
 
-  /* STATE B: the statement takes the room the portrait would have taken. Not a fallback —
-     a different composition, with more air and a longer measure. */
-  .opening--typographic .statement {
-    max-width: 26ch;
+  .statement-head {
+    display: block;
+    font-size: calc(var(--type-display-hero) * var(--type-arabic-size-factor));
+    line-height: calc(0.95 * var(--type-arabic-leading-factor));
+    max-inline-size: 11ch;
+  }
+
+  .statement-tail {
+    display: block;
+    font-size: calc(var(--type-display-md) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-display-md) * var(--type-arabic-leading-factor));
+    max-inline-size: 22ch;
+  }
+
+  .hero-intro {
+    margin-block-start: var(--space-4);
+    max-inline-size: 42ch;
+    font-size: calc(var(--type-body-lg) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-body-lg) * var(--type-arabic-leading-factor));
+    color: var(--color-text-secondary);
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3) var(--space-4);
+    margin-block-start: var(--space-5);
   }
 
   .attribution {
     display: flex;
-    flex-direction: column;
-    gap: var(--space-0-5);
-    margin-block-start: var(--space-5);
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-2);
+    margin-block-start: var(--space-6);
+    padding-block-start: var(--space-3);
+    border-block-start: var(--border-rule-hairline);
+    max-inline-size: 30rem;
   }
 
-  /* THE NAME IS SMALL. */
   .name {
-    font-family: var(--type-family-ui);
-    font-size: calc(var(--type-ui-md) * var(--type-arabic-size-factor));
+    font-family: var(--type-family-display);
+    font-size: calc(1.35rem * var(--type-arabic-size-factor));
     color: var(--color-text-primary);
   }
 
-  .role {
+  .method-line {
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
     color: var(--color-text-muted);
   }
 
-  .method-line {
-    margin-block-start: var(--space-4);
-    max-width: var(--type-measure-editorial);
-    font-family: var(--type-family-ui);
-    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
-    color: var(--color-text-secondary);
+  /* ---------------------------------------------------------------- portrait composition */
+
+  .portrait {
+    position: relative;
+    justify-self: center;
+    inline-size: min(82vw, 30rem);
+    margin-block: var(--space-4) var(--space-4);
   }
 
-  /* ---------------------------------------------------------------- shared headings */
+  .portrait-arch {
+    position: absolute;
+    inset: -5% -9% 7% -9%;
+    border-radius: var(--radius-arch);
+    background: linear-gradient(180deg, rgb(235 201 200 / 70%), rgb(243 233 222 / 40%));
+  }
 
-  .section-heading {
+  .portrait-ring {
+    inset: -9% -3% 14% 10%;
+    border-radius: var(--radius-arch);
+  }
+
+  .portrait-petal {
+    inline-size: 46%;
+    aspect-ratio: 1;
+    inset-block-end: -6%;
+    inset-inline-end: -16%;
+  }
+
+  .portrait-image {
+    position: relative;
+    z-index: 1;
+    box-shadow: var(--shadow-float);
+  }
+
+  /* Glass caption card overlapping the portrait's lower edge. */
+  .portrait-caption {
+    position: absolute;
+    z-index: 3;
+    inset-block-end: 7%;
+    inset-inline-end: -6%;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 0.85rem 1.2rem;
+    border-radius: var(--radius-soft);
+    background: rgb(255 250 247 / 82%);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgb(255 255 255 / 70%);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .caption-count {
+    font-family: var(--type-family-display);
+    font-size: 2.6rem;
+    line-height: 1;
+    color: var(--color-accent-clay);
+  }
+
+  .caption-text {
+    display: grid;
+  }
+
+  .caption-text .label {
+    color: var(--color-text-primary);
+  }
+
+  .caption-sub {
+    font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
+    color: var(--color-text-muted);
+  }
+
+  .hero-cosmetic--serum {
+    inline-size: 32%;
+    inset-block-start: 10%;
+    inset-inline-start: -18%;
+  }
+
+  .hero-cosmetic--jar {
+    inline-size: 42%;
+    inset-block-end: -9%;
+    inset-inline-start: -16%;
+  }
+
+  .hero-cosmetic--lipstick {
+    inline-size: 28%;
+    inset-block-start: -8%;
+    inset-inline-end: -8%;
+  }
+
+  .hero-cosmetic--perfume {
+    inline-size: 32%;
+    inset-block-start: 30%;
+    inset-inline-end: -26%;
+  }
+
+  .hero-cosmetic--compact {
+    inline-size: 30%;
+    inset-block-end: 20%;
+    inset-inline-start: -34%;
+  }
+
+  .scroll-cue {
+    display: none;
+  }
+
+  /* MOBILE COMPOSITION — Zina leads. The portrait moves above the headline, products tuck
+     inside the screen edge, and the caption card sits within the arch. */
+  @media (max-width: 1023px) {
+    .opening {
+      padding-block: var(--space-3) var(--space-8);
+    }
+
+    .opening-inner {
+      gap: var(--space-4);
+    }
+
+    .portrait {
+      order: -1;
+      inline-size: min(70vw, 24rem);
+      margin-block: var(--space-4) var(--space-2);
+    }
+
+    .portrait-caption {
+      inset-inline-end: -12%;
+      inset-block-end: 5%;
+      padding: 0.6rem 0.9rem;
+    }
+
+    .caption-count {
+      font-size: 2rem;
+    }
+
+    .hero-cosmetic--serum {
+      inline-size: 34%;
+      inset-block-start: 4%;
+      inset-inline-start: -16%;
+    }
+
+    .hero-cosmetic--jar {
+      inline-size: 44%;
+      inset-block-end: -8%;
+      inset-inline-start: -18%;
+    }
+
+    .hero-cosmetic--lipstick {
+      inline-size: 30%;
+      inset-block-start: -6%;
+      inset-inline-end: -12%;
+    }
+
+    .statement-block {
+      text-align: start;
+    }
+  }
+
+  /* ================================================================ 2 · marquee */
+
+  .marquee {
+    display: flex;
+    overflow: hidden;
+    padding-block: var(--space-3);
+    border-block: 1px solid var(--color-line-hairline);
+    background: var(--palette-ivory);
+    mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  }
+
+  .marquee-track,
+  .marquee-list {
+    display: flex;
+    flex: none;
+    align-items: center;
+  }
+
+  .marquee-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    padding-inline-end: var(--space-5);
+    font-family: var(--type-family-accent);
+    font-size: calc(clamp(1.6rem, 1.2rem + 1.6vw, 2.6rem) * var(--type-arabic-size-factor));
+    color: var(--color-text-primary);
+    white-space: nowrap;
+  }
+
+  .marquee-item::after {
+    content: "✦";
+    font-family: var(--type-family-ui);
+    font-size: 0.9rem;
+    color: var(--palette-champagne-metal);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .marquee-track {
+      animation: marquee var(--motion-marquee-duration) linear infinite;
+    }
+
+    .marquee:hover .marquee-track {
+      animation-play-state: paused;
+    }
+  }
+
+  @keyframes marquee {
+    to {
+      transform: translateX(-100%);
+    }
+  }
+
+  /* In RTL the loop runs the other way, matching the reading direction. */
+  .marquee-track:dir(rtl) {
+    animation-direction: reverse;
+  }
+
+  /* ================================================================ 3 · story */
+
+  .story {
+    position: relative;
+    overflow: clip;
+    padding-block: var(--space-10);
+    background: var(--gradient-ivory-blush);
+  }
+
+  .story-glow {
+    inline-size: 40rem;
+    block-size: 40rem;
+    inset-block-start: 20%;
+    inset-inline-start: -14rem;
+  }
+
+  .story-inner {
+    position: relative;
+    display: grid;
+    gap: var(--space-8);
+  }
+
+  .story-visual-sticky {
+    position: relative;
+    inline-size: min(100%, 30rem);
+    margin-inline: auto;
+  }
+
+  .story-image {
+    box-shadow: var(--shadow-float);
+  }
+
+  .story-cosmetic {
+    inline-size: 44%;
+    inset-block-end: -10%;
+    inset-inline-end: -12%;
+  }
+
+  .story-chip {
+    position: absolute;
+    z-index: 3;
+    inset-block-start: 8%;
+    inset-inline-start: -4%;
+    display: grid;
+    gap: 0.15rem;
+    max-inline-size: 15rem;
+    padding: 0.8rem 1.1rem;
+    border-radius: var(--radius-soft);
+    background: rgb(255 250 247 / 88%);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .story-chip .label {
+    color: var(--color-accent-clay);
+  }
+
+  .story-chip-text {
+    font-family: var(--type-family-display);
+    font-size: calc(1.1rem * var(--type-arabic-size-factor));
+    line-height: 1.2;
+    color: var(--color-text-primary);
+  }
+
+  .story-steps {
+    display: grid;
+    margin-block-start: var(--space-6);
+    counter-reset: step;
+  }
+
+  .step {
+    position: relative;
+    display: grid;
+    grid-template-columns: 3.25rem minmax(0, 1fr);
+    gap: var(--space-2);
+    padding-block: var(--space-4);
+    border-block-start: 1px solid var(--color-line-hairline);
+  }
+
+  /* The thread that joins the five stages. */
+  .step::before {
+    content: "";
+    position: absolute;
+    inset-block: calc(var(--space-4) + 2.6rem) calc(var(--space-4) * -1);
+    inset-inline-start: 1.1rem;
+    inline-size: 1px;
+    background: linear-gradient(180deg, var(--palette-dusty-rose), transparent);
+    opacity: 0.5;
+  }
+
+  .step:last-child::before {
+    display: none;
+  }
+
+  .step-number {
+    display: grid;
+    place-items: center;
+    inline-size: 2.3rem;
+    block-size: 2.3rem;
+    border-radius: 50%;
+    border: 1px solid var(--palette-dusty-rose);
+    font-family: var(--type-family-accent);
+    font-size: 1rem;
+    color: var(--color-accent-clay);
+    background: var(--color-ground-card);
+  }
+
+  .step-title {
     font-family: var(--type-family-ui);
     font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
     font-weight: var(--type-weight-medium);
     letter-spacing: var(--type-tracking-label);
     text-transform: uppercase;
     color: var(--color-text-muted);
+    line-height: 2.3rem;
   }
 
-  :global(html[lang="ar"]) .section-heading {
+  :global(html[lang="ar"]) .step-title {
     text-transform: none;
-    font-weight: var(--type-weight-regular);
     font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
   }
 
-  /* ---------------------------------------------------------------- featured */
-
-  .featured {
-    padding-block: var(--space-9);
-    border-block-end: var(--border-rule-hairline);
+  .step-body {
+    display: grid;
+    gap: var(--space-1);
+    min-inline-size: 0;
   }
 
   .disclosure {
-    margin-block-start: var(--space-4);
-    color: var(--color-text-muted);
+    margin-block-start: var(--space-1);
+    color: var(--color-accent-clay);
   }
 
   .featured-title-link {
-    display: inline-block;
-    margin-block-start: var(--space-1);
     text-decoration: none;
+    justify-self: start;
   }
 
   .featured-title {
+    font-family: var(--type-family-display);
+    font-size: calc(var(--type-display-md) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-display-md) * var(--type-arabic-leading-factor));
     color: var(--color-text-primary);
-    max-width: 20ch;
+    transition: color var(--motion-duration-base) var(--motion-easing-silk);
   }
 
   .featured-title-link:hover .featured-title {
     color: var(--color-accent-clay-hover);
     text-decoration: underline;
+    text-decoration-thickness: 1px;
   }
 
-  .featured-subtitle {
-    margin-block-start: var(--space-2);
-    max-width: var(--type-measure-editorial);
-    font-size: calc(var(--type-body-md) * var(--type-arabic-size-factor));
-    line-height: calc(var(--type-leading-body-md) * var(--type-arabic-leading-factor));
+  .featured-identity,
+  .step-text {
     color: var(--color-text-secondary);
+    max-inline-size: var(--type-measure-editorial);
+  }
+
+  .featured-identity {
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
   }
 
   .conditions {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-3) var(--space-6);
-    margin-block-start: var(--space-5);
-    padding-block: var(--space-3);
-    border-block: var(--border-rule-hairline);
+    gap: var(--space-2);
+    margin-block-start: var(--space-2);
   }
 
   .condition {
     display: grid;
-    gap: var(--space-0-5);
+    gap: 0.15rem;
     min-width: 0;
+    padding: 0.7rem 1rem;
+    border-radius: var(--radius-soft);
+    background: rgb(255 250 247 / 75%);
+    border: 1px solid var(--color-line-hairline);
   }
 
   .conditions dd {
@@ -380,61 +999,148 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
   }
 
   .observation {
-    margin-block-start: var(--space-5);
-    border-inline-start: var(--border-rule-observation);
+    position: relative;
+    padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4);
+    border-radius: var(--radius-card);
+    background: var(--color-ground-card);
+    box-shadow: var(--shadow-soft);
+    font-family: var(--type-family-display);
+    font-size: calc(1.35rem * var(--type-arabic-size-factor));
+    line-height: calc(1.4 * var(--type-arabic-leading-factor));
+    max-inline-size: 38rem;
+  }
+
+  .observation::before {
+    content: "“";
+    position: absolute;
+    inset-block-start: -0.35em;
+    inset-inline-start: 0.25em;
+    font-family: var(--type-family-accent);
+    font-size: 4rem;
+    color: var(--palette-dusty-rose);
+  }
+
+  .observation-when {
+    margin-block-end: var(--space-1);
+    color: var(--color-accent-mineral);
+  }
+
+  .result-pair {
+    display: grid;
+    gap: var(--space-2);
+    margin-block-start: var(--space-1);
+  }
+
+  .result {
+    display: grid;
+    gap: 0.2rem;
     padding-inline-start: var(--space-2);
-    max-width: var(--type-measure-editorial);
-    font-size: calc(var(--type-body-md) * var(--type-arabic-size-factor));
-    line-height: calc(var(--type-leading-body-md) * var(--type-arabic-leading-factor));
+    border-inline-start: 2px solid var(--palette-dusty-rose);
+  }
+
+  .result--minus {
+    border-inline-start-color: var(--color-line-strong);
+  }
+
+  .result dd {
+    color: var(--color-text-primary);
+    max-inline-size: 44ch;
+  }
+
+  .verdict-summary {
+    font-family: var(--type-family-display);
+    font-size: calc(var(--type-display-sm) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-display-sm) * var(--type-arabic-leading-factor));
+    color: var(--color-text-primary);
+    max-inline-size: 30ch;
+    margin-block-end: var(--space-2);
   }
 
   .featured-link {
     margin-block-start: var(--space-5);
-    font-family: var(--type-family-ui);
-    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
   }
 
-  /* ---------------------------------------------------------------- method well */
+  /* ================================================================ 4 · method */
 
   .method-well {
-    padding-block: var(--space-9);
-    background: var(--color-ground-inset);
+    position: relative;
+    overflow: clip;
+    padding-block: var(--space-10);
+    background: var(--gradient-powder-champagne);
+    border-start-start-radius: 50% 3rem;
+    border-start-end-radius: 50% 3rem;
+  }
+
+  .method-inner {
+    display: grid;
+    gap: var(--space-8);
+  }
+
+  .method-visual {
+    position: relative;
+    inline-size: min(72vw, 24rem);
+    justify-self: center;
+  }
+
+  .method-image {
+    position: relative;
+    z-index: 1;
+    box-shadow: var(--shadow-float);
+  }
+
+  .method-ring {
+    inset: 6% -10% -6% 10%;
+    border-radius: var(--radius-arch);
+  }
+
+  .method-cosmetic {
+    inline-size: 52%;
+    inset-block-end: -12%;
+    inset-inline-end: -26%;
   }
 
   .stages {
     display: grid;
-    gap: var(--space-3);
-    margin-block-start: var(--space-4);
+    margin-block-start: var(--space-5);
+    border-block-start: 1px solid rgb(122 35 66 / 16%);
   }
 
   .stage {
     display: flex;
     align-items: baseline;
-    gap: var(--space-2);
+    gap: var(--space-3);
+    padding-block: var(--space-2);
+    border-block-end: 1px solid rgb(122 35 66 / 16%);
   }
 
   .stage-number {
-    color: var(--color-accent-mineral);
-    font-size: var(--type-record-sm);
     flex: none;
+    inline-size: 2.5rem;
+    font-family: var(--type-family-accent);
+    font-size: 1.5rem;
+    color: var(--color-accent-clay);
   }
 
   .stage-name {
-    font-family: var(--type-family-ui);
-    font-size: calc(var(--type-ui-md) * var(--type-arabic-size-factor));
+    font-family: var(--type-family-display);
+    font-size: calc(clamp(1.35rem, 1.15rem + 0.8vw, 1.9rem) * var(--type-arabic-size-factor));
+    line-height: 1.2;
     color: var(--color-text-primary);
     text-decoration: none;
+    transition:
+      color var(--motion-duration-base) var(--motion-easing-silk),
+      padding var(--motion-duration-base) var(--motion-easing-silk);
   }
 
   .stage-name:hover {
     color: var(--color-accent-clay-hover);
+    padding-inline-start: 0.4rem;
     text-decoration: underline;
+    text-decoration-thickness: 1px;
   }
 
   .boundary-line {
-    margin-block-start: var(--space-6);
-    padding-block-start: var(--space-3);
-    border-block-start: var(--border-rule-hairline);
+    margin-block-start: var(--space-5);
     max-width: var(--type-measure-editorial);
     font-size: calc(var(--type-body-sm) * var(--type-arabic-size-factor));
     line-height: calc(var(--type-leading-body-sm) * var(--type-arabic-leading-factor));
@@ -443,66 +1149,280 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
 
   .method-cta {
     margin-block-start: var(--space-4);
-    max-width: var(--type-measure-editorial);
-    font-family: var(--type-family-ui);
-    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
   }
 
-  /* ---------------------------------------------------------------- recent */
+  .method-cta :global(.btn) {
+    white-space: normal;
+    text-align: start;
+  }
+
+  /* ================================================================ 5 · recent */
 
   .recent {
-    padding-block: var(--space-9);
+    padding-block: var(--space-10);
   }
 
-  .entries {
-    display: grid;
-    gap: var(--space-5);
-    margin-block-start: var(--space-4);
-  }
-
-  .all-link {
-    margin-block-start: var(--space-6);
-    padding-block-start: var(--space-3);
-    border-block-start: var(--border-rule-hairline);
-    font-family: var(--type-family-ui);
-    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+  .recent-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--space-3);
   }
 
   .all-link .count {
     margin-inline-start: var(--space-1);
     color: var(--color-text-muted);
-    font-size: var(--type-record-sm);
   }
 
-  /* ---------------------------------------------------------------- 768+ */
+  .entries {
+    display: grid;
+    gap: var(--space-4);
+    margin-block-start: var(--space-6);
+  }
+
+  /* ================================================================ 6 · meet */
+
+  .meet {
+    overflow: clip;
+    padding-block: var(--space-8) var(--space-12);
+    background: linear-gradient(180deg, var(--palette-ivory), var(--palette-champagne));
+  }
+
+  .meet-inner {
+    display: grid;
+    gap: var(--space-8);
+    align-items: center;
+  }
+
+  .meet-collage {
+    position: relative;
+    inline-size: min(80vw, 28rem);
+    justify-self: center;
+    margin-block-end: var(--space-6);
+  }
+
+  .meet-petal {
+    inline-size: 70%;
+    aspect-ratio: 1;
+    inset-block-start: -8%;
+    inset-inline-start: -18%;
+  }
+
+  .meet-image--main {
+    position: relative;
+    z-index: 1;
+    box-shadow: var(--shadow-float);
+  }
+
+  .meet-image--inset {
+    position: absolute;
+    z-index: 2;
+    inline-size: 44%;
+    inset-block-end: -12%;
+    inset-inline-end: -12%;
+    border: 6px solid var(--palette-ivory);
+    box-shadow: var(--shadow-float);
+  }
+
+  .meet-cosmetic {
+    inline-size: 34%;
+    inset-block-start: 12%;
+    inset-inline-end: -24%;
+  }
+
+  .meet-bio {
+    margin-block-start: var(--space-3);
+    max-inline-size: 48ch;
+    font-size: calc(var(--type-body-lg) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-body-lg) * var(--type-arabic-leading-factor));
+    color: var(--color-text-secondary);
+  }
+
+  .expertise {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    margin-block-start: var(--space-4);
+  }
+
+  .expertise li {
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-control);
+    border: 1px solid rgb(122 35 66 / 22%);
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+    color: var(--color-text-secondary);
+    background: rgb(255 250 247 / 60%);
+  }
+
+  .meet-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3) var(--space-4);
+    margin-block-start: var(--space-5);
+  }
+
+  /* ================================================================ 7 · closing */
+
+  .closing {
+    position: relative;
+    overflow: clip;
+    padding-block: var(--space-12);
+    text-align: center;
+  }
+
+  .closing-glow {
+    inline-size: 50rem;
+    block-size: 50rem;
+    inset-block-start: -20rem;
+    inset-inline-start: 50%;
+    translate: -50% 0;
+    opacity: 0.4;
+  }
+
+  .closing-inner {
+    position: relative;
+    z-index: 3;
+    display: grid;
+    justify-items: center;
+  }
+
+  .closing-quote {
+    margin-block-start: var(--space-4);
+    max-inline-size: 22ch;
+    font-family: var(--type-family-accent);
+    font-size: calc(var(--type-display-lg) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-display-lg) * var(--type-arabic-leading-factor));
+    color: var(--color-text-primary);
+  }
+
+  .closing-sign {
+    margin-block-start: var(--space-4);
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
+    letter-spacing: var(--type-tracking-label);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .closing-cosmetic--a {
+    inline-size: clamp(8rem, 18vw, 15rem);
+    inset-block-end: 6%;
+    inset-inline-start: 4%;
+  }
+
+  .closing-cosmetic--b {
+    inline-size: clamp(7rem, 12vw, 11rem);
+    inset-block-start: 12%;
+    inset-inline-end: 7%;
+  }
+
+  /* ================================================================ 768+ */
 
   @media (min-width: 768px) {
-    .conditions {
-      gap: var(--space-4) var(--space-8);
+    .entries {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .step {
+      grid-template-columns: 4rem minmax(0, 1fr);
+    }
+  }
+
+  /* ================================================================ 1024+ */
+
+  @media (min-width: 1024px) {
+    .opening {
+      padding-block: var(--space-6) var(--space-12);
+      min-block-size: calc(100svh - var(--layout-header-height));
+    }
+
+    .opening-inner {
+      grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+      gap: var(--space-8);
+      align-items: center;
+    }
+
+    .portrait {
+      inline-size: 100%;
+      max-inline-size: 31rem;
+      justify-self: end;
+      margin-inline-end: 6%;
+    }
+
+    .scroll-cue {
+      position: absolute;
+      inset-block-end: var(--space-4);
+      inset-inline-start: 50%;
+      translate: -50% 0;
+      z-index: 2;
+      display: grid;
+      justify-items: center;
+      gap: var(--space-1);
+      font-family: var(--type-family-ui);
+      font-size: var(--type-label-sm);
+      letter-spacing: var(--type-tracking-label);
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+    }
+
+    .scroll-cue::after {
+      content: "";
+      inline-size: 1px;
+      block-size: 2.5rem;
+      background: linear-gradient(180deg, var(--color-text-muted), transparent);
+    }
+
+    .story-inner {
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      gap: var(--space-12);
+      align-items: start;
+    }
+
+    .story-visual {
+      align-self: stretch;
+    }
+
+    .story-visual-sticky {
+      position: sticky;
+      inset-block-start: calc(var(--layout-header-height) + var(--space-6));
+    }
+
+    .method-well {
+      border-start-start-radius: 50% 6rem;
+      border-start-end-radius: 50% 6rem;
+    }
+
+    .method-inner {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+      gap: var(--space-12);
+      align-items: center;
     }
 
     .stages {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--space-3) var(--space-6);
+      column-gap: var(--space-6);
+    }
+
+    .entries {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .meet-inner {
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      gap: var(--space-12);
+    }
+
+    .meet-collage {
+      margin-block-end: 0;
     }
   }
 
-  /* ---------------------------------------------------------------- 1024+ */
-
-  @media (min-width: 1024px) {
-    .opening {
-      padding-block: var(--space-10) var(--space-10);
-    }
-
-    /* STATE A: asymmetric — statement in the wider column, portrait beside it. */
-    .opening--portrait .opening-inner {
-      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-      gap: var(--space-8);
-      align-items: start;
-    }
-
-    .stages {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+  @media (min-width: 1440px) {
+    .portrait {
+      max-inline-size: 34rem;
     }
   }
 </style>

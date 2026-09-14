@@ -29,6 +29,7 @@ import { isolateValue } from "../../../lib/bidi";
 import { formatCount, countedNoun } from "../../../lib/format";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
+import PageHero from "../../../components/beauty/PageHero.astro";
 import BrandEntry from "../../../components/brand/BrandEntry.astro";
 
 export const getStaticPaths = (() =>
@@ -69,7 +70,7 @@ const schemas = [jsonLd(breadcrumbSchema(crumbs))];
   schemas={schemas}
   switcherHref={path.brandsIndex(locale === "en" ? "ar" : "en")}
 >
-  <div class="container brands">
+  <PageHero locale={locale} compact cosmetics={[{ kind: "compact", tint: "blush" }]}>
     <Breadcrumbs locale={locale} crumbs={crumbs} />
 
     <h1 class="display-lg title">{t(locale, "brands")}</h1>
@@ -82,6 +83,9 @@ const schemas = [jsonLd(breadcrumbSchema(crumbs))];
       <span class="count-label">·</span>
       <span class="count-label">{t(locale, "inThisLocale")}</span>
     </p>
+  </PageHero>
+
+  <div class="container brands">
 
     {
       listed.length > 0 ? (

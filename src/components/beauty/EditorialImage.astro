@@ -1,0 +1,144 @@
+---
+/**
+ * EDITORIAL IMAGE — Zina's photography, art-directed.
+ *
+ * Built on astro:assets <Picture>: WebP at several widths with a JPEG fallback, intrinsic
+ * width/height (no layout shift), lazy by default, eager + high priority only for the one LCP
+ * image on a page. AVIF was measured and dropped: at a quality that keeps skin texture intact it
+ * produced LARGER files than WebP for these photographs (1.29 MB vs 0.89 MB across the set).
+ *
+ * Masks are the identity's shape language:
+ *   arch     the signature — a tall portrait under a rounded arch
+ *   pebble   an organic cream-swirl silhouette
+ *   oval     a soft egg
+ *   soft     a rounded editorial rectangle
+ *   circle   a small round inset
+ *
+ * `parallax` adds a CSS scroll-driven drift inside the mask (no JavaScript, disabled under
+ * reduced motion). The photograph is never distorted: it moves within a crop that already has
+ * room for the movement.
+ */
+import { Picture } from "astro:assets";
+import type { Locale } from "../../../content/schema/types";
+import { photography, type PhotographKey } from "../../lib/photography";
+
+interface Props {
+  photo: PhotographKey;
+  locale: Locale;
+  mask?: "arch" | "pebble" | "oval" | "soft" | "circle";
+  /** CSS aspect-ratio of the mask, e.g. "4 / 5". */
+  ratio?: string;
+  /** The `sizes` attribute — how wide the image renders at each breakpoint. */
+  sizes?: string;
+  widths?: number[];
+  priority?: boolean;
+  parallax?: boolean;
+  class?: string;
+}
+
+const {
+  photo,
+  locale,
+  mask = "soft",
+  ratio = "4 / 5",
+  sizes = "(min-width: 1024px) 40vw, 90vw",
+  widths = [360, 560, 760, 960],
+  priority = false,
+  parallax = false,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const image = photography[photo];
+/* `rest` carries the caller's forwarded `data-astro-cid-*` attribute (see FloatingCosmetic). */
+---
+
+<figure
+  {...rest}
+  class:list={["editorial-image", `editorial-image--${mask}`, parallax && "parallax-media", className]}
+  style={`--image-ratio: ${ratio}; --image-focus: ${image.focus};`}
+>
+  <Picture
+    src={image.src}
+    alt={image.alt[locale]}
+    formats={["webp"]}
+    fallbackFormat="jpg"
+    widths={widths}
+    sizes={sizes}
+    quality={78}
+    loading={priority ? "eager" : "lazy"}
+    decoding={priority ? "sync" : "async"}
+    fetchpriority={priority ? "high" : "auto"}
+  />
+</figure>
+
+<style>
+  /* Zero specificity: a caller's positioning class (absolute insets, sizes) must always win,
+     whatever order Astro emits the page and component stylesheets in. */
+  :global(:where(.editorial-image)) {
+    position: relative;
+    margin: 0;
+    aspect-ratio: var(--image-ratio);
+    overflow: hidden;
+    background: var(--palette-powder);
+    isolation: isolate;
+  }
+
+  .editorial-image :global(picture),
+  .editorial-image :global(img) {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+
+  .editorial-image :global(img) {
+    object-fit: cover;
+    object-position: var(--image-focus);
+    transition: transform 1.4s var(--motion-easing-silk);
+  }
+
+  /* A warm, very light wash so every photograph sits inside the blush palette. */
+  .editorial-image::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgb(246 231 227 / 0%) 55%, rgb(122 35 66 / 14%) 100%);
+    mix-blend-mode: multiply;
+  }
+
+  /* Each mask is set as BOTH a radius and a clip-path. The radius alone is not enough: Chrome
+     composites a scroll-animated <img> on its own layer, and that layer escapes an
+     overflow:hidden + border-radius clip. clip-path always clips composited descendants. */
+  .editorial-image--arch {
+    border-radius: var(--radius-arch);
+    clip-path: inset(0 round var(--radius-arch));
+  }
+
+  .editorial-image--pebble {
+    border-radius: var(--radius-pebble);
+    clip-path: inset(0 round var(--radius-pebble));
+  }
+
+  .editorial-image--oval {
+    border-radius: 50%;
+    clip-path: ellipse(50% 50% at 50% 50%);
+  }
+
+  .editorial-image--soft {
+    border-radius: var(--radius-card);
+    clip-path: inset(0 round var(--radius-card));
+  }
+
+  .editorial-image--circle {
+    border-radius: 50%;
+    aspect-ratio: 1;
+    clip-path: circle(50% at 50% 50%);
+  }
+
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .editorial-image:not(.parallax-media):hover :global(img) {
+      transform: scale(var(--motion-scale-image));
+    }
+  }
+</style>

@@ -28,43 +28,62 @@ interface Props {
 const { locale, headingId, summary, bestFor, wouldRepurchase } = Astro.props;
 ---
 
+{/* Phase 11: the verdict is the page's emotional peak, so it takes the wine surface — the one
+    dark moment on a review page — with Zina's conclusion set in the italic accent face. */}
 <section class="verdict full-bleed">
-  <div class="container inner">
-    <h2 class="label verdict-label" id={headingId}>{t(locale, "verdict")}</h2>
-    <p class="summary display-md">{summary}</p>
-    <dl class="supporting">
-      <div class="pair">
-        <dt>{t(locale, "bestFor")}</dt>
-        <dd>{bestFor}</dd>
-      </div>
-      <div class="pair">
-        <dt>{t(locale, "wouldRepurchase")}</dt>
-        <dd>{wouldRepurchase}</dd>
-      </div>
-    </dl>
+  <div class="container">
+    <div class="inner tone-wine">
+      <span class="organic organic--glow verdict-glow" aria-hidden="true"></span>
+      <h2 class="label verdict-label" id={headingId}>{t(locale, "verdict")}</h2>
+      <p class="summary display-md">{summary}</p>
+      <dl class="supporting">
+        <div class="pair">
+          <dt>{t(locale, "bestFor")}</dt>
+          <dd>{bestFor}</dd>
+        </div>
+        <div class="pair">
+          <dt>{t(locale, "wouldRepurchase")}</dt>
+          <dd>{wouldRepurchase}</dd>
+        </div>
+      </dl>
+    </div>
   </div>
 </section>
 
 <style>
   .verdict {
-    background: var(--color-ground-raised);
-    /* THE ONLY 2px CLAY RULE ON THE PAGE. */
-    border-block-start: var(--border-rule-verdict);
     margin-block: var(--space-section) var(--space-8);
   }
 
   .inner {
-    padding-block: var(--space-6);
+    position: relative;
+    overflow: clip;
+    padding: var(--space-6) var(--space-4);
+    border-radius: var(--radius-card);
+    /* THE ONLY 2px ACCENT RULE ON THE PAGE. */
+    border-block-start: 2px solid #f3b8c6;
+    box-shadow: var(--shadow-float);
+  }
+
+  .verdict-glow {
+    inline-size: 36rem;
+    block-size: 36rem;
+    inset-block-start: -18rem;
+    inset-inline-end: -10rem;
+    opacity: 0.4;
   }
 
   .verdict-label {
+    position: relative;
     color: var(--color-accent-clay);
   }
 
   .summary {
-    margin-block-start: var(--space-2);
-    max-width: var(--type-measure-editorial);
-    color: var(--color-evidence-verdict);
+    position: relative;
+    margin-block-start: var(--space-3);
+    max-width: 30ch;
+    font-family: var(--type-family-accent);
+    color: var(--color-text-primary);
   }
 
   .supporting {
@@ -97,9 +116,13 @@ const { locale, headingId, summary, bestFor, wouldRepurchase } = Astro.props;
     color: var(--color-text-secondary);
   }
 
+  .supporting {
+    position: relative;
+  }
+
   @media (min-width: 768px) {
     .inner {
-      padding-block: var(--space-8);
+      padding: var(--space-10) var(--space-8);
     }
 
     .supporting {

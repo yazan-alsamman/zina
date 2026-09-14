@@ -239,7 +239,8 @@ export const jurisdictionIsKnown = (): boolean => legalIdentity().jurisdiction !
  * Whether this build sets any non-essential cookie or runs any tracking.
  *
  * Hardcoded `false`, and deliberately so: there is no analytics, no tag manager, no embed, no
- * third-party request and zero client JavaScript in the entire site. If that ever changes, this
+ * third-party request, and the only client JavaScript (Phase 11's decorative 3D loader) contains no
+ * network, cookie or storage API. If that ever changes, this
  * constant is the single place the legal pages read, and `tests/trust.test.mjs` asserts the
  * build actually matches it.
  */

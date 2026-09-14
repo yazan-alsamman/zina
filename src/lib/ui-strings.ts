@@ -269,7 +269,7 @@ const en = {
   legalFactualHeading: "What this site actually does",
   legalFactNoTracking: "It runs no analytics, no tracking and no third-party scripts of any kind.",
   legalFactNoCookies: "It sets no cookies, and therefore asks for no cookie consent. A banner asking permission for something that does not happen would be misleading.",
-  legalFactNoScripts: "It ships no client-side JavaScript at all. Every page is static HTML and CSS.",
+  legalFactNoScripts: "Every page is complete static HTML and CSS. Its only client-side JavaScript draws the decorative 3D product illustrations; it is served from this domain and reads, stores and sends nothing about the reader.",
   legalFactNoAccounts: "There are no accounts, no logins, no comments and no forms, so it collects nothing a reader types.",
   legalFactContactExternal: "The email, phone and Instagram links on this site open the reader's own mail, phone or Instagram app directly; nothing sent through them passes through, is logged by, or is stored by this site.",
   legalFactFonts: "Fonts are self-hosted and served from this domain, so reading a page makes no request to any other party.",
@@ -281,6 +281,25 @@ const en = {
   legalOnwardHeading: "Related",
   legalOnwardStandards: "How evidence and disclosure are handled",
   legalOnwardContact: "How to reach this publication",
+
+  /* Phase 11 — visual redesign. Interface vocabulary only; no string here makes a claim. */
+  exploreReviews: "Explore the reviews",
+  readMyVerdict: "Read my verdict",
+  storyEyebrow: "From first touch to final word",
+  storyHeading: "How a product earns a verdict",
+  storyProduct: "The product",
+  storyTested: "Zina tests it",
+  storyExperience: "The real experience",
+  storyResult: "The result",
+  storyVerdict: "Her verdict",
+  verdictLabel: "Zina's verdict",
+  categoriesTested: "Categories on the testing table",
+  meetZina: "Meet Zina",
+  discoverApproach: "Discover her approach",
+  methodEyebrow: "The ritual behind every review",
+  collaborateEyebrow: "Work with Zina",
+  menuHeading: "Menu",
+  scrollCue: "Scroll",
 } satisfies Strings;
 
 const ar = {
@@ -515,7 +534,7 @@ const ar = {
   legalFactualHeading: "ما يفعله هذا الموقع فعليا",
   legalFactNoTracking: "لا يشغّل أي تحليلات أو تتبع أو نصوص برمجية من طرف ثالث من أي نوع.",
   legalFactNoCookies: "لا يضع أي ملفات تعريف ارتباط، ولذلك لا يطلب أي موافقة عليها. شريط يطلب الإذن بشيء لا يحدث سيكون مضللا.",
-  legalFactNoScripts: "لا يرسل أي جافاسكربت إلى المتصفح إطلاقا. كل صفحة هي HTML وCSS ثابتة.",
+  legalFactNoScripts: "كل صفحة كاملة بصيغة HTML وCSS ثابتة. الجافاسكربت الوحيد الذي يعمل في المتصفح يرسم رسومات المنتجات ثلاثية الأبعاد الزخرفية؛ ويُقدَّم من هذا النطاق، ولا يقرأ أو يخزن أو يرسل أي شيء عن الزائر.",
   legalFactNoAccounts: "لا توجد حسابات ولا تسجيل دخول ولا تعليقات ولا نماذج، لذلك لا يجمع شيئا مما تكتبينه.",
   legalFactContactExternal: "روابط البريد الإلكتروني والهاتف وإنستغرام في هذا الموقع تفتح تطبيق البريد أو الهاتف أو إنستغرام مباشرة على جهاز الزائر؛ فلا يمر أي شيء يُرسَل عبرها بهذا الموقع، ولا يُسجَّله، ولا يُخزّنه.",
   legalFactFonts: "الخطوط مستضافة ذاتيا وتُقدّم من هذا النطاق، لذلك قراءة أي صفحة لا ترسل أي طلب إلى أي طرف آخر.",
@@ -527,6 +546,25 @@ const ar = {
   legalOnwardHeading: "ذات صلة",
   legalOnwardStandards: "كيف يُتعامل مع الأدلة والإفصاح",
   legalOnwardContact: "كيفية التواصل مع هذه المنصة",
+
+  /* Phase 11 — composed for the redesign; NEEDS NATIVE REVIEW like the headings above (Q3-2). */
+  exploreReviews: "استكشفي المراجعات",
+  readMyVerdict: "اقرئي حكمي",
+  storyEyebrow: "من اللمسة الأولى إلى الكلمة الأخيرة",
+  storyHeading: "كيف يصل المنتج إلى حكم",
+  storyProduct: "المنتج",
+  storyTested: "زينا تجربه",
+  storyExperience: "التجربة الفعلية",
+  storyResult: "النتيجة",
+  storyVerdict: "حكمها",
+  verdictLabel: "حكم زينا",
+  categoriesTested: "فئات على طاولة التجربة",
+  meetZina: "تعرّفي على زينا",
+  discoverApproach: "اكتشفي أسلوبها",
+  methodEyebrow: "الطقس خلف كل مراجعة",
+  collaborateEyebrow: "تعاوني مع زينا",
+  menuHeading: "القائمة",
+  scrollCue: "مرّري",
 } satisfies Record<keyof typeof en, string>;
 
 const dictionaries = { en, ar } as const;

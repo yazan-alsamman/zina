@@ -36,6 +36,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
 import ReviewEntry from "../../../components/review/ReviewEntry.astro";
 import FacetNav from "../../../components/review/FacetNav.astro";
+import PageHero from "../../../components/beauty/PageHero.astro";
 
 export const getStaticPaths = (() =>
   LOCALES.map((locale) => ({ params: { locale } }))) satisfies GetStaticPaths;
@@ -87,7 +88,7 @@ const [featured, ...rest] = records;
   schemas={schemas}
   switcherHref={switcherHref}
 >
-  <div class="container index">
+  <PageHero locale={locale} photo="studioBlazer" cosmetics={[{ kind: "serum", tint: "rose" }, { kind: "compact", tint: "blush" }]}>
     <Breadcrumbs locale={locale} crumbs={crumbs} />
 
     <h1 class="display-lg title">{t(locale, "reviewsIndexTitle")}</h1>
@@ -104,6 +105,9 @@ const [featured, ...rest] = records;
       <span class="count-label">·</span>
       <span class="count-label">{t(locale, "inThisLocale")}</span>
     </p>
+  </PageHero>
+
+  <div class="container index">
 
     {/* Crawlable facet routes. No client-side state, no JavaScript. */}
     <FacetNav
@@ -141,11 +145,7 @@ const [featured, ...rest] = records;
 
 <style>
   .index {
-    padding-block: var(--space-6) var(--space-10);
-  }
-
-  .title {
-    margin-block-start: var(--space-3);
+    padding-block: var(--space-4) var(--space-10);
   }
 
   .intro {
@@ -175,13 +175,25 @@ const [featured, ...rest] = records;
 
   .entries {
     display: grid;
-    gap: var(--space-5);
+    gap: var(--space-4);
     margin-block-start: var(--space-8);
   }
 
   @media (min-width: 768px) {
     .entries {
-      gap: var(--space-6);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-5);
+    }
+
+    /* The most recent record spans the row. */
+    .entries > :global(.entry--featured) {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .entries {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 </style>

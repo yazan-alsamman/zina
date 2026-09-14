@@ -33,7 +33,8 @@
  * ============================================================================
  * WHY THERE IS NO COOKIE BANNER
  * ============================================================================
- * The site sets no non-essential cookie, ships zero client JavaScript, loads no analytics, no tag
+ * The site sets no non-essential cookie, ships no client JavaScript beyond the decorative 3D loader
+ * (which reads, stores and sends nothing — verified in tests/helpers/client-js.mjs), loads no analytics, no tag
  * manager, no embed and no third-party request of any kind. A consent banner would therefore ask
  * permission for something that does not happen — which trains readers to dismiss consent UI and
  * implies tracking that is not occurring.
@@ -56,6 +57,7 @@ import type { Locale } from "../../../content/schema/types";
 import { hasAnyContactChannel, legalIdentity, jurisdictionIsKnown, USES_TRACKING } from "../../lib/trust";
 import { t, type UiKey } from "../../lib/ui-strings";
 import { path } from "../../lib/routing";
+import PageHero from "../beauty/PageHero.astro";
 
 interface Props {
   locale: Locale;
@@ -94,11 +96,14 @@ const hasContact = hasAnyContactChannel();
 const isComplete = blockedItems.length === 0;
 ---
 
-<div class="container legal">
+<PageHero locale={locale} compact tone="champagne">
   <slot name="breadcrumb" />
 
   <h1 class="display-lg title">{t(locale, titleKey)}</h1>
   <p class="intro text-column">{t(locale, introKey)}</p>
+</PageHero>
+
+<div class="container legal">
 
   {/*
     THE STATUS BAND, FIRST.
@@ -208,16 +213,15 @@ const isComplete = blockedItems.length === 0;
 
 <style>
   .legal {
-    padding-block: var(--space-6) var(--space-8);
+    padding-block: var(--space-4) var(--space-8);
+  }
+
+  .legal > * {
     max-inline-size: 52rem;
   }
 
-  .title {
-    margin: 0;
-  }
-
   .intro {
-    margin-block: var(--space-2) var(--space-4);
+    margin-block: var(--space-3) 0;
     color: var(--color-text-secondary);
     font-size: var(--type-body-lg);
   }

@@ -41,6 +41,7 @@ import { t } from "../../../lib/ui-strings";
 import { formatCount, countedNoun } from "../../../lib/format";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
+import PageHero from "../../../components/beauty/PageHero.astro";
 import JournalEntry from "../../../components/editorial/JournalEntry.astro";
 import FacetNav from "../../../components/review/FacetNav.astro";
 
@@ -116,7 +117,7 @@ const siblings = journalCategories(locale);
   feedHref={absoluteUrl(machinePath.journalRss(locale))}
   feedTitle={t(locale, "journalIndexTitle")}
 >
-  <div class="container archive">
+  <PageHero locale={locale} compact tone="champagne" cosmetics={[{ kind: "tube", tint: "champagne" }]}>
     <Breadcrumbs locale={locale} crumbs={crumbs} />
 
     <h1 class="display-lg title">{label}</h1>
@@ -130,6 +131,9 @@ const siblings = journalCategories(locale);
         !facet.indexable && <span class="count-label nav-only">{t(locale, "navigationOnly")}</span>
       }
     </p>
+  </PageHero>
+
+  <div class="container archive">
 
     <FacetNav
       locale={locale}

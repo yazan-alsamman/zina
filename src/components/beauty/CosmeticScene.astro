@@ -1,0 +1,13 @@
+---
+/**
+ * COSMETIC SCENE LOADER — included once, by BaseLayout.
+ *
+ * Astro bundles this into a single small, same-origin module (`/_astro/*.js`). It loads Three.js
+ * only when the page actually has product slots, only after the page has loaded, and only when the
+ * device can render WebGL. See src/scripts/cosmetics/boot.ts.
+ */
+---
+
+<script>
+  import "../../scripts/cosmetics/boot";
+</script>

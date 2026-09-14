@@ -12,9 +12,12 @@ import type { Locale } from "../../content/schema/types";
 import type { PageMeta } from "../lib/seo";
 import type { Alternate } from "../lib/routing";
 import { localeConfig, IS_MOCK_SOURCE, IS_PREVIEW } from "../lib/content";
+import { absoluteUrl } from "../lib/routing";
+import { photography } from "../lib/photography";
 import SiteHeader from "../components/shell/SiteHeader.astro";
 import SiteFooter from "../components/shell/SiteFooter.astro";
 import SkipLink from "../components/shell/SkipLink.astro";
+import CosmeticScene from "../components/beauty/CosmeticScene.astro";
 import "../styles/tokens.css";
 import "../styles/global.css";
 
@@ -48,6 +51,8 @@ const {
 } = Astro.props;
 const config = localeConfig(locale);
 const dir = config.dir;
+const ogImage = meta.ogImage ?? absoluteUrl("/og/zina-almokri.jpg");
+const ogImageAlt = photography.portraitGlow.alt[locale];
 ---
 
 <!doctype html>
@@ -80,18 +85,19 @@ const dir = config.dir;
     <meta property="og:description" content={meta.description} />
     <meta property="og:url" content={meta.canonical} />
     <meta property="og:locale" content={locale === "ar" ? "ar_AR" : "en_US"} />
-    {meta.ogImage && <meta property="og:image" content={meta.ogImage} />}
-
-    {/* summary_large_image is declared in site.json, but no OG image asset exists yet — the
-        photography has not been commissioned. Declaring the card type without an image would
-        promise a preview the page cannot deliver, so the card falls back to `summary`. */}
-    <meta name="twitter:card" content={meta.ogImage ? "summary_large_image" : "summary"} />
+    {/* Phase 11: real photography exists, so every page has a social preview. A page-specific
+        image wins; otherwise the portrait card from scripts/build-og-image.mjs is used. */}
+    <meta property="og:image" content={ogImage} />
+    {!meta.ogImage && <meta property="og:image:width" content="1200" />}
+    {!meta.ogImage && <meta property="og:image:height" content="630" />}
+    <meta property="og:image:alt" content={ogImageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={ogImage} />
     <meta name="twitter:title" content={meta.title} />
     <meta name="twitter:description" content={meta.description} />
 
-    {/* Warm ink, matching --color-ground-base. site.json carries #0E0E0F, which predates the
-        Phase 2 palette; the measured token wins. Recorded as D4-6. */}
-    <meta name="theme-color" content="#12100D" />
+    {/* Warm ivory, matching --color-ground-base in the Phase 11 palette. */}
+    <meta name="theme-color" content="#FBF6F2" />
 
     {/*
       LOCALE-SPLIT FONT LOADING. An English page never downloads an Arabic subset and vice versa.
@@ -115,7 +121,7 @@ const dir = config.dir;
       href={
         locale === "ar"
           ? "/fonts/noto-naskh-arabic-arabic-400-normal.woff2"
-          : "/fonts/ibm-plex-serif-latin-400-normal.woff2"
+          : "/fonts/cormorant-garamond-latin-500-normal.woff2"
       }
     />
     <link
@@ -126,7 +132,7 @@ const dir = config.dir;
       href={
         locale === "ar"
           ? "/fonts/ibm-plex-sans-arabic-arabic-400-normal.woff2"
-          : "/fonts/ibm-plex-sans-latin-400-normal.woff2"
+          : "/fonts/jost-latin-400-normal.woff2"
       }
     />
     <link rel="stylesheet" href={locale === "ar" ? "/fonts/ar.css" : "/fonts/en.css"} />
@@ -147,6 +153,10 @@ const dir = config.dir;
     </main>
 
     <SiteFooter locale={locale} />
+
+    {/* Phase 11: the decorative 3D product layer. Loads Three.js lazily, and only when the page
+        has product slots and the device can render WebGL. */}
+    <CosmeticScene />
 
     {
       /*

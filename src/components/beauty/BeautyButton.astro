@@ -1,0 +1,24 @@
+---
+/**
+ * BEAUTY BUTTON — the Phase 11 call to action.
+ *
+ * Always a real link: every CTA on this site navigates to a page, so there is no <button> variant
+ * and no JavaScript. The styling lives in global.css (`.btn`) so prose links and components can
+ * share it; this component guarantees the markup — label, arrow, accessible name — is consistent.
+ */
+interface Props {
+  href: string;
+  variant?: "primary" | "outline" | "quiet";
+  class?: string;
+}
+
+const { href, variant = "primary", class: className } = Astro.props;
+const classes = variant === "quiet" ? ["link-quiet", className] : ["btn", `btn--${variant}`, className];
+---
+
+<a class:list={classes} href={href}>
+  <span><slot /></span>
+  <svg class="btn-arrow" viewBox="0 0 20 10" fill="none" aria-hidden="true" focusable="false">
+    <path d="M0 5h18.5M14 1l4.5 4L14 9" stroke="currentColor" stroke-width="1.1"></path>
+  </svg>
+</a>

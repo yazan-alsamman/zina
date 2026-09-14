@@ -22,6 +22,7 @@ import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { TOC_SECTION_GATE, earnsTableOfContents } from "../src/lib/journal.ts";
+import { assertOnlyCosmeticsLoader } from "./helpers/client-js.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "dist");
@@ -398,14 +399,12 @@ describe("journal pages claim nothing they cannot support", () => {
     }
   });
 
-  test("no journal page ships client JavaScript", () => {
+  test("no journal page ships a script beyond the decorative 3D loader", () => {
     // Asserted globally too. Repeated here because the MDX pipeline is the one part of the build
-    // that can introduce a runtime without anyone asking for it.
+    // that can introduce a runtime without anyone asking for it. Phase 11: the single permitted
+    // script is the same-origin cosmetics module loader (tests/helpers/client-js.mjs).
     for (const page of [...articles(), ...categories()]) {
-      assert.ok(
-        !/<script(?![^>]*type="application\/ld\+json")/.test(page.html),
-        `${page.route}: a script tag reached the page`
-      );
+      assertOnlyCosmeticsLoader(assert, page.html, page.route);
     }
   });
 });

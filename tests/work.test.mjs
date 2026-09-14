@@ -30,6 +30,7 @@ import {
 } from "../src/lib/work.ts";
 import { eligibleSocialProfiles, workById } from "../src/lib/content.ts";
 import { path } from "../src/lib/routing.ts";
+import { assertOnlyCosmeticsLoader } from "./helpers/client-js.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "dist");
@@ -339,12 +340,9 @@ describe("a work page claims no outcome it cannot evidence", () => {
     }
   });
 
-  test("no work page ships client JavaScript", () => {
+  test("no work page ships a script beyond the decorative 3D loader", () => {
     for (const page of workPages()) {
-      assert.ok(
-        !/<script(?![^>]*type="application\/ld\+json")/.test(page.html),
-        `${page.route}: a script tag reached the page`
-      );
+      assertOnlyCosmeticsLoader(assert, page.html, page.route);
     }
   });
 });

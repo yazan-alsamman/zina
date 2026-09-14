@@ -56,6 +56,9 @@ import { t } from "../../../lib/ui-strings";
 import { isolateIdentifier, isolateValue } from "../../../lib/bidi";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
+import FloatingCosmetic from "../../../components/beauty/FloatingCosmetic.astro";
+import EditorialImage from "../../../components/beauty/EditorialImage.astro";
+import { cosmeticForCategory } from "../../../lib/cosmetic-kinds";
 import DisclosureBand from "../../../components/devices/DisclosureBand.astro";
 import ConditionsWell from "../../../components/devices/ConditionsWell.astro";
 import ObservationTimeline from "../../../components/devices/ObservationTimeline.astro";
@@ -201,6 +204,7 @@ const id = {
 const disclosurePublishable = isDisclosurePublishable(record);
 const evidence = record.media?.evidence ?? [];
 const updates = record.updateLog ?? [];
+const heroCosmetic = cosmeticForCategory(record.entity.category);
 ---
 
 <BaseLayout
@@ -252,15 +256,30 @@ const updates = record.updateLog ?? [];
       <p class="visually-hidden">Disclosure pending verification: this review cannot be published.</p>
     )}
 
-    {/* 6 · HERO — the LCP element. No text over it, no animation, no scrim. */}
-    <div class="hero full-bleed">
-      <Frame
-        src={record.media?.hero?.src}
-        alt={record.media?.hero?.alt ?? content.title}
-        width={record.media?.hero?.width ?? 1600}
-        height={record.media?.hero?.height ?? 1000}
-        priority={true}
-      />
+    {/* 6 · HERO — Phase 11: while no product photograph exists, the frame becomes a still-life
+        stage. The 3D object is a generic illustration of the CATEGORY (never the reviewed
+        product's packaging), and a small portrait marks who ran the test. */}
+    <div class="container">
+      <div class="hero">
+        <Frame
+          src={record.media?.hero?.src}
+          alt={record.media?.hero?.alt ?? content.title}
+          width={record.media?.hero?.width ?? 1600}
+          height={record.media?.hero?.height ?? 1000}
+          priority={true}
+        />
+        <span class="hero-word" aria-hidden="true">{record.entity.category}</span>
+        <span class="hero-podium" aria-hidden="true"></span>
+        <FloatingCosmetic kind={heroCosmetic.kind} tint={heroCosmetic.tint} depth={0.7} yaw={-0.4} class="hero-cosmetic" />
+        {/* A <div>, not a <p>: a <figure> may not sit inside a paragraph. */}
+        <div class="hero-tester">
+          <EditorialImage photo="portraitGlow" locale={locale} mask="circle" sizes="64px" widths={[96, 144]} class="hero-tester-image" />
+          <span class="hero-tester-text">
+            <span class="label">{t(locale, "tested")}</span>
+            <span class="hero-tester-name">{person().name[locale === "ar" ? "arabic" : "latin"]}</span>
+          </span>
+        </div>
+      </div>
     </div>
     {
       record.media?.hero?.caption && (
@@ -428,6 +447,9 @@ const updates = record.updateLog ?? [];
 <style>
   .review {
     padding-block-start: var(--space-4);
+    background:
+      radial-gradient(40rem 30rem at 85% 0%, rgb(235 201 200 / 65%), rgb(235 201 200 / 0%) 70%),
+      linear-gradient(180deg, var(--palette-blush) 0, var(--palette-ivory) 44rem);
   }
 
   .identity {
@@ -467,11 +489,82 @@ const updates = record.updateLog ?? [];
   /* HERO — art-directed by ratio per breakpoint. A real crop, not a scale: mobile downloads a
      smaller file when real photography exists. */
   .hero {
-    margin-block-end: var(--space-3);
+    position: relative;
+    margin-block: var(--space-6) var(--space-3);
+    border-radius: var(--radius-card);
+    overflow: clip;
+    box-shadow: var(--shadow-soft);
   }
 
   .hero :global(.frame) {
-    aspect-ratio: 4 / 5;
+    /* An explicit height wins over the Frame's inline aspect-ratio, which describes the future
+       photograph rather than this interim still-life stage. */
+    block-size: clamp(22rem, 48vw, 34rem);
+    background:
+      radial-gradient(60% 70% at 50% 85%, rgb(235 201 200 / 95%), rgb(235 201 200 / 0%) 70%),
+      linear-gradient(180deg, var(--palette-cream), var(--palette-powder));
+  }
+
+  .hero-word {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: 10%;
+    text-align: center;
+    font-family: var(--type-family-accent);
+    font-size: calc(clamp(3.5rem, 2rem + 7vw, 9rem) * var(--type-arabic-size-factor));
+    line-height: 1;
+    color: color-mix(in srgb, var(--palette-deep-rose) 16%, transparent);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .hero-podium {
+    position: absolute;
+    inset-inline: 30%;
+    inset-block-end: 12%;
+    block-size: 12%;
+    border-radius: 50%;
+    background: linear-gradient(180deg, #fffaf7, var(--palette-petal));
+    box-shadow: 0 24px 40px -24px rgb(94 31 51 / 40%);
+  }
+
+  .hero-cosmetic {
+    inline-size: min(56%, 30rem);
+    inset-inline-start: 50%;
+    inset-block-start: 8%;
+    translate: -50% 0;
+  }
+
+  .hero-cosmetic:dir(rtl) {
+    translate: 50% 0;
+  }
+
+  .hero-tester {
+    position: absolute;
+    inset-block-end: var(--space-3);
+    inset-inline-start: var(--space-3);
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.45rem 1.1rem 0.45rem 0.45rem;
+    border-radius: var(--radius-control);
+    background: rgb(255 250 247 / 88%);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .hero-tester :global(.hero-tester-image) {
+    inline-size: 2.75rem;
+  }
+
+  .hero-tester-text {
+    display: grid;
+  }
+
+  .hero-tester-name {
+    font-family: var(--type-family-display);
+    font-size: 1.15rem;
+    line-height: 1.1;
   }
 
   .hero-caption {
@@ -564,7 +657,12 @@ const updates = record.updateLog ?? [];
      itself — margin index, air column, 16:10 hero. */
   @media (min-width: 1024px) {
     .hero :global(.frame) {
-      aspect-ratio: 16 / 10;
+      aspect-ratio: 21 / 9;
+    }
+
+    .hero-cosmetic {
+      inline-size: min(34%, 26rem);
+      inset-block-start: 4%;
     }
 
     .title {

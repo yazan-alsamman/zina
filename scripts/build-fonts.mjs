@@ -58,24 +58,25 @@ const outDir = join(root, "public", "fonts");
  * identifiers only — including inside Arabic prose.
  */
 const FACES = {
+  // PHASE 11 (docs/PHASE_11_VISUAL_REDESIGN.md): the luxury beauty identity replaces IBM Plex.
+  //   Cormorant Garamond 500   display headlines (a 400 request resolves to this face — no synthesis)
+  //   Cormorant Garamond 500 italic, registered as the family "Cormorant Garamond Italic" so the
+  //     accent is selected by FAMILY, never by `font-style: italic` (Arabic has no italic form)
+  //   Jost 400/500             body, UI, labels and the tabular record tier
   en: [
-    // display + body
-    { pkg: "ibm-plex-serif", subset: "latin", weight: 400, family: "IBM Plex Serif", preload: true },
-    // UI, and the label tier at 500
-    { pkg: "ibm-plex-sans", subset: "latin", weight: 400, family: "IBM Plex Sans", preload: true },
-    { pkg: "ibm-plex-sans", subset: "latin", weight: 500, family: "IBM Plex Sans" },
-    // record: numerals, units, Latin identifiers
-    { pkg: "ibm-plex-mono", subset: "latin", weight: 400, family: "IBM Plex Mono" },
+    { pkg: "cormorant-garamond", subset: "latin", weight: 500, family: "Cormorant Garamond", preload: true },
+    { pkg: "cormorant-garamond", subset: "latin", weight: 500, style: "italic", family: "Cormorant Garamond Italic" },
+    { pkg: "jost", subset: "latin", weight: 400, family: "Jost", preload: true },
+    { pkg: "jost", subset: "latin", weight: 500, family: "Jost" },
   ],
   ar: [
-    // display + body
+    // display
     { pkg: "noto-naskh-arabic", subset: "arabic", weight: 400, family: "Noto Naskh Arabic", preload: true },
-    // UI and labels at 400 — Arabic reaches equal volume by size, not weight
+    // body, UI and labels — Arabic reaches equal volume by size, not weight
     { pkg: "ibm-plex-sans-arabic", subset: "arabic", weight: 400, family: "IBM Plex Sans Arabic", preload: true },
-    // 500 is used by the active navigation item only
     { pkg: "ibm-plex-sans-arabic", subset: "arabic", weight: 500, family: "IBM Plex Sans Arabic" },
-    // record: the same Latin mono face, for numerals inside Arabic prose
-    { pkg: "ibm-plex-mono", subset: "latin", weight: 400, family: "IBM Plex Mono" },
+    // record: numerals and Latin identifiers inside Arabic prose
+    { pkg: "jost", subset: "latin", weight: 400, family: "Jost" },
   ],
 };
 
@@ -93,7 +94,7 @@ for (const [locale, faces] of Object.entries(FACES)) {
   ];
 
   for (const face of faces) {
-    const file = `${face.pkg}-${face.subset}-${face.weight}-normal.woff2`;
+    const file = `${face.pkg}-${face.subset}-${face.weight}-${face.style ?? "normal"}.woff2`;
     const source = join(modules, face.pkg, "files", file);
 
     if (!existsSync(source)) {
@@ -110,6 +111,8 @@ for (const [locale, faces] of Object.entries(FACES)) {
     blocks.push(
       `@font-face {`,
       `  font-family: '${face.family}';`,
+      // The italic face is registered under its OWN family with a normal style descriptor, so
+      // selecting it never requires `font-style: italic` in component CSS.
       `  font-style: normal;`,
       `  font-weight: ${face.weight};`,
       // swap, with metric-matched fallbacks declared in tokens.css. An unmatched swap can
@@ -125,7 +128,7 @@ for (const [locale, faces] of Object.entries(FACES)) {
 }
 
 // Redistribute the licences alongside the fonts, as OFL 1.1 requires.
-for (const pkg of ["ibm-plex-serif", "ibm-plex-sans", "ibm-plex-sans-arabic", "ibm-plex-mono", "noto-naskh-arabic"]) {
+for (const pkg of ["cormorant-garamond", "jost", "ibm-plex-sans-arabic", "noto-naskh-arabic"]) {
   const licence = join(modules, pkg, "LICENSE");
   if (existsSync(licence)) {
     copyFileSync(licence, join(outDir, `LICENSE-${pkg}.txt`));

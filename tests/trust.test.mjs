@@ -16,6 +16,7 @@
 
 import { test, describe, before } from "node:test";
 import assert from "node:assert/strict";
+import { assertOnlyCosmeticsLoader, assertChunksCollectNothing } from "./helpers/client-js.mjs";
 import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -431,11 +432,12 @@ describe("the legal foundation invents nothing", () => {
   test("the factual claims about the build are actually TRUE of the build", () => {
     // These are the only assertions the legal pages make, so they are verified against dist/
     // rather than taken on trust.
+    // Phase 11: the privacy page now states that the only client JavaScript draws decorative 3D
+    // illustrations, is served from this domain, and reads, stores and sends nothing. All three
+    // halves of that sentence are checked here against the build.
+    assertChunksCollectNothing(assert, dist);
     for (const page of pages) {
-      assert.ok(
-        !/<script(?![^>]*type="application\/ld\+json")/.test(page.html),
-        `${page.route}: ships client JavaScript, contradicting the privacy page`
-      );
+      assertOnlyCosmeticsLoader(assert, page.html, `${page.route} (privacy claim)`);
       // A REQUEST, not a reference. `<link rel="canonical">` and `rel="alternate"` carry absolute
       // URLs built from SITE_URL and fetch nothing; a stylesheet, script, image or frame does.
       const fetching = [

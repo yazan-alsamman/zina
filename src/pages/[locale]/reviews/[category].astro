@@ -36,6 +36,8 @@ import { t } from "../../../lib/ui-strings";
 import { formatCount, countedNoun } from "../../../lib/format";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
+import PageHero from "../../../components/beauty/PageHero.astro";
+import { cosmeticForCategory } from "../../../lib/cosmetic-kinds";
 import ReviewEntry from "../../../components/review/ReviewEntry.astro";
 import FacetNav from "../../../components/review/FacetNav.astro";
 
@@ -114,7 +116,7 @@ const siblings = categoryFacets(locale);
   schemas={schemas}
   switcherHref={switcherHref}
 >
-  <div class="container facet-page">
+  <PageHero locale={locale} compact cosmetics={[cosmeticForCategory(facet.category)]}>
     <Breadcrumbs locale={locale} crumbs={crumbs} />
 
     <h1 class="display-lg title">{facet.category}</h1>
@@ -131,6 +133,9 @@ const siblings = categoryFacets(locale);
         !facet.indexable && <span class="count-label nav-only">{t(locale, "navigationOnly")}</span>
       }
     </p>
+  </PageHero>
+
+  <div class="container facet-page">
 
     <FacetNav
       locale={locale}

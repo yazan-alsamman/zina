@@ -1,0 +1,107 @@
+---
+/**
+ * VERDICT SEAL — Zina's own conclusion, as a quiet editorial mark.
+ *
+ * It renders ONLY what the review record already says in words: `verdict.wouldRepurchase`
+ * ("Yes, for short days only"). It is never a score, a star, a percentage or a grade — the
+ * publication's standards forbid ratings, and a seal that converted her sentence into a number
+ * would be inventing precision she never claimed.
+ *
+ * No verdict on the record → nothing renders.
+ */
+import type { Locale } from "../../../content/schema/types";
+import { t } from "../../lib/ui-strings";
+
+interface Props {
+  locale: Locale;
+  value?: string | undefined;
+  compact?: boolean;
+}
+
+const { locale, value, compact = false } = Astro.props;
+---
+
+{
+  value && (
+    <p class:list={["verdict-seal", compact && "verdict-seal--compact"]}>
+      <span class="verdict-seal-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M12 2.5c1.2 3.6 2.9 5.3 6.5 6.5-3.6 1.2-5.3 2.9-6.5 6.5-1.2-3.6-2.9-5.3-6.5-6.5 3.6-1.2 5.3-2.9 6.5-6.5Z" fill="currentColor" />
+          <circle cx="18.5" cy="18" r="1.6" fill="currentColor" opacity=".55" />
+        </svg>
+      </span>
+      <span class="verdict-seal-text">
+        <span class="verdict-seal-label">{t(locale, "wouldRepurchase")}</span>
+        <span class="verdict-seal-value">{value}</span>
+      </span>
+    </p>
+  )
+}
+
+<style>
+  .verdict-seal {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.55rem 1.1rem 0.55rem 0.6rem;
+    border-radius: var(--radius-control);
+    background: color-mix(in srgb, var(--palette-petal) 45%, var(--color-ground-card));
+    border: 1px solid color-mix(in srgb, var(--palette-dusty-rose) 40%, transparent);
+    max-inline-size: 100%;
+  }
+
+  .verdict-seal-mark {
+    display: grid;
+    place-items: center;
+    flex: none;
+    inline-size: 2rem;
+    block-size: 2rem;
+    border-radius: 50%;
+    background: var(--color-accent-clay);
+    color: var(--color-text-on-accent);
+  }
+
+  .verdict-seal-mark svg {
+    inline-size: 1.05rem;
+    block-size: 1.05rem;
+  }
+
+  .verdict-seal-text {
+    display: grid;
+    min-inline-size: 0;
+  }
+
+  .verdict-seal-label {
+    font-family: var(--type-family-ui);
+    font-size: calc(0.6875rem * var(--type-arabic-size-factor));
+    font-weight: var(--type-weight-medium);
+    letter-spacing: var(--type-tracking-label);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  :global(html[lang="ar"]) .verdict-seal-label {
+    text-transform: none;
+    font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
+  }
+
+  .verdict-seal-value {
+    font-family: var(--type-family-display);
+    font-size: calc(1.2rem * var(--type-arabic-size-factor));
+    line-height: 1.15;
+    color: var(--color-text-primary);
+  }
+
+  .verdict-seal--compact {
+    padding-block: 0.4rem;
+  }
+
+  .verdict-seal--compact .verdict-seal-mark {
+    inline-size: 1.6rem;
+    block-size: 1.6rem;
+  }
+
+  .verdict-seal--compact .verdict-seal-value {
+    font-size: calc(1.05rem * var(--type-arabic-size-factor));
+  }
+</style>

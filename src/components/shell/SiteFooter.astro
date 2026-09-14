@@ -1,26 +1,25 @@
 ---
 /**
- * SITE FOOTER — three groups, per locale.
+ * SITE FOOTER — Phase 11: the closing frame of the campaign, on the wine ground.
  *
- * The STANDARDS group exists to be found, not hidden. Its presence in a persistent footer is
- * itself a trust signal, and it guarantees /editorial-standards/, /brands/ and the legal pages
- * are never orphans.
+ * The STANDARDS group still exists to be found, not hidden, and still guarantees that
+ * /editorial-standards/, /brands/ and the legal pages are never orphans. The groups are filtered
+ * against the same route registry as the header, and empty groups are dropped.
  *
- * "How I test" rather than "Method": the footer is where a hesitant reader looks, and the
- * plainer phrasing converts better than the label.
+ * The social row renders ONLY confirmed, sameAs-eligible profiles, with rel="me".
  *
- * THE SOCIAL ROW DOES NOT EXIST. Every profile has sameAsEligible: false, so nothing renders —
- * no greyed-out icon, no placeholder handle, no follower count. Absence is silent.
+ * Decoration: an oversized wordmark and one quiet floating product. Both are aria-hidden where
+ * they repeat information already present.
  */
 import type { Locale } from "../../../content/schema/types";
 import { eligibleSocialProfiles, navigation, person } from "../../lib/content";
 import { isImplemented, path, siteName } from "../../lib/routing";
 import { t } from "../../lib/ui-strings";
+import FloatingCosmetic from "../beauty/FloatingCosmetic.astro";
 
 interface Props { locale: Locale }
 const { locale } = Astro.props;
 
-/** site.json routeKey -> the key used by IMPLEMENTED_ROUTES. */
 const routeKeyFor: Record<string, string> = {
   "reviews.index": "reviewsIndex",
   method: "method",
@@ -45,13 +44,6 @@ const routeFor: Record<string, (l: Locale) => string> = {
   terms: path.terms,
 };
 
-/**
- * The footer filters against the same registry as the header, then drops any group left empty.
- * Today that removes the Professional and Standards groups entirely: /work/, /contact/,
- * /editorial-standards/, /privacy/ and /terms/ are not built.
- *
- * An empty footer group is worse than a missing one — it is a heading over nothing.
- */
 const groups = navigation()
   .footer.map((group) => ({
     title: group.group[locale],
@@ -64,17 +56,32 @@ const groups = navigation()
   }))
   .filter((group) => group.links.length > 0);
 
-const bio = person().locales[locale]?.bios?.homepageIntro ?? "";
+const personLocale = person().locales[locale];
+const bio = personLocale?.bios?.homepageIntro ?? "";
+const professionalTitle = personLocale?.professionalTitle ?? "";
 const social = eligibleSocialProfiles();
 const year = new Date().getFullYear();
 ---
 
-<footer class="site-footer">
-  <div class="container">
+<footer class="site-footer tone-wine">
+  <span class="organic organic--glow footer-glow" aria-hidden="true"></span>
+  <FloatingCosmetic kind="perfume" tint="rose" depth={0.3} yaw={0.4} desktopOnly class="footer-cosmetic" />
+
+  <div class="container container--wide">
     <div class="footer-top">
       <div class="identity">
-        <p class="wordmark">{siteName(locale)}</p>
-        <p class="bio">{bio}</p>
+        <p class="eyebrow">{professionalTitle}</p>
+        <p class="tagline">{t(locale, "collaborateEyebrow")}</p>
+        {
+          isImplemented("contact") && (
+            <a class="btn btn--primary footer-cta" href={path.contact(locale)}>
+              <span>{t(locale, "collaborate")}</span>
+              <svg class="btn-arrow" viewBox="0 0 20 10" fill="none" aria-hidden="true" focusable="false">
+                <path d="M0 5h18.5M14 1l4.5 4L14 9" stroke="currentColor" stroke-width="1.1" />
+              </svg>
+            </a>
+          )
+        }
       </div>
 
       <nav class="groups" aria-label={t(locale, "footerNavigation")}>
@@ -95,102 +102,165 @@ const year = new Date().getFullYear();
       </nav>
     </div>
 
-    {/* Rendered only when a profile is confirmed official in writing. Today: none. */}
-    {
-      social.length > 0 && (
-        <ul class="social plain">
-          {social.map((profile) => (
-            <li>
-              <a href={profile.url} rel="me noopener" target="_blank">
-                {profile.platform}
-              </a>
-            </li>
-          ))}
-        </ul>
-      )
-    }
+    <p class="footer-wordmark" aria-hidden="true">{siteName(locale)}</p>
 
-    <p class="copyright">© {year} {siteName(locale)}</p>
+    <div class="footer-bottom">
+      <p class="bio">{bio}</p>
+
+      {
+        social.length > 0 && (
+          <ul class="social plain">
+            {social.map((profile) => (
+              <li>
+                <a href={profile.url} rel="me noopener" target="_blank">
+                  {profile.platform}
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+
+      <p class="copyright">© {year} {siteName(locale)}</p>
+    </div>
   </div>
 </footer>
 
 <style>
   .site-footer {
+    position: relative;
+    overflow: clip;
     margin-block-start: var(--space-12);
-    padding-block: var(--space-8);
-    border-block-start: var(--border-rule-hairline);
-    background: var(--color-ground-base);
+    padding-block: var(--space-10) var(--space-5);
+    border-start-start-radius: 50% 3rem;
+    border-start-end-radius: 50% 3rem;
+  }
+
+  .footer-glow {
+    inline-size: 42rem;
+    block-size: 42rem;
+    inset-block-start: -18rem;
+    inset-inline-start: 30%;
+    opacity: 0.35;
+  }
+
+  /* Sits in the quiet space between the identity column and the link groups. */
+  .footer-cosmetic {
+    inline-size: 11rem;
+    inset-block-start: 7rem;
+    inset-inline-start: 34%;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
   }
 
   .footer-top {
     display: grid;
-    gap: var(--space-6);
+    gap: var(--space-8);
   }
 
-  .wordmark {
+  .tagline {
+    margin-block-start: var(--space-3);
+    max-width: 12ch;
     font-family: var(--type-family-display);
-    font-size: calc(var(--type-display-sm) * var(--type-arabic-size-factor));
+    font-size: calc(var(--type-display-md) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-display-md) * var(--type-arabic-leading-factor));
+    color: var(--color-text-primary);
   }
 
-  .bio {
-    margin-block-start: var(--space-1);
-    max-width: 42ch;
-    font-size: calc(var(--type-body-sm) * var(--type-arabic-size-factor));
-    color: var(--color-text-secondary);
+  .footer-cta {
+    margin-block-start: var(--space-5);
   }
 
   .groups {
     display: grid;
     gap: var(--space-5);
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
   }
 
   .group h2 {
     margin-block-end: var(--space-2);
+    color: var(--color-text-muted);
   }
 
   .group ul {
     display: grid;
-    gap: var(--space-1);
+    gap: 0.6rem;
   }
 
   .group a {
     font-family: var(--type-family-ui);
-    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+    font-size: calc(var(--type-ui-md) * var(--type-arabic-size-factor));
     color: var(--color-text-secondary);
     text-decoration: none;
   }
 
   .group a:hover {
-    color: var(--color-accent-clay-hover);
+    color: var(--color-text-primary);
     text-decoration: underline;
+  }
+
+  .footer-wordmark {
+    margin-block-start: var(--space-10);
+    font-family: var(--type-family-display);
+    font-size: calc(clamp(2.6rem, 0.8rem + 8.6vw, 10.5rem) * var(--type-arabic-size-factor));
+    line-height: 0.9;
+    letter-spacing: var(--type-tracking-display);
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: transparent;
+    -webkit-text-stroke: 1px rgb(243 184 198 / 45%);
+    user-select: none;
+  }
+
+  .footer-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-5);
+    margin-block-start: var(--space-4);
+    padding-block-start: var(--space-3);
+    border-block-start: var(--border-rule-hairline);
+  }
+
+  .bio {
+    max-width: 52ch;
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+    color: var(--color-text-secondary);
   }
 
   .social {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-3);
-    margin-block-start: var(--space-5);
+    font-family: var(--type-family-ui);
+    font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
+    letter-spacing: var(--type-tracking-label);
+    text-transform: uppercase;
   }
 
   .copyright {
-    margin-block-start: var(--space-6);
-    padding-block-start: var(--space-3);
-    border-block-start: var(--border-rule-hairline);
     font-family: var(--type-family-ui);
     font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
     color: var(--color-text-muted);
   }
 
-  @media (min-width: 768px) {
-    .groups {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-
   @media (min-width: 1024px) {
+    .site-footer {
+      border-start-start-radius: 50% 6rem;
+      border-start-end-radius: 50% 6rem;
+    }
+
     .footer-top {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-      gap: var(--space-8);
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+      gap: var(--space-10);
+    }
+
+    .groups {
+      padding-block-start: var(--space-8);
     }
   }
 </style>

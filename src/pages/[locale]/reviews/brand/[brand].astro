@@ -27,6 +27,7 @@ import { t } from "../../../../lib/ui-strings";
 import { formatCount, countedNoun } from "../../../../lib/format";
 import BaseLayout from "../../../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../../../components/shell/Breadcrumbs.astro";
+import PageHero from "../../../../components/beauty/PageHero.astro";
 import ReviewEntry from "../../../../components/review/ReviewEntry.astro";
 
 export const getStaticPaths = (() => {
@@ -83,7 +84,7 @@ const brandPageHref = (() => {
 
 {/* No hreflang: a noindex navigation view claims no cross-language equivalence. */}
 <BaseLayout locale={locale} meta={meta} schemas={schemas} switcherHref={switcherHref}>
-  <div class="container facet-page">
+  <PageHero locale={locale} compact cosmetics={[{ kind: "jar", tint: "blush" }]}>
     <Breadcrumbs locale={locale} crumbs={crumbs} />
 
     <h1 class="display-lg title">{facet.name}</h1>
@@ -96,6 +97,9 @@ const brandPageHref = (() => {
       <span class="count-label">·</span>
       <span class="count-label nav-only">{t(locale, "navigationOnly")}</span>
     </p>
+  </PageHero>
+
+  <div class="container facet-page">
 
     <div class="entries">
       {facet.reviews.map((review) => <ReviewEntry locale={locale} review={review} />)}

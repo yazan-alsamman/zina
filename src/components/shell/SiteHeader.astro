@@ -1,27 +1,24 @@
 ---
 /**
- * SITE HEADER — editorial, five items, one CTA, one language control.
+ * SITE HEADER — Phase 11: minimal, expensive, and still JavaScript-free.
  *
- * MEASURED CONSTRAINTS (docs/PHASE_3_BILINGUAL_TYPE_PROOF.md section 4):
- *   intrinsic width   English 753px · Arabic 686px  → the full header does not exist below 1024
- *   height            English 82px  · Arabic 88px   → height is RESERVED for the Arabic line box
- *                                                     in BOTH locales, so the header does not
- *                                                     change height when the language changes
+ * Desktop (1024+): tracked serif wordmark · five editorial links · the Collaborate pill · language.
+ * Below 1024: wordmark and a two-line "Menu" trigger that opens a FULLSCREEN wine overlay with
+ * large serif navigation, a small arched portrait of Zina, the CTA and the language switcher.
  *
- * Phase 2 instructed "lay the header out to the Arabic width". Measured, English is 9% wider and
- * Arabic binds VERTICALLY. The rule is now: lay out to the wider of the two measured sets, and
- * reserve height for Arabic. Recorded as C3-3 / D3-3.
+ * NO JAVASCRIPT. The menu is still a checkbox-driven disclosure — it works with scripting
+ * unavailable, which is the exact condition of a slow mobile connection. While it is open,
+ * `:has()` locks page scroll behind it.
  *
- * NO JAVASCRIPT. The mobile menu is a checkbox-driven disclosure — it works on a slow connection
- * and with scripting unavailable, which is the exact condition of the mobile audience.
- * No mega-menu, no dropdowns: every primary item is a real page, and a dropdown would imply a
- * hierarchy the information architecture does not have.
+ * NAVIGATION EXPOSES ONLY WHAT EXISTS: items are filtered against IMPLEMENTED_ROUTES exactly as
+ * before, so a link can never lead into an unbuilt page.
  */
 import type { Locale } from "../../../content/schema/types";
 import { navigation } from "../../lib/content";
 import { isImplemented, path, siteName } from "../../lib/routing";
 import { t } from "../../lib/ui-strings";
 import LocaleSwitcher from "./LocaleSwitcher.astro";
+import EditorialImage from "../beauty/EditorialImage.astro";
 
 interface Props {
   locale: Locale;
@@ -32,19 +29,6 @@ interface Props {
 const { locale, switcherHref, switcherState } = Astro.props;
 const nav = navigation();
 
-/**
- * NAVIGATION EXPOSES ONLY WHAT EXISTS.
- *
- * The Phase 1 information architecture declares five primary items. Three of their destinations
- * are not built yet, so they are NOT RENDERED — not greyed out, not disabled, not marked "soon".
- * A disabled navigation item advertises a gap; a missing one is simply a smaller navigation.
- *
- * Order is preserved from site.json: content first, commerce last. Leading with Work would tell
- * every organic visitor that the site is a media kit.
- *
- * The Collaborate CTA is likewise hidden until /contact/ exists — a call to action that leads
- * nowhere is worse than none.
- */
 const routeKeyFor: Record<string, string> = {
   reviews: "reviewsIndex",
   method: "method",
@@ -73,10 +57,13 @@ const showCta = isImplemented("contact");
 const ctaLabel = nav.cta.label[locale];
 const ctaHref = path.contact(locale);
 const currentPath = Astro.url.pathname;
+/** "page" for the exact page, "true" for a page inside that section (WAI-ARIA 1.2). */
+const currentState = (href: string): "page" | "true" | undefined =>
+  currentPath === href ? "page" : href !== path.home(locale) && currentPath.startsWith(href) ? "true" : undefined;
 ---
 
 <header class="site-header">
-  <div class="container header-inner">
+  <div class="container container--wide header-inner">
     <a class="wordmark" href={path.home(locale)}>{siteName(locale)}</a>
 
     {/* Checkbox-driven disclosure: no JS, no hydration, no layout shift. */}
@@ -84,28 +71,40 @@ const currentPath = Astro.url.pathname;
     <label class="menu-trigger" for="menu-toggle">
       <span class="menu-trigger-open">{t(locale, "openMenu")}</span>
       <span class="menu-trigger-close">{t(locale, "closeMenu")}</span>
+      <span class="menu-lines" aria-hidden="true"><span></span><span></span></span>
     </label>
 
     <nav class="primary-nav" aria-label={t(locale, "primaryNavigation")}>
+      <div class="menu-portrait" aria-hidden="true">
+        <EditorialImage
+          photo="studioMonochromeProfile"
+          locale={locale}
+          mask="arch"
+          ratio="3 / 4"
+          sizes="112px"
+          widths={[160, 240]}
+        />
+      </div>
+
       <ul class="nav-list plain">
         {
-          items.map((item) => (
-            <li>
-              <a
-                href={item.href}
-                aria-current={currentPath === item.href ? "page" : undefined}
-              >
-                {item.label}
+          items.map((item, index) => (
+            <li style={`--i: ${index}`}>
+              <a href={item.href} aria-current={currentState(item.href)}>
+                <span class="nav-index record" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+                <span class="nav-label">{item.label}</span>
               </a>
             </li>
           ))
         }
       </ul>
 
-      {showCta && <a class="cta" href={ctaHref}>{ctaLabel}</a>}
+      <div class="nav-actions">
+        {showCta && <a class="cta" href={ctaHref} aria-current={currentState(ctaHref)}>{ctaLabel}</a>}
 
-      <div class="switcher-slot">
-        <LocaleSwitcher locale={locale} href={switcherHref} state={switcherState} />
+        <div class="switcher-slot">
+          <LocaleSwitcher locale={locale} href={switcherHref} state={switcherState} />
+        </div>
       </div>
     </nav>
   </div>
@@ -113,57 +112,107 @@ const currentPath = Astro.url.pathname;
 
 <style>
   .site-header {
-    border-block-end: var(--border-rule-hairline);
-    background: var(--color-ground-base);
+    position: sticky;
+    inset-block-start: 0;
+    z-index: var(--z-header);
+    background: color-mix(in srgb, var(--palette-ivory) 86%, transparent);
+    backdrop-filter: saturate(1.2) blur(14px);
+    -webkit-backdrop-filter: saturate(1.2) blur(14px);
+    border-block-end: 1px solid color-mix(in srgb, var(--color-line-hairline) 80%, transparent);
+  }
+
+  /* The overlay must escape the header's backdrop-filter containing block. */
+  .site-header:has(.menu-toggle:checked) {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  :global(html:has(#menu-toggle:checked)) {
+    overflow: hidden;
   }
 
   .header-inner {
     display: flex;
     align-items: center;
     gap: var(--space-3);
-    /* Height reserved for the ARABIC line box in both locales (measured 88px). */
-    min-block-size: 88px;
+    min-block-size: var(--layout-header-height);
   }
 
   .wordmark {
+    position: relative;
+    z-index: calc(var(--z-overlay) + 1);
     font-family: var(--type-family-display);
-    font-size: calc(1.25rem * var(--type-arabic-size-factor));
+    font-size: calc(1.3rem * var(--type-arabic-size-factor));
+    letter-spacing: var(--type-tracking-wordmark);
+    text-transform: uppercase;
     color: var(--color-text-primary);
     text-decoration: none;
     white-space: nowrap;
     margin-inline-end: auto;
+    transition: color var(--motion-duration-base) var(--motion-easing-silk);
   }
 
   .wordmark:hover {
-    color: var(--color-accent-clay-hover);
+    color: var(--color-accent-clay);
   }
 
-  /* ---------------------------------------------------------------- below 1024
-     The full header needs 753px of intrinsic width plus margins. It does not exist here;
-     the overlay replaces it. This is a composition change, not a squeeze. */
+  /* ---------------------------------------------------------------- below 1024 */
 
   .menu-trigger {
+    position: relative;
+    z-index: calc(var(--z-overlay) + 1);
     display: inline-flex;
     align-items: center;
+    gap: 0.75rem;
+    flex: none;
+    white-space: nowrap;
     min-block-size: 44px;
     min-inline-size: 44px;
-    padding-inline: var(--space-1);
+    padding-inline: 1rem 0.9rem;
     font-family: var(--type-family-ui);
-    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
-    color: var(--color-text-secondary);
+    font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
+    font-weight: var(--type-weight-medium);
+    letter-spacing: var(--type-tracking-label);
+    text-transform: uppercase;
+    color: var(--color-text-primary);
     cursor: pointer;
-    border: var(--border-rule-strong);
+    border: 1px solid var(--color-line-strong);
     border-radius: var(--radius-control);
+    transition:
+      color var(--motion-duration-base) var(--motion-easing-silk),
+      border-color var(--motion-duration-base) var(--motion-easing-silk);
   }
 
-  .menu-trigger:hover {
-    color: var(--color-accent-clay-hover);
+  .menu-lines {
+    display: grid;
+    gap: 5px;
+    inline-size: 18px;
   }
 
-  /* The label is the control; give it a real focus ring driven by the hidden checkbox. */
+  .menu-lines span {
+    display: block;
+    block-size: 1px;
+    background: currentColor;
+    transition: transform var(--motion-duration-settle) var(--motion-easing-silk);
+  }
+
+  .menu-lines span:last-child {
+    inline-size: 70%;
+    justify-self: end;
+  }
+
+  .menu-toggle:checked + .menu-trigger .menu-lines span:first-child {
+    transform: translateY(3px) rotate(45deg);
+  }
+
+  .menu-toggle:checked + .menu-trigger .menu-lines span:last-child {
+    inline-size: 100%;
+    transform: translateY(-3px) rotate(-45deg);
+  }
+
   .menu-toggle:focus-visible + .menu-trigger {
     outline: var(--border-width-accent) solid var(--color-focus-ring);
-    outline-offset: 2px;
+    outline-offset: 3px;
   }
 
   .menu-trigger-close {
@@ -178,95 +227,141 @@ const currentPath = Astro.url.pathname;
     display: inline;
   }
 
+  /* While open, the header's own controls sit on the wine overlay. */
+  .site-header:has(.menu-toggle:checked) .wordmark,
+  .menu-toggle:checked + .menu-trigger {
+    color: #fbf1ee;
+    border-color: rgb(251 241 238 / 40%);
+  }
+
   .primary-nav {
     display: none;
   }
 
-  /* Full-screen overlay, not a slide-down strip. Opaque — no blur, because a contrast ratio
-     over a shifting backdrop cannot be measured. */
+  /* Fullscreen overlay on the wine ground. Opaque — a contrast ratio over a shifting backdrop
+     cannot be measured. Items sit in the lower two-thirds, within thumb reach. */
   .menu-toggle:checked ~ .primary-nav {
     position: fixed;
     inset: 0;
     z-index: var(--z-overlay);
     display: flex;
     flex-direction: column;
-    /* Items in the LOWER TWO-THIRDS, within thumb reach. A menu that needs a second hand has
-       failed. */
     justify-content: flex-end;
-    gap: var(--space-4);
-    padding: var(--space-6) var(--layout-margin) var(--space-10);
-    background: var(--color-ground-overlay);
-    animation: reveal var(--motion-duration-base) var(--motion-easing-standard);
+    gap: var(--space-5);
+    padding: calc(var(--layout-header-height) + var(--space-3)) var(--layout-margin) var(--space-8);
+    background: var(--gradient-wine);
+    overflow-y: auto;
+    animation: menu-in var(--motion-duration-settle) var(--motion-easing-silk);
   }
 
-  @keyframes reveal {
+  @keyframes menu-in {
     from {
       opacity: 0;
+      clip-path: inset(0 0 100% 0);
     }
     to {
       opacity: 1;
+      clip-path: inset(0 0 0 0);
     }
+  }
+
+  .menu-portrait {
+    inline-size: 7rem;
+    opacity: 0.95;
   }
 
   .nav-list {
     display: flex;
     flex-direction: column;
-    gap: var(--space-2);
+    gap: var(--space-1);
   }
 
   .nav-list a {
-    display: block;
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
     min-block-size: 44px;
     padding-block: var(--space-1);
-    font-family: var(--type-family-ui);
-    font-size: calc(var(--type-body-lg) * var(--type-arabic-size-factor));
-    color: var(--color-text-primary);
+    color: #fbf1ee;
     text-decoration: none;
+    border-block-end: 1px solid rgb(251 241 238 / 12%);
   }
 
-  .nav-list a[aria-current="page"] {
-    /* State, not colour alone: weight plus a rule beneath. */
-    font-weight: var(--type-weight-medium);
-    border-block-end: var(--border-rule-verdict);
-    padding-block-end: var(--space-0-5);
+  .nav-index {
+    font-size: var(--type-record-sm);
+    color: #cfaab1;
   }
 
-  .nav-list a:hover {
-    color: var(--color-accent-clay-hover);
+  .nav-label {
+    font-family: var(--type-family-display);
+    font-size: calc(clamp(2.1rem, 1.5rem + 3vw, 3rem) * var(--type-arabic-size-factor));
+    line-height: 1.1;
+  }
+
+  .nav-list a:hover .nav-label,
+  .nav-list a[aria-current] .nav-label {
+    font-family: var(--type-family-accent);
+    color: #f3b8c6;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .menu-toggle:checked ~ .primary-nav .nav-list li {
+      animation: reveal-rise 700ms var(--motion-easing-silk) both;
+      animation-delay: calc(var(--i) * 60ms + 120ms);
+    }
+  }
+
+  .nav-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
   }
 
   .cta {
-    align-self: flex-start;
-    padding: var(--space-1) var(--space-3);
-    min-block-size: 44px;
     display: inline-flex;
     align-items: center;
-    border: var(--border-rule-strong);
+    min-block-size: 44px;
+    padding: 0.7rem 1.5rem;
+    border: 1px solid rgb(251 241 238 / 55%);
     border-radius: var(--radius-control);
     font-family: var(--type-family-ui);
-    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
-    color: var(--color-text-primary);
+    font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
+    font-weight: var(--type-weight-medium);
+    letter-spacing: var(--type-tracking-label);
+    text-transform: uppercase;
+    color: #fbf1ee;
     text-decoration: none;
     white-space: nowrap;
+    transition:
+      background-color var(--motion-duration-base) var(--motion-easing-silk),
+      color var(--motion-duration-base) var(--motion-easing-silk),
+      border-color var(--motion-duration-base) var(--motion-easing-silk);
+  }
+
+  :global(html[lang="ar"]) .cta,
+  :global(html[lang="ar"]) .menu-trigger {
+    text-transform: none;
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
   }
 
   .cta:hover {
-    border-color: var(--color-accent-clay);
-    color: var(--color-accent-clay-hover);
+    background: #fbf1ee;
+    color: var(--palette-wine);
   }
 
-  .switcher-slot {
-    padding-block-start: var(--space-2);
-    border-block-start: var(--border-rule-hairline);
+  .switcher-slot :global(.switcher),
+  .switcher-slot :global(.switcher a) {
+    color: #ecc9c9;
   }
 
-  /* ---------------------------------------------------------------- 1024 and up
-     The full header appears. Measured to fit: 961px available at 1024, 753px needed in
-     English, 686px in Arabic. */
+  /* ---------------------------------------------------------------- 1024 and up */
 
   @media (min-width: 1024px) {
     .menu-trigger,
-    .menu-toggle {
+    .menu-toggle,
+    .menu-portrait {
       display: none;
     }
 
@@ -274,38 +369,103 @@ const currentPath = Astro.url.pathname;
     .menu-toggle:checked ~ .primary-nav {
       position: static;
       display: flex;
+      flex: 1;
       flex-direction: row;
       align-items: center;
-      gap: var(--space-4);
+      justify-content: space-between;
+      gap: var(--space-5);
       padding: 0;
       background: none;
       animation: none;
       inset: auto;
+      overflow: visible;
     }
 
     .nav-list {
       flex-direction: row;
-      gap: var(--space-4);
+      gap: clamp(1.25rem, 2.2vw, 2.5rem);
+      margin-inline: auto;
+    }
+
+    .nav-list li {
+      animation: none !important;
     }
 
     .nav-list a {
+      position: relative;
       min-block-size: 0;
-      font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+      padding-block: 0.4rem;
+      border: 0;
       color: var(--color-text-secondary);
       white-space: nowrap;
     }
 
-    .nav-list a[aria-current="page"] {
+    .nav-index {
+      display: none;
+    }
+
+    .nav-label {
+      font-family: var(--type-family-ui);
+      font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
+      font-weight: var(--type-weight-medium);
+      letter-spacing: var(--type-tracking-label);
+      text-transform: uppercase;
+      line-height: 1.4;
+    }
+
+    :global(html[lang="ar"]) .nav-label {
+      text-transform: none;
+      font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+    }
+
+    .nav-list a:hover .nav-label,
+    .nav-list a[aria-current] .nav-label {
+      font-family: var(--type-family-ui);
       color: var(--color-text-primary);
     }
 
-    .cta {
-      align-self: auto;
+    /* A drawn underline, from the reading edge. */
+    .nav-list a::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0;
+      inset-block-end: 0;
+      block-size: 1px;
+      background: var(--color-accent-clay);
+      transform: scaleX(0);
+      transform-origin: inline-start;
+      transition: transform var(--motion-duration-settle) var(--motion-easing-silk);
     }
 
-    .switcher-slot {
-      padding-block-start: 0;
-      border-block-start: none;
+    .nav-list a:hover::after,
+    .nav-list a[aria-current]::after {
+      transform: scaleX(1);
+    }
+
+    .nav-actions {
+      flex-wrap: nowrap;
+      gap: var(--space-4);
+    }
+
+    .cta {
+      min-block-size: 42px;
+      padding: 0.6rem 1.35rem;
+      border-color: var(--color-text-primary);
+      color: var(--color-text-primary);
+    }
+
+    .cta:hover,
+    .cta[aria-current] {
+      background: var(--color-text-primary);
+      color: var(--palette-ivory);
+    }
+
+    .switcher-slot :global(.switcher) {
+      color: var(--color-text-muted);
+    }
+
+    .switcher-slot :global(.switcher a) {
+      color: var(--color-text-secondary);
     }
   }
 </style>

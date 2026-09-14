@@ -1,28 +1,21 @@
 ---
 /**
- * REVIEW ENTRY — the index treatment, and the reason there is no Card in this codebase.
+ * REVIEW ENTRY — the index treatment. Phase 11 turns the hairline row into an editorial card.
  *
- * Image, hairline, type. No container, no border, no padding box, no shadow, no hover lift.
- * The hairline does the separating that a card's edge would have done, at a fraction of the
- * visual weight.
+ * The card has two parts: a STAGE, where an original 3D product floats over a blush plate with the
+ * category set large behind it, and the RECORD beneath. The component is still not a generic Card:
+ * it exists for exactly one entity and exposes exactly the fields below.
  *
- * WHAT AN ENTRY EXPOSES, and why each field is here rather than "because we have it":
- *
- *   disclosure label   FIRST. A review's commercial status is part of its identity even in a
- *                      listing. This is the single most important thing an archive of paid and
- *                      unpaid testing can show at a glance, and it is why no filter for it is
- *                      needed: the answer is already on every row.
+ * WHAT AN ENTRY EXPOSES:
+ *   disclosure label   FIRST — a review's commercial status is part of its identity
  *   brand + category   what was tested, and from whom
- *   title              the product
- *   subtitle           THE TEST — "Eight hours in 38 degree heat, tested four times". This is
- *                      what makes the archive an index of testing records rather than a product
- *                      grid
- *   conditions         at most two, in record density, where the review published them
- *   dates              tested / updated, because a record's age is part of the record
+ *   title / subtitle   the product, and THE TEST ("Eight hours in 38 degree heat…")
+ *   conditions         at most two, where the review published them
+ *   verdict seal       Zina's own words from `verdict.wouldRepurchase` — never a score
+ *   dates              tested / updated
  *
- * WHAT IT MUST NEVER EXPOSE: a score, a star, a rank, a "best" label, an award, a popularity
- * or engagement figure, or any social proof. The archive must not imply that reviews are
- * scientifically equivalent measurements.
+ * WHAT IT MUST NEVER EXPOSE: a score, a star, a rank, a "best" label, an award, a popularity or
+ * engagement figure, or any social proof.
  */
 import type { Locale, Review } from "../../../content/schema/types";
 import { brandById, brandPassesGate } from "../../lib/content";
@@ -30,22 +23,15 @@ import { path } from "../../lib/routing";
 import { t } from "../../lib/ui-strings";
 import { isolateIdentifier, isolateValue } from "../../lib/bidi";
 import { formatDate } from "../../lib/format";
+import { cosmeticForCategory } from "../../lib/cosmetic-kinds";
+import FloatingCosmetic from "../beauty/FloatingCosmetic.astro";
+import VerdictSeal from "../beauty/VerdictSeal.astro";
 
 interface Props {
   locale: Locale;
   review: Review;
-  /** The featured entry gets more room; layout is chosen by count, not scaled. */
   featured?: boolean;
-  /**
-   * Heading level, declared by the CALLER because it is a property of the document outline
-   * rather than of this component.
-   *
-   *   reviews index / facet pages   h2  — the entries sit directly under the page h1
-   *   homepage "Recent records"     h3  — the entries sit under that section's h2
-   *
-   * Hard-coding h3 produced an h1 -> h3 skip on the facet pages, caught by
-   * tests/global.test.mjs.
-   */
+  /** Heading level, declared by the CALLER — a property of the document outline. */
   headingLevel?: 2 | 3;
 }
 
@@ -55,80 +41,153 @@ const Heading: "h2" | "h3" = headingLevel === 3 ? "h3" : "h2";
 const content = review.locales[locale]!;
 const brand = brandById(review.entity.brandId);
 const brandName = brand?.locales?.[locale]?.name ?? brand?.slug;
-
-// The gated-link rule (R-14): the brand name is only a LINK to a brand page when that page
-// exists in this locale. Here it is never a link at all — the whole row already links to the
-// review, and a nested link would give the row two targets.
 const brandLinked = brand ? brandPassesGate(brand, locale) : false;
-
-// At most two conditions, from what the review actually published. Not padded to two.
 const conditions = (content.conditions ?? []).slice(0, 2);
+const cosmetic = cosmeticForCategory(review.entity.category);
+const verdict = (content as { verdict?: { wouldRepurchase?: string } }).verdict;
 ---
 
-<article class:list={["entry", featured && "entry--featured"]}>
+<article class:list={["entry", featured && "entry--featured", "reveal"]}>
   <a class="entry-link" href={path.review(locale, content.slug!)}>
-    <p class="label disclosure">{content.disclosureLabel}</p>
+    <div class="entry-stage" aria-hidden="true">
+      <span class="entry-stage-word">{review.entity.category}</span>
+      <span class="entry-stage-arch"></span>
+      <FloatingCosmetic kind={cosmetic.kind} tint={cosmetic.tint} depth={0.6} yaw={-0.35} class="entry-cosmetic" />
+    </div>
 
-    <p class="identity">
-      {brandName && <Fragment set:html={isolateIdentifier(brandName, locale)} />}
-      <span class="sep" aria-hidden="true">·</span>
-      <span>{review.entity.category}</span>
-    </p>
+    <div class="entry-body">
+      <p class="label disclosure">{content.disclosureLabel}</p>
 
-    <Heading class="title">{content.title}</Heading>
-    <p class="subtitle">{content.subtitle}</p>
+      <p class="identity">
+        {brandName && <Fragment set:html={isolateIdentifier(brandName, locale)} />}
+        <span class="sep" aria-hidden="true">·</span>
+        <span>{review.entity.category}</span>
+      </p>
+
+      <Heading class="title">{content.title}</Heading>
+      <p class="subtitle">{content.subtitle}</p>
+    </div>
   </a>
 
-  {
-    conditions.length > 0 && (
-      <dl class="conditions record">
-        {conditions.map((condition) => (
-          <div class="condition">
-            <dt>{condition.label}</dt>
-            <dd set:html={isolateValue(condition.value)} />
-          </div>
-        ))}
-      </dl>
-    )
-  }
+  <div class="entry-meta">
+    {
+      conditions.length > 0 && (
+        <dl class="conditions record">
+          {conditions.map((condition) => (
+            <div class="condition">
+              <dt>{condition.label}</dt>
+              <dd set:html={isolateValue(condition.value)} />
+            </div>
+          ))}
+        </dl>
+      )
+    }
 
-  <p class="dates">
-    <span>{t(locale, "tested")}</span>{" "}
-    <time datetime={review.dates.testedTo} set:html={isolateValue(formatDate(review.dates.testedTo, locale))} />
-    {
-      review.dates.updatedAt !== review.dates.publishedAt && (
-        <>
-          <span class="sep" aria-hidden="true">·</span>
-          <span>{t(locale, "updated")}</span>{" "}
-          <time datetime={review.dates.updatedAt} set:html={isolateValue(formatDate(review.dates.updatedAt, locale))} />
-        </>
-      )
-    }
-    {
-      !brandLinked && brandName && (
-        <span class="visually-hidden">{brandName}</span>
-      )
-    }
-  </p>
+    <VerdictSeal locale={locale} value={verdict?.wouldRepurchase} compact />
+
+    <p class="dates">
+      <span>{t(locale, "tested")}</span>{" "}
+      <time datetime={review.dates.testedTo} set:html={isolateValue(formatDate(review.dates.testedTo, locale))} />
+      {
+        review.dates.updatedAt !== review.dates.publishedAt && (
+          <>
+            <span class="sep" aria-hidden="true">·</span>
+            <span>{t(locale, "updated")}</span>{" "}
+            <time datetime={review.dates.updatedAt} set:html={isolateValue(formatDate(review.dates.updatedAt, locale))} />
+          </>
+        )
+      }
+      {!brandLinked && brandName && <span class="visually-hidden">{brandName}</span>}
+    </p>
+  </div>
 </article>
 
 <style>
   .entry {
-    padding-block-start: var(--space-3);
-    border-block-start: var(--border-rule-hairline);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--radius-card);
+    background: var(--color-ground-card);
+    border: 1px solid color-mix(in srgb, var(--color-line-hairline) 90%, transparent);
+    box-shadow: var(--shadow-soft);
+    overflow: hidden;
+    transition:
+      transform var(--motion-duration-settle) var(--motion-easing-silk),
+      box-shadow var(--motion-duration-settle) var(--motion-easing-silk);
   }
 
-  /* The whole block is the link. One focusable element, one accessible name, and the ring
-     surrounds all of it. */
+  @media (hover: hover) {
+    .entry:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-float);
+    }
+  }
+
+  /* The whole upper block is the link: one focusable element, one accessible name. */
   .entry-link {
     display: grid;
-    gap: var(--space-1);
     text-decoration: none;
     color: inherit;
+    border-radius: var(--radius-card) var(--radius-card) 0 0;
+  }
+
+  .entry-link:focus-visible {
+    outline-offset: -4px;
+  }
+
+  /* ---------------------------------------------------------------- the stage */
+
+  .entry-stage {
+    position: relative;
+    aspect-ratio: 5 / 3.6;
+    overflow: hidden;
+    background:
+      radial-gradient(70% 80% at 50% 90%, rgb(235 201 200 / 90%), rgb(235 201 200 / 0%) 70%),
+      linear-gradient(180deg, var(--palette-cream), var(--palette-powder));
+  }
+
+  .entry-stage-word {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: 12%;
+    text-align: center;
+    font-family: var(--type-family-accent);
+    font-size: calc(clamp(2.6rem, 2rem + 2.4vw, 4.2rem) * var(--type-arabic-size-factor));
+    line-height: 1;
+    color: color-mix(in srgb, var(--palette-deep-rose) 22%, transparent);
+    white-space: nowrap;
+  }
+
+  /* A pale podium — the plinth of a product still life. */
+  .entry-stage-arch {
+    position: absolute;
+    inset-inline: 24%;
+    inset-block-end: 9%;
+    block-size: 15%;
+    border-radius: 50%;
+    background: linear-gradient(180deg, #fffaf7 0%, var(--palette-petal) 100%);
+    box-shadow:
+      0 18px 30px -18px rgb(94 31 51 / 35%),
+      inset 0 -6px 12px rgb(122 35 66 / 10%);
+  }
+
+  .entry-cosmetic {
+    inline-size: 56%;
+    inset-inline-start: 22%;
+    inset-block-start: 4%;
+  }
+
+  /* ---------------------------------------------------------------- the record */
+
+  .entry-body {
+    display: grid;
+    gap: var(--space-1);
+    padding: var(--space-3) var(--space-3) 0;
   }
 
   .disclosure {
-    color: var(--color-text-muted);
+    color: var(--color-accent-clay);
   }
 
   .identity {
@@ -146,16 +205,20 @@ const conditions = (content.conditions ?? []).slice(0, 2);
   }
 
   .title {
+    margin-block-start: var(--space-0-5);
     font-family: var(--type-family-display);
     font-size: calc(var(--type-display-sm) * var(--type-arabic-size-factor));
     line-height: calc(var(--type-leading-display-sm) * var(--type-arabic-leading-factor));
     font-weight: var(--type-weight-regular);
     color: var(--color-text-primary);
+    transition: color var(--motion-duration-base) var(--motion-easing-silk);
   }
 
   .entry-link:hover .title {
     color: var(--color-accent-clay-hover);
     text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
   }
 
   .subtitle {
@@ -165,12 +228,21 @@ const conditions = (content.conditions ?? []).slice(0, 2);
     color: var(--color-text-secondary);
   }
 
-  /* Record density, rationed: two values, no tiles, no borders, no icons. */
+  .entry-meta {
+    display: grid;
+    gap: var(--space-2);
+    justify-items: start;
+    margin-block-start: auto;
+    padding: var(--space-3);
+  }
+
   .conditions {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-1) var(--space-4);
-    margin-block-start: var(--space-2);
+    padding-block-start: var(--space-2);
+    border-block-start: var(--border-rule-hairline);
+    inline-size: 100%;
   }
 
   .condition {
@@ -197,7 +269,6 @@ const conditions = (content.conditions ?? []).slice(0, 2);
   }
 
   .dates {
-    margin-block-start: var(--space-2);
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-1);
@@ -212,7 +283,8 @@ const conditions = (content.conditions ?? []).slice(0, 2);
     font-size: var(--type-record-sm);
   }
 
-  /* Layout by count: the featured entry is given MORE space, not a different component. */
+  /* ---------------------------------------------------------------- featured */
+
   .entry--featured .title {
     font-size: calc(var(--type-display-md) * var(--type-arabic-size-factor));
     line-height: calc(var(--type-leading-display-md) * var(--type-arabic-leading-factor));
@@ -223,9 +295,31 @@ const conditions = (content.conditions ?? []).slice(0, 2);
     max-width: var(--type-measure-editorial);
   }
 
-  @media (min-width: 768px) {
-    .entry {
-      padding-block-start: var(--space-4);
+  @media (min-width: 900px) {
+    .entry--featured {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+      grid-template-rows: auto 1fr;
+    }
+
+    .entry--featured .entry-link {
+      display: contents;
+    }
+
+    .entry--featured .entry-stage {
+      grid-row: 1 / span 2;
+      aspect-ratio: auto;
+      min-block-size: 26rem;
+    }
+
+    .entry--featured .entry-body {
+      padding: var(--space-6) var(--space-6) 0;
+      align-content: start;
+    }
+
+    .entry--featured .entry-meta {
+      padding: var(--space-4) var(--space-6) var(--space-6);
+      align-content: end;
     }
   }
 </style>

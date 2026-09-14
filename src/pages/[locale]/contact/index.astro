@@ -50,6 +50,7 @@ import { t } from "../../../lib/ui-strings";
 import { isolateValue } from "../../../lib/bidi";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
+import PageHero from "../../../components/beauty/PageHero.astro";
 
 export const getStaticPaths = (() =>
   LOCALES.map((locale) => ({ params: { locale } }))) satisfies GetStaticPaths;
@@ -117,11 +118,15 @@ const hasAnyChannel = hasAnyContactChannel();
   schemas={schemas}
   switcherHref={path.contact(locale === "en" ? "ar" : "en")}
 >
-  <div class="container contact">
+  <PageHero locale={locale} photo="portraitGoldenHour" tone="champagne" cosmetics={[{ kind: "perfume", tint: "rose" }, { kind: "gloss", tint: "blush" }]}>
     <Breadcrumbs locale={locale} crumbs={crumbs} />
 
+    <p class="eyebrow">{t(locale, "collaborateEyebrow")}</p>
     <h1 class="display-lg title">{t(locale, "collaborate")}</h1>
     <p class="intro text-column">{t(locale, "contactIntro")}</p>
+  </PageHero>
+
+  <div class="container contact">
 
     {collaborationBio && <p class="collaboration text-column">{collaborationBio}</p>}
 
@@ -217,12 +222,12 @@ const hasAnyChannel = hasAnyContactChannel();
     padding-block: var(--space-6) var(--space-8);
   }
 
-  .title {
-    margin: 0;
+  .eyebrow {
+    margin-block-start: var(--space-5);
   }
 
   .intro {
-    margin-block: var(--space-2) var(--space-3);
+    margin-block: var(--space-3) 0;
     color: var(--color-text-secondary);
     font-size: var(--type-body-lg);
   }
@@ -262,12 +267,33 @@ const hasAnyChannel = hasAnyContactChannel();
     font-weight: var(--type-weight-regular);
   }
 
+  .channel-list {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  /* Each channel is a soft card with the address set large — the page's primary action. */
   .channel {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-1) var(--space-2);
-    padding-block: var(--space-2);
-    border-block-start: var(--border-rule-hairline);
+    display: grid;
+    gap: var(--space-1);
+    padding: var(--space-4);
+    border-radius: var(--radius-card);
+    background: var(--color-ground-card);
+    border: 1px solid var(--color-line-hairline);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .channel dd a {
+    font-family: var(--type-family-display);
+    font-size: calc(var(--type-display-sm) * var(--type-arabic-size-factor));
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+
+  @media (min-width: 900px) {
+    .channel-list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
   }
 
   .channel dt {

@@ -49,6 +49,7 @@ import { t } from "../../../lib/ui-strings";
 import { isolateValue } from "../../../lib/bidi";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
+import PageHero from "../../../components/beauty/PageHero.astro";
 
 export const getStaticPaths = (() =>
   LOCALES.map((locale) => ({ params: { locale } }))) satisfies GetStaticPaths;
@@ -116,11 +117,14 @@ const bio = person().locales[locale]?.bios?.editorialByline ?? "";
   schemas={schemas}
   switcherHref={path.method(locale === "en" ? "ar" : "en")}
 >
-  <div class="container method">
+  <PageHero locale={locale} photo="studioSeated" tone="powder" cosmetics={[{ kind: "foundation", tint: "nude" }, { kind: "serum", tint: "blush" }]}>
     <Breadcrumbs locale={locale} crumbs={crumbs} />
 
     <h1 class="display-lg title">{content.name}</h1>
     <p class="tagline">{content.tagline}</p>
+  </PageHero>
+
+  <div class="container method">
 
     {/*
       THE REAL PROCESS, FIRST — Phase 9.
@@ -239,16 +243,11 @@ const bio = person().locales[locale]?.bios?.editorialByline ?? "";
 
 <style>
   .method {
-    padding-block: var(--space-6) var(--space-10);
-  }
-
-  .title {
-    margin-block-start: var(--space-3);
-    max-width: 18ch;
+    padding-block: var(--space-4) var(--space-10);
   }
 
   .tagline {
-    margin-block-start: var(--space-2);
+    margin-block-start: var(--space-3);
     max-width: var(--type-measure-editorial);
     font-family: var(--type-family-display);
     font-size: calc(var(--type-display-sm) * var(--type-arabic-size-factor));

@@ -39,6 +39,9 @@ import { breadcrumbSchema, jsonLd, personSchema, templatedMeta } from "../../../
 import { t } from "../../../lib/ui-strings";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
+import PageHero from "../../../components/beauty/PageHero.astro";
+import EditorialImage from "../../../components/beauty/EditorialImage.astro";
+import FloatingCosmetic from "../../../components/beauty/FloatingCosmetic.astro";
 
 export const getStaticPaths = (() =>
   LOCALES.map((locale) => ({ params: { locale } }))) satisfies GetStaticPaths;
@@ -95,13 +98,15 @@ const methodName = methodRecord.locales[locale]?.name ?? t(locale, "method");
   schemas={schemas}
   switcherHref={path.about(locale === "en" ? "ar" : "en")}
 >
-  <div class="container about">
+  <PageHero locale={locale} photo="studioWarmProfile" cosmetics={[{ kind: "jar", tint: "blush" }, { kind: "lipstick", tint: "rose" }]}>
     <Breadcrumbs locale={locale} crumbs={crumbs} />
 
     <h1 class="display-lg title">{name}</h1>
     <p class="professional-title label">{content.professionalTitle}</p>
     <p class="tagline">{content.tagline}</p>
+  </PageHero>
 
+  <div class="container about">
     {
       IS_MOCK_SOURCE && (
         /* The biography is placeholder copy. Said once, above it, not in a footnote. */
@@ -109,8 +114,33 @@ const methodName = methodRecord.locales[locale]?.name ?? t(locale, "method");
       )
     }
 
-    <div class="bio text-column">
-      {content.bios.long.split("\n\n").map((para) => <p>{para}</p>)}
+    {/* Phase 11: the biography sits beside a layered pair of Zina's portraits. */}
+    <div class="bio-spread">
+      <div class="bio text-column">
+        {content.bios.long.split("\n\n").map((para) => <p>{para}</p>)}
+      </div>
+
+      <div class="bio-gallery">
+        <EditorialImage
+          photo="portraitRadiant"
+          locale={locale}
+          mask="arch"
+          ratio="4 / 5"
+          parallax={true}
+          sizes="(min-width: 1024px) 26vw, 70vw"
+          class="bio-photo bio-photo--main"
+        />
+        <EditorialImage
+          photo="studioMonochrome"
+          locale={locale}
+          mask="soft"
+          ratio="3 / 4"
+          sizes="(min-width: 1024px) 14vw, 40vw"
+          widths={[240, 360, 480]}
+          class="bio-photo bio-photo--inset"
+        />
+        <FloatingCosmetic kind="perfume" tint="blush" depth={0.6} yaw={0.4} desktopOnly class="bio-cosmetic" />
+      </div>
     </div>
 
     {
@@ -173,18 +203,63 @@ const methodName = methodRecord.locales[locale]?.name ?? t(locale, "method");
 
 <style>
   .about {
-    padding-block: var(--space-6) var(--space-8);
-    /* Lighter than the evidence surfaces: a narrower column and more air. */
+    padding-block: var(--space-4) var(--space-8);
+  }
+
+  .about > section {
     max-inline-size: 52rem;
   }
 
-  .title {
-    margin: 0;
+  .professional-title {
+    margin: var(--space-3) 0 0;
+    color: var(--color-accent-clay);
   }
 
-  .professional-title {
-    margin: var(--space-1) 0 0;
-    color: var(--color-text-muted);
+  .bio-spread {
+    display: grid;
+    gap: var(--space-8);
+    align-items: start;
+  }
+
+  .bio-gallery {
+    position: relative;
+    inline-size: min(78vw, 26rem);
+    justify-self: center;
+    margin-block-end: var(--space-6);
+  }
+
+  .bio-photo--main {
+    box-shadow: var(--shadow-float);
+  }
+
+  .bio-photo--inset {
+    position: absolute;
+    inline-size: 46%;
+    inset-block-end: -14%;
+    inset-inline-start: -16%;
+    border: 6px solid var(--palette-ivory);
+  }
+
+  .bio-cosmetic {
+    inline-size: 38%;
+    inset-block-start: -6%;
+    inset-inline-end: -22%;
+  }
+
+  .bio p + p {
+    margin-block-start: var(--space-3);
+  }
+
+  @media (min-width: 1024px) {
+    .bio-spread {
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+      gap: var(--space-12);
+    }
+
+    .bio-gallery {
+      position: sticky;
+      inset-block-start: calc(var(--layout-header-height) + var(--space-6));
+    }
   }
 
   .tagline {

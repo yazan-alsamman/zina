@@ -1,0 +1,193 @@
+---
+/**
+ * PAGE HERO — the shared opening of every inner page (BeautyHero in the Phase 11 brief).
+ *
+ * The page keeps ownership of its own breadcrumbs, <h1> and intro (passed as the default slot),
+ * so each template's document outline, test hooks and copy are untouched. This component only
+ * supplies the composition around them: a tonal ground, soft organic light, an optional arched
+ * portrait of Zina, and up to two floating products beside it.
+ *
+ * Without a photograph the copy takes the full width — a typographic opening, not a gap.
+ */
+import type { Locale } from "../../../content/schema/types";
+import type { PhotographKey } from "../../lib/photography";
+import type { CosmeticKind, CosmeticTint } from "../../scripts/cosmetics/models";
+import EditorialImage from "./EditorialImage.astro";
+import FloatingCosmetic from "./FloatingCosmetic.astro";
+
+interface Props {
+  locale: Locale;
+  photo?: PhotographKey;
+  tone?: "blush" | "champagne" | "powder";
+  cosmetics?: { kind: CosmeticKind; tint?: CosmeticTint }[];
+  compact?: boolean;
+}
+
+const { locale, photo, tone = "blush", cosmetics = [], compact = false } = Astro.props;
+const [first, second] = cosmetics;
+---
+
+<div class:list={["page-hero", `page-hero--${tone}`, photo && "page-hero--portrait", compact && "page-hero--compact"]}>
+  <span class="organic organic--glow page-hero-glow" aria-hidden="true"></span>
+  <span class="organic organic--champagne page-hero-glow-2" aria-hidden="true"></span>
+
+  <div class="container page-hero-inner">
+    <div class="page-hero-copy enter">
+      <slot />
+    </div>
+
+    {
+      photo && (
+        <div class="page-hero-media enter-fade" style="--enter-step: 2">
+          <span class="organic organic--petal organic--drift page-hero-petal" aria-hidden="true" />
+          <span class="organic organic--ring page-hero-ring" aria-hidden="true" />
+          <EditorialImage
+            photo={photo}
+            locale={locale}
+            mask="arch"
+            ratio="4 / 5.2"
+            priority={true}
+            sizes="(min-width: 1024px) 30vw, (min-width: 768px) 40vw, 70vw"
+            widths={[320, 480, 640, 820]}
+            class="page-hero-image"
+          />
+          {first && <FloatingCosmetic kind={first.kind} tint={first.tint} depth={0.8} class="page-hero-cosmetic page-hero-cosmetic--a" />}
+          {second && (
+            <FloatingCosmetic kind={second.kind} tint={second.tint} depth={0.4} yaw={0.5} desktopOnly class="page-hero-cosmetic page-hero-cosmetic--b" />
+          )}
+        </div>
+      )
+    }
+
+    {
+      !photo && first && (
+        <FloatingCosmetic kind={first.kind} tint={first.tint} depth={0.6} desktopOnly class="page-hero-cosmetic page-hero-cosmetic--solo" />
+      )
+    }
+  </div>
+</div>
+
+<style>
+  .page-hero {
+    position: relative;
+    overflow: clip;
+    padding-block: var(--space-4) var(--space-8);
+  }
+
+  .page-hero--blush {
+    background: var(--gradient-ivory-blush);
+  }
+
+  .page-hero--champagne {
+    background: linear-gradient(180deg, var(--palette-ivory), var(--palette-champagne));
+  }
+
+  .page-hero--powder {
+    background: linear-gradient(180deg, var(--palette-blush), var(--palette-powder));
+  }
+
+  .page-hero-glow {
+    inline-size: 38rem;
+    block-size: 38rem;
+    inset-block-start: -12rem;
+    inset-inline-end: -10rem;
+  }
+
+  .page-hero-glow-2 {
+    inline-size: 26rem;
+    block-size: 26rem;
+    inset-block-end: -12rem;
+    inset-inline-start: -8rem;
+  }
+
+  .page-hero-inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: var(--space-6);
+    align-items: end;
+  }
+
+  .page-hero-copy {
+    min-inline-size: 0;
+  }
+
+  /* The page's own h1 gets the magazine scale here, whatever class the template gave it. */
+  .page-hero-copy :global(h1) {
+    margin-block-start: var(--space-4);
+    font-size: calc(var(--type-display-xl) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-display-xl) * var(--type-arabic-leading-factor));
+    max-inline-size: 14ch;
+  }
+
+  .page-hero--compact .page-hero-copy :global(h1) {
+    font-size: calc(var(--type-display-lg) * var(--type-arabic-size-factor));
+    max-inline-size: 20ch;
+  }
+
+  .page-hero-media {
+    position: relative;
+    justify-self: center;
+    inline-size: min(78vw, 22rem);
+  }
+
+  .page-hero-image {
+    position: relative;
+    z-index: 1;
+    box-shadow: var(--shadow-float);
+  }
+
+  .page-hero-petal {
+    inset: 12% -14% -8% 18%;
+  }
+
+  .page-hero-ring {
+    inset: -4% 8% 10% -10%;
+    border-radius: var(--radius-arch);
+  }
+
+  .page-hero-cosmetic--a {
+    inline-size: 42%;
+    inset-block-end: -8%;
+    inset-inline-start: -22%;
+  }
+
+  .page-hero-cosmetic--b {
+    inline-size: 28%;
+    inset-block-start: -2%;
+    inset-inline-end: -6%;
+  }
+
+  .page-hero-cosmetic--solo {
+    inline-size: 14rem;
+    inset-block-start: 10%;
+    inset-inline-end: 4%;
+  }
+
+  @media (min-width: 768px) {
+    .page-hero {
+      padding-block: var(--space-6) var(--space-10);
+    }
+
+    .page-hero--portrait .page-hero-inner {
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+      gap: var(--space-8);
+    }
+
+    .page-hero-media {
+      inline-size: 100%;
+      max-inline-size: 26rem;
+      justify-self: end;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .page-hero {
+      padding-block: var(--space-8) var(--space-12);
+    }
+
+    .page-hero-inner {
+      align-items: center;
+    }
+  }
+</style>

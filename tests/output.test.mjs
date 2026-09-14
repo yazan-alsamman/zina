@@ -9,6 +9,7 @@
 
 import { test, describe, before } from "node:test";
 import assert from "node:assert/strict";
+import { assertOnlyCosmeticsLoader, assertChunksCollectNothing } from "./helpers/client-js.mjs";
 import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -368,36 +369,48 @@ describe("the gated-link rule (risk R-14)", () => {
 });
 
 describe("no prohibited dependencies or techniques", () => {
-  test("no client-side JavaScript is shipped", () => {
+  test("the only client script is the same-origin 3D loader, and it collects nothing", () => {
+    // Phase 11 replaced "zero client JavaScript" with this narrower, still-verifiable rule.
     for (const page of pages) {
-      const scripts = [...page.html.matchAll(/<script(?![^>]*application\/ld\+json)[^>]*>/g)];
-      assert.equal(scripts.length, 0, `${page.path} ships ${scripts.length} script tag(s)`);
+      assertOnlyCosmeticsLoader(assert, page.html, page.path);
     }
+    assertChunksCollectNothing(assert, dist);
   });
 
-  test("no rounded corners above the 2px control radius", () => {
+  test("every corner radius comes from the radius tokens or an organic percentage", () => {
+    // Phase 11 introduced soft geometry (pills, cards, arches). What must not happen is a one-off
+    // pixel radius invented in a component: every radius resolves to a token, 0, or a percentage
+    // shape (circles and the cream-swirl pebble).
     const css = readdirSync(join(dist, "_astro"))
       .filter((f) => f.endsWith(".css"))
       .map((f) => readFileSync(join(dist, "_astro", f), "utf8"))
       .join("\n");
     const radii = [...css.matchAll(/border-radius:\s*([^;}]+)/g)].map((m) => m[1].trim());
     for (const radius of radii) {
-      assert.ok(
-        /^(0|2px|var\(--radius-(none|control)\))$/.test(radius),
-        `forbidden border-radius in output: ${radius}`
-      );
+      for (const part of radius.split(/[\s/]+/).filter(Boolean)) {
+        assert.ok(
+          /^(0|\d+(\.\d+)?%|var\(--radius-[a-z]+\))$/.test(part),
+          `off-system border-radius in output: ${radius}`
+        );
+      }
     }
   });
 
-  test("no box-shadow is used for elevation", () => {
+  test("shadows are tokens or warm wine-tinted light — never neutral grey or black elevation", () => {
     const css = readdirSync(join(dist, "_astro"))
       .filter((f) => f.endsWith(".css"))
       .map((f) => readFileSync(join(dist, "_astro", f), "utf8"))
       .join("\n");
     const shadows = [...css.matchAll(/box-shadow:\s*([^;}]+)/g)].map((m) => m[1].trim());
     for (const shadow of shadows) {
-      // `inset 0 0 0 1px` draws the HOLLOW method-stage marker — a border, not elevation.
-      assert.ok(shadow.startsWith("inset"), `elevation shadow in output: ${shadow}`);
+      if (/^(none|var\(--shadow-[a-z]+\))$/.test(shadow)) continue;
+      for (const layer of shadow.split(/,(?![^(]*\))/)) {
+        if (/^inset 0 0 0 1px/.test(layer.trim()) || /CanvasText/.test(layer)) continue;
+        assert.ok(
+          /#(5e1f33|7a2342)[0-9a-f]{0,2}\b|rgb\((94 31 51|122 35 66)/i.test(layer),
+          `neutral or off-palette shadow in output: ${layer}`
+        );
+      }
     }
   });
 

@@ -10,6 +10,8 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "build:fonts": "node scripts/build-fonts.mjs",
+    "build:og": "node scripts/build-og-image.mjs",
     "preview": "astro preview",
     "check": "astro check",
     "test": "node --test \"tests/**/*.test.mjs\"",
@@ -22,15 +24,19 @@
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.14",
+    "@fontsource/cormorant-garamond": "^5.3.0",
     "@fontsource/ibm-plex-mono": "^5.3.0",
     "@fontsource/ibm-plex-sans": "^5.3.0",
     "@fontsource/ibm-plex-sans-arabic": "^5.3.0",
     "@fontsource/ibm-plex-serif": "^5.3.0",
+    "@fontsource/jost": "^5.3.0",
     "@fontsource/noto-naskh-arabic": "^5.3.0",
-    "astro": "^5.14.1"
+    "astro": "^5.14.1",
+    "three": "^0.186.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
+    "@types/three": "^0.186.0",
     "typescript": "^5.9.2"
   }
 }

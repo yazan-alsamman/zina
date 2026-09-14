@@ -37,6 +37,7 @@ import { breadcrumbSchema, jsonLd, templatedMeta } from "../../../lib/seo";
 import { t, type UiKey } from "../../../lib/ui-strings";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
+import PageHero from "../../../components/beauty/PageHero.astro";
 
 export const getStaticPaths = (() =>
   LOCALES.map((locale) => ({ params: { locale } }))) satisfies GetStaticPaths;
@@ -93,11 +94,14 @@ const methodName = method().locales[locale]?.name ?? t(locale, "method");
   schemas={schemas}
   switcherHref={path.editorialStandards(locale === "en" ? "ar" : "en")}
 >
-  <div class="container standards">
+  <PageHero locale={locale} compact tone="powder" cosmetics={[{ kind: "serum", tint: "rose" }]}>
     <Breadcrumbs locale={locale} crumbs={crumbs} />
 
     <h1 class="display-lg title">{t(locale, "editorialStandards")}</h1>
     <p class="intro text-column">{t(locale, "standardsIntro")}</p>
+  </PageHero>
+
+  <div class="container standards">
 
     {/*
       THE DISTINCTION FROM THE METHOD, STATED FIRST.

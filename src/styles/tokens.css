@@ -1,47 +1,74 @@
 /**
- * DESIGN TOKENS — direct implementation of docs/DESIGN_TOKENS_SPEC.md (Phase 2).
+ * DESIGN TOKENS — Phase 11 "Blush Atelier" identity (docs/PHASE_11_VISUAL_REDESIGN.md).
  *
- * Every colour value here is verified by `node tools/check-contrast.mjs` (24 pairs, exit 0).
- * Do not change a colour without re-running that tool.
+ * Phase 11 replaced the Phase 2 warm-ink palette with a luxury beauty identity: layered ivory,
+ * blush, powder, champagne and nude grounds; near-black plum text; deep rose and burgundy
+ * accents. Every text/ground pair here is verified by `node tools/check-contrast.mjs` — do not
+ * change a colour without re-running it.
  *
- * Naming follows the spec exactly: category.group.variant → --category-group-variant.
- * Semantic names only. There is no `--black-900` in this system and there must not be.
+ * SEMANTIC NAMES ARE PRESERVED. Components across the site reference --color-ground-base,
+ * --color-accent-clay and friends; those names keep their ROLE (the page ground, the editorial
+ * accent) while their values changed. That is what lets one file re-skin 85 pages consistently.
+ * `clay` now resolves to deep rose and `mineral` to muted plum.
  *
- * Three tokens encode a refusal and exist so the refusal cannot be quietly reversed:
- *   --shadow-none          the only shadow token in the system
- *   --radius-none          with no third radius value
- *   --type-tracking-arabic fixed at 0, never overridable
+ * Refusals that SURVIVE the redesign:
+ *   --type-tracking-arabic   fixed at 0, never overridable — tracking severs Arabic letterforms
+ *   no weights above 600
+ *   no italic synthesis — the italic accent is a real italic FACE registered under its own family
+ *   motion tokens collapse to 0 under prefers-reduced-motion
  */
 
 :root {
+  /* ---------------------------------------------------------------- colour: brand palette
+   * Raw brand values. Components should prefer the semantic tokens below; these exist for
+   * decorative surfaces (organic shapes, gradients, the 3D scene's CSS fallback). */
+  --palette-ivory: #fbf6f2;
+  --palette-cream: #f8f0ea;
+  --palette-blush: #f6e7e3;
+  --palette-powder: #f0dad6;
+  --palette-petal: #ebc9c8;
+  --palette-rose: #d9a3ab;
+  --palette-dusty-rose: #c08591;
+  --palette-champagne: #f3e9de;
+  --palette-champagne-metal: #c9a27e;
+  --palette-nude: #ebd9cf;
+  --palette-peach: #f7e3d9;
+  --palette-deep-rose: #9c3556;
+  --palette-burgundy: #7a2342;
+  --palette-wine: #2e1119;
+  --palette-plum: #74405f;
+
   /* ---------------------------------------------------------------- colour: ground */
-  --color-ground-inset: #0b0a08; /* conditions well, evidence strip */
-  --color-ground-base: #12100d; /* the page — warm ink, NOT black */
-  --color-ground-raised: #1a1714; /* disclosure band, claim block, related content */
-  --color-ground-overlay: #211d18; /* mobile menu, dialogs */
+  --color-ground-base: var(--palette-ivory); /* the page — warm ivory, NOT white */
+  --color-ground-raised: var(--palette-blush); /* disclosure band, claim block, related content */
+  --color-ground-inset: var(--palette-powder); /* conditions well, evidence strip */
+  --color-ground-overlay: var(--palette-wine); /* the fullscreen menu */
+  --color-ground-champagne: var(--palette-champagne);
+  --color-ground-nude: var(--palette-nude);
+  --color-ground-card: #fffaf7; /* review cards and floating captions */
 
   /* ---------------------------------------------------------------- colour: text */
-  --color-text-primary: #f2ede3; /* 16.28:1 on base — ivory, NOT white */
-  --color-text-secondary: #c3bAac; /* 9.89:1 */
-  --color-text-muted: #9a9184; /* 6.11:1 */
-  --color-text-on-accent: #12100d; /* 7.37:1 on clay */
+  --color-text-primary: #2b1a1f; /* 15.40:1 on ivory — plum near-black, never #000 */
+  --color-text-secondary: #5a444b; /* 8.28:1 */
+  --color-text-muted: #75595f; /* 5.84:1 on ivory, 4.69:1 on powder */
+  --color-text-on-accent: #fff8f5; /* 6.54:1 on deep rose */
 
   /* ---------------------------------------------------------------- colour: line */
-  --color-line-hairline: #2c2823; /* 1.30:1 — decorative only, carries no information */
-  --color-line-strong: #75695c; /* 3.56:1 — meaningful boundaries */
+  --color-line-hairline: #ead7d3; /* decorative only, carries no information */
+  --color-line-strong: #8c6b71; /* ≥3:1 on ivory, blush and card — meaningful boundaries */
 
   /* ---------------------------------------------------------------- colour: accent */
-  --color-accent-clay: #d9906a; /* 7.37:1 — editorial accent */
-  --color-accent-clay-hover: #e9a47e; /* 9.11:1 */
-  --color-accent-mineral: #a3bcaf; /* 9.38:1 — observed accent */
+  --color-accent-clay: var(--palette-deep-rose); /* 6.40:1 — links, CTAs, verdict rule */
+  --color-accent-clay-hover: var(--palette-burgundy); /* 9.12:1 */
+  --color-accent-mineral: var(--palette-plum); /* 7.41:1 — the observed voice */
+  --color-accent-champagne: var(--palette-champagne-metal); /* decorative metal, never text */
 
   /* ---------------------------------------------------------------- colour: status */
-  --color-status-success: #93b189;
-  --color-status-warning: #dca95e;
-  --color-status-error: #e08a80;
+  --color-status-success: #3d6a4c;
+  --color-status-warning: #86570f;
+  --color-status-error: #a1303a;
 
   /* ---------------------------------------------------------------- colour: evidence */
-  /* The three voices. Semantic aliases so the distinction cannot drift from the system. */
   --color-evidence-claim: var(--color-text-muted); /* what the brand says — quietest */
   --color-evidence-observation: var(--color-accent-mineral); /* what Zina saw */
   --color-evidence-verdict: var(--color-text-primary); /* what Zina concluded — loudest */
@@ -55,73 +82,86 @@
   --color-disclosure-pending: var(--color-status-warning);
 
   /* ---------------------------------------------------------------- colour: focus */
-  --color-focus-ring: var(--color-accent-clay);
+  --color-focus-ring: var(--palette-deep-rose);
   --color-focus-ring-on-accent: var(--color-text-primary);
+
+  /* ---------------------------------------------------------------- surfaces: gradients
+   * Soft tonal light, never a saturated sweep. Each one moves between two neighbouring
+   * grounds, so a section edge reads as a change of light rather than a cut. */
+  --gradient-ivory-blush: linear-gradient(180deg, var(--palette-ivory) 0%, var(--palette-blush) 100%);
+  --gradient-blush-ivory: linear-gradient(180deg, var(--palette-blush) 0%, var(--palette-ivory) 100%);
+  --gradient-powder-champagne: linear-gradient(160deg, var(--palette-powder) 0%, var(--palette-champagne) 100%);
+  --gradient-hero:
+    radial-gradient(60% 70% at 72% 38%, rgb(235 201 200 / 85%) 0%, rgb(235 201 200 / 0%) 70%),
+    radial-gradient(45% 50% at 12% 88%, rgb(243 233 222 / 90%) 0%, rgb(243 233 222 / 0%) 70%),
+    linear-gradient(180deg, var(--palette-cream) 0%, var(--palette-blush) 100%);
+  --gradient-glow: radial-gradient(closest-side, rgb(217 163 171 / 55%), rgb(217 163 171 / 0%));
+  --gradient-champagne-glow: radial-gradient(closest-side, rgb(201 162 126 / 35%), rgb(201 162 126 / 0%));
+  --gradient-wine:
+    radial-gradient(70% 90% at 85% 10%, rgb(156 53 86 / 45%) 0%, rgb(156 53 86 / 0%) 70%),
+    linear-gradient(180deg, #3a1522 0%, var(--palette-wine) 100%);
+  --gradient-rose-metal: linear-gradient(135deg, #e9c3b4 0%, #c79a86 45%, #f3dccf 60%, #b88471 100%);
 
   /* ---------------------------------------------------------------- typography: family
    *
-   * Zarid is NOT licensed (Phase 2 Q-2, Phase 3 Q3-1). These are the documented open-source
-   * FALLBACK TIER from docs/TYPOGRAPHY_SYSTEM.md section 6, self-hosted under SIL OFL 1.1.
-   *
-   * The families are declared once, here. Swapping in Zarid later is an edit to these four
-   * lines plus the @font-face declarations — no component changes.
+   * Display: Cormorant Garamond — a high-contrast Garamond for magazine-scale headlines.
+   * Accent: its true italic, registered as its OWN FAMILY so no `font-style: italic` is ever
+   *         declared (Arabic has no italic form, and the Arabic locale maps this token back to
+   *         its upright display face).
+   * UI/body: Jost — a geometric sans with the quiet authority of fashion labelling.
+   * All SIL OFL 1.1, self-hosted by scripts/build-fonts.mjs.
    */
-  --type-family-display: "IBM Plex Serif", Georgia, "Times New Roman", serif;
-  --type-family-body: "IBM Plex Serif", Georgia, "Times New Roman", serif;
-  --type-family-ui: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --type-family-record: "IBM Plex Mono", ui-monospace, "Cascadia Mono", monospace;
+  --type-family-display: "Cormorant Garamond", "Cormorant", Georgia, "Times New Roman", serif;
+  --type-family-accent: "Cormorant Garamond Italic", "Cormorant Garamond", Georgia, serif;
+  --type-family-body: "Jost", "Helvetica Neue", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --type-family-ui: "Jost", "Helvetica Neue", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* The record tier (numerals, units, Latin identifiers) keeps its role but sheds the
+     monospace face — tabular Jost reads as a luxury spec sheet rather than a terminal. */
+  --type-family-record: "Jost", "Helvetica Neue", system-ui, sans-serif;
 
   /* ---------------------------------------------------------------- typography: weight */
   --type-weight-regular: 400;
   --type-weight-medium: 500;
   --type-weight-semibold: 600;
-  /* No weights below 400 or above 600 exist in this system. */
 
-  /* ---------------------------------------------------------------- typography: script adaptation
-   *
-   * Applied at the LOCALE ROOT only (see [lang="ar"] below), never per component.
-   * Getting these wrong is the most common reason Arabic pages feel cramped beside English.
-   */
+  /* ---------------------------------------------------------------- typography: script adaptation */
   --type-arabic-size-factor: 1;
   --type-arabic-leading-factor: 1;
-  --type-tracking-label: 0.08em; /* Latin only */
-  --type-tracking-display: -0.01em; /* Latin only */
+  --type-tracking-label: 0.22em; /* Latin only — luxury labelling is widely tracked */
+  --type-tracking-display: -0.015em; /* Latin only */
+  --type-tracking-wordmark: 0.32em; /* Latin only */
+  --type-tracking-record: 0.02em; /* Latin only */
 
   /* ---------------------------------------------------------------- typography: scale
-   *
-   * Fluid between 375 and 1440 (docs/RESPONSIVE_UX_SPEC.md section 4).
-   * clamp() uses a rem-based preferred value so browser text-size settings and zoom keep
-   * working. A vw-only formula breaks user font scaling and is a WCAG 1.4.4 failure.
-   *
-   * Floors hold at every width: body never below 16px, mono never below 13px, nothing below 12px.
-   */
-  --type-display-xl: clamp(2.125rem, 1.2rem + 3.95vw, 4.75rem); /* 34 → 76 */
-  --type-display-lg: clamp(1.875rem, 1.32rem + 2.37vw, 3.5rem); /* 30 → 56 */
-  --type-display-md: clamp(1.625rem, 1.32rem + 1.32vw, 2.5rem); /* 26 → 40 */
-  --type-display-sm: clamp(1.375rem, 1.24rem + 0.56vw, 1.875rem); /* 22 → 30 */
-  --type-body-lg: clamp(1.1875rem, 1.15rem + 0.19vw, 1.3125rem); /* 19 → 21 */
-  --type-body-md: clamp(1.0625rem, 1.05rem + 0.09vw, 1.125rem); /* 17 → 18 */
+   * Fluid between 375 and 1440. rem-based preferred values keep browser text scaling working
+   * (WCAG 1.4.4). Floors: body never below 16px, nothing below 12px. */
+  --type-display-hero: clamp(3rem, 1.6rem + 6vw, 7.25rem); /* 48 → 116 */
+  --type-display-xl: clamp(2.5rem, 1.5rem + 4.3vw, 5.5rem); /* 40 → 88 */
+  --type-display-lg: clamp(2.25rem, 1.45rem + 3.2vw, 4.25rem); /* 36 → 68 */
+  --type-display-md: clamp(1.875rem, 1.4rem + 1.9vw, 3rem); /* 30 → 48 */
+  --type-display-sm: clamp(1.5rem, 1.3rem + 0.8vw, 2.125rem); /* 24 → 34 */
+  --type-body-lg: clamp(1.125rem, 1.08rem + 0.2vw, 1.25rem); /* 18 → 20 */
+  --type-body-md: clamp(1rem, 0.98rem + 0.1vw, 1.0625rem); /* 16 → 17 */
   --type-body-sm: 1rem; /* 16, fixed */
   --type-ui-md: 1rem; /* 16, fixed */
   --type-ui-sm: 0.875rem; /* 14, fixed */
   --type-record-md: clamp(0.875rem, 0.86rem + 0.09vw, 0.9375rem); /* 14 → 15 */
-  --type-record-sm: 0.8125rem; /* 13, fixed — the mono floor */
+  --type-record-sm: 0.8125rem; /* 13, fixed */
   --type-label-sm: 0.75rem; /* 12, fixed — the system floor */
 
-  /* line-heights, multiplied by the Arabic leading factor at the locale root */
-  --type-leading-display-xl: 1.04;
-  --type-leading-display-lg: 1.08;
-  --type-leading-display-md: 1.14;
-  --type-leading-display-sm: 1.2;
-  --type-leading-body-lg: 1.62;
-  --type-leading-body-md: 1.68;
-  --type-leading-body-sm: 1.6;
+  --type-leading-display-xl: 0.98;
+  --type-leading-display-lg: 1.02;
+  --type-leading-display-md: 1.08;
+  --type-leading-display-sm: 1.16;
+  --type-leading-body-lg: 1.65;
+  --type-leading-body-md: 1.72;
+  --type-leading-body-sm: 1.65;
   --type-leading-ui: 1.4;
   --type-leading-record: 1.5;
   --type-leading-label: 1.35;
 
   /* measure */
-  --type-measure-editorial: 66ch; /* 62–68 character target, a MAXIMUM not a fixed width */
+  --type-measure-editorial: 66ch; /* a MAXIMUM, not a fixed width */
   --type-measure-narrow: 48ch;
 
   /* ---------------------------------------------------------------- spacing — 8px baseline */
@@ -132,30 +172,38 @@
   --space-4: 2rem; /* 32 */
   --space-5: 2.5rem; /* 40 */
   --space-6: 3rem; /* 48 */
-  --space-7: 3.5rem; /* 56 — mobile section rhythm */
+  --space-7: 3.5rem; /* 56 */
   --space-8: 4rem; /* 64 */
-  --space-9: 4.5rem; /* 72 — tablet section rhythm */
-  --space-10: 6rem; /* 96 — desktop section rhythm */
-  --space-12: 8rem; /* 128 — major separation */
+  --space-9: 4.5rem; /* 72 */
+  --space-10: 6rem; /* 96 */
+  --space-12: 8rem; /* 128 */
+  --space-14: 10rem; /* 160 */
 
-  /* semantic spacing — section rhythm steps at the two real thresholds */
-  --space-section: var(--space-7);
+  --space-section: var(--space-8);
   --space-subsection: var(--space-6);
   --space-related-above: var(--space-9);
 
   /* ---------------------------------------------------------------- layout */
-  --layout-max-content: 1180px;
+  /* One edge for the whole site: header, heroes, sections and footer align at every width. */
+  --layout-max-content: 1400px;
+  --layout-max-wide: 1400px;
   --layout-max-text: 620px;
   --layout-max-narrow: 640px;
-  --layout-gutter: 1.5rem; /* 24 */
+  --layout-gutter: 1.5rem;
   --layout-margin: 1.25rem; /* 20 — mobile */
-  --layout-index-width: 160px; /* the margin index, the signature device */
-  --layout-index-gap: 2rem; /* 32 */
+  --layout-index-width: 160px;
+  --layout-index-gap: 2rem;
+  --layout-header-height: 76px;
 
   /* ---------------------------------------------------------------- radius
-   * Two values. There is no third, deliberately. */
+   * Phase 11 introduces soft geometry: pills for controls, generous radii for cards and
+   * photographs, and the arch — the signature mask of the identity. */
   --radius-none: 0;
-  --radius-control: 2px; /* buttons, inputs, filter chips — ONLY these */
+  --radius-control: 999px; /* buttons, chips, the menu trigger */
+  --radius-soft: 14px; /* small surfaces, captions */
+  --radius-card: 28px; /* review cards, panels */
+  --radius-arch: 999px 999px 32px 32px; /* the signature portrait mask */
+  --radius-pebble: 58% 42% 46% 54% / 48% 56% 44% 52%; /* organic, cream-swirl masks */
 
   /* ---------------------------------------------------------------- borders */
   --border-width-hairline: 1px;
@@ -163,93 +211,98 @@
   --border-rule-hairline: 1px solid var(--color-line-hairline);
   --border-rule-strong: 1px solid var(--color-line-strong);
   --border-rule-observation: 1px solid var(--color-accent-mineral);
-  --border-rule-claim: 1px dotted var(--color-line-hairline);
-  --border-rule-verdict: 2px solid var(--color-accent-clay); /* once per review page, nowhere else */
+  --border-rule-claim: 1px dotted var(--color-line-strong);
+  --border-rule-verdict: 2px solid var(--color-accent-clay);
 
   /* ---------------------------------------------------------------- shadow
-   * The system has one shadow token and its value is none. Recorded so the absence is
-   * explicit rather than an omission someone later "fixes". */
+   * Low, warm and diffuse — a product-photography shadow, tinted with wine rather than grey. */
   --shadow-none: none;
+  --shadow-soft: 0 24px 48px -28px rgb(94 31 51 / 28%);
+  --shadow-float: 0 40px 80px -40px rgb(94 31 51 / 38%), 0 12px 24px -16px rgb(94 31 51 / 18%);
+  --shadow-control: 0 10px 24px -14px rgb(122 35 66 / 55%);
 
-  /* ---------------------------------------------------------------- motion */
-  --motion-duration-instant: 100ms; /* focus rings — never eased in */
-  --motion-duration-quick: 150ms;
-  --motion-duration-base: 250ms;
-  --motion-duration-settle: 400ms;
+  /* ---------------------------------------------------------------- motion
+   * Luxury is slow. Entrances are long and decelerating; nothing bounces or overshoots. */
+  --motion-duration-instant: 100ms;
+  --motion-duration-quick: 180ms;
+  --motion-duration-base: 320ms;
+  --motion-duration-settle: 600ms;
+  --motion-duration-reveal: 1100ms;
   --motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
   --motion-easing-exit: cubic-bezier(0.4, 0, 1, 1);
   --motion-easing-attend: cubic-bezier(0.4, 0, 0.2, 1);
-  --motion-stagger-sequence: 80ms;
+  --motion-easing-silk: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-stagger-sequence: 90ms;
   --motion-stagger-compact: 60ms;
-  --motion-distance-settle: 12px;
-  --motion-distance-subtle: 8px;
-  --motion-scale-image: 1.02;
-  /* No spring, bounce or overshoot tokens exist. Nothing above 600ms. */
+  --motion-distance-settle: 28px;
+  --motion-distance-subtle: 10px;
+  --motion-scale-image: 1.04;
+  --motion-marquee-duration: 48s;
 
   /* ---------------------------------------------------------------- z-index — named layers only */
   --z-base: 0;
   --z-raised: 10;
+  --z-cosmetics: 40; /* the shared 3D canvas — above photography, below the header */
   --z-header: 100;
   --z-overlay: 200;
   --z-dialog: 300;
-  --z-skip-link: 500; /* always on top */
+  --z-skip-link: 500;
 }
 
 /* ====================================================================
    SCRIPT ADAPTATION — applied at the locale root, never per component.
-   docs/TYPOGRAPHY_SYSTEM.md section 1, docs/BILINGUAL_TYPE_TEST.md.
    ==================================================================== */
 :root:lang(ar),
 [lang="ar"] {
   --type-family-display: "Noto Naskh Arabic", "IBM Plex Sans Arabic", serif;
-  --type-family-body: "Noto Naskh Arabic", "IBM Plex Sans Arabic", serif;
+  --type-family-accent: "Noto Naskh Arabic", "IBM Plex Sans Arabic", serif;
+  --type-family-body: "IBM Plex Sans Arabic", system-ui, sans-serif;
   --type-family-ui: "IBM Plex Sans Arabic", system-ui, sans-serif;
-  /* --type-family-record stays IBM Plex Mono: the record tier carries NUMERALS AND LATIN
-     IDENTIFIERS ONLY. Arabic labels beside them use the Arabic UI face. There is no Arabic
-     monospace tradition and forcing one would read as a technical artefact, not a record. */
+  /* --type-family-record stays Jost: it carries numerals and Latin identifiers only. */
 
-  --type-arabic-size-factor: 1.12;
-  --type-arabic-leading-factor: 1.18;
+  --type-arabic-size-factor: 1.08;
+  --type-arabic-leading-factor: 1.22;
 
   /* Letter-spacing severs Arabic letterforms. Fixed at 0 and not overridable. */
   --type-tracking-label: 0;
   --type-tracking-display: 0;
+  --type-tracking-wordmark: 0;
+  --type-tracking-record: 0;
 }
 
 /* ====================================================================
    REDUCED MOTION — a TOKEN-LEVEL override, so it cannot be forgotten per component.
-   Nothing is lost: no information, affordance or wayfinding depends on movement.
    ==================================================================== */
 @media (prefers-reduced-motion: reduce) {
   :root {
     --motion-duration-quick: 0ms;
     --motion-duration-base: 0ms;
     --motion-duration-settle: 0ms;
+    --motion-duration-reveal: 0ms;
     --motion-stagger-sequence: 0ms;
     --motion-stagger-compact: 0ms;
     --motion-distance-settle: 0px;
     --motion-distance-subtle: 0px;
     --motion-scale-image: 1;
-    /* --motion-duration-instant is deliberately NOT zeroed: a focus indicator must still
-       appear immediately, and it already does not animate. */
   }
 }
 
 /* ====================================================================
-   RESPONSIVE RHYTHM — the two thresholds that carry real compositional change.
-   docs/RESPONSIVE_UX_SPEC.md section 1.
+   RESPONSIVE RHYTHM
    ==================================================================== */
 @media (min-width: 768px) {
   :root {
-    --layout-margin: 3rem; /* 48 */
-    --space-section: var(--space-9); /* 72 */
+    --layout-margin: 2.5rem; /* 40 */
+    --space-section: var(--space-10);
     --space-related-above: var(--space-10);
+    --layout-header-height: 84px;
   }
 }
 
 @media (min-width: 1024px) {
   :root {
-    --space-section: var(--space-10); /* 96 */
-    --space-related-above: var(--space-12); /* 128 — the largest gap on a review page */
+    --layout-margin: 3.5rem; /* 56 */
+    --space-section: var(--space-12);
+    --space-related-above: var(--space-12);
   }
 }

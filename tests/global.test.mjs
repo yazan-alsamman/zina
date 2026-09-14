@@ -7,6 +7,7 @@
 
 import { test, describe, before } from "node:test";
 import assert from "node:assert/strict";
+import { assertOnlyCosmeticsLoader, assertChunksCollectNothing } from "./helpers/client-js.mjs";
 import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -207,6 +208,18 @@ describe("the site origin is configuration-driven", () => {
     }
   });
 
+  test("every page has a same-origin social preview image that was actually emitted", () => {
+    // Phase 11: real photography made a summary_large_image card honest for the first time.
+    for (const page of pages) {
+      const image = page.html.match(/<meta property="og:image" content="([^"]+)"/)?.[1];
+      assert.ok(image, `${page.route}: no og:image`);
+      assert.ok(image.startsWith(SITE_URL), `${page.route}: og:image on a foreign origin: ${image}`);
+      assert.ok(existsSync(join(dist, image.slice(SITE_URL.length))), `${page.route}: og:image file missing: ${image}`);
+      assert.ok(/<meta property="og:image:alt" content="[^"]{10,}"/.test(page.html), `${page.route}: og:image has no alt`);
+      assert.ok(page.html.includes('<meta name="twitter:card" content="summary_large_image"'), page.route);
+    }
+  });
+
   test("outbound brand links are marked nofollow and are never our origin", () => {
     // ONE precise exception (Phase 9): a link to a CONFIRMED, sameAsEligible social profile —
     // Zina's own official Instagram — carries rel="me" instead of nofollow. That is the correct
@@ -375,21 +388,34 @@ describe("design-system invariants", () => {
       .map((f) => readFileSync(join(dist, "_astro", f), "utf8"))
       .join("\n");
 
-  test("no border-radius other than 0 or the 2px control radius", () => {
+  /*
+   * PHASE 11 — the "Blush Atelier" identity (docs/PHASE_11_VISUAL_REDESIGN.md) deliberately
+   * replaced the Phase 2 refusals of radius, shadow and gradient. These tests now guard the NEW
+   * system against the ways a luxury palette decays: one-off radii, grey drop shadows, and
+   * off-palette or neon gradients.
+   */
+  const tokenHexes = () => {
+    const tokens = readFileSync(join(srcDir, "styles", "tokens.css"), "utf8");
+    const hexes = new Set([...tokens.matchAll(/#([0-9a-f]{6})\b/gi)].map((m) => m[1].toLowerCase()));
+    for (const m of tokens.matchAll(/rgb\((\d+) (\d+) (\d+)/g)) {
+      hexes.add([m[1], m[2], m[3]].map((n) => Number(n).toString(16).padStart(2, "0")).join(""));
+    }
+    return hexes;
+  };
+
+  test("every border-radius resolves to a radius token, 0 or an organic percentage", () => {
     const radii = [...css().matchAll(/border-radius:\s*([^;}]+)/g)].map((m) => m[1].trim());
     for (const radius of radii) {
-      assert.ok(
-        /^(0|2px|var\(--radius-(none|control)\))$/.test(radius),
-        `forbidden border-radius: ${radius}`
-      );
+      for (const part of radius.split(/[\s/]+/).filter(Boolean)) {
+        assert.ok(/^(0|\d+(\.\d+)?%|var\(--radius-[a-z]+\))$/.test(part), `off-system border-radius: ${radius}`);
+      }
     }
   });
 
-  test("no elevation shadow", () => {
+  test("no neutral grey or black elevation shadow", () => {
     const shadows = [...css().matchAll(/box-shadow:\s*([^;}]+)/g)].map((m) => m[1].trim());
     for (const shadow of shadows) {
-      // `inset 0 0 0 1px` draws the HOLLOW stage marker — a border, not elevation.
-      assert.ok(shadow.startsWith("inset"), `elevation shadow: ${shadow}`);
+      assert.ok(!/#000|rgba?\(0[ ,]+0[ ,]+0|black|gr[ae]y/i.test(shadow), `neutral shadow: ${shadow}`);
     }
   });
 
@@ -398,13 +424,18 @@ describe("design-system invariants", () => {
     assert.equal(cards.length, 0, "a Card component appeared");
   });
 
-  test("no gradient beyond the paper grain", () => {
-    const gradients = [...css().matchAll(/(linear|radial|conic)-gradient\([^)]*\)/g)].map((m) => m[0]);
+  test("every colour in every decorative gradient belongs to the token palette", () => {
+    // Mask gradients are luminance masks, not colour, so they are excluded.
+    const stylesheet = css().replace(/(-webkit-)?mask-image:[^;}]+/g, "");
+    const palette = tokenHexes();
+    const gradients = [...stylesheet.matchAll(/(?:repeating-)?(?:linear|radial|conic)-gradient\((?:[^()]|\([^()]*\))*\)/g)].map((m) => m[0]);
+    assert.ok(gradients.length > 0, "the identity's tonal gradients are missing from the build");
     for (const gradient of gradients) {
-      assert.ok(
-        gradient.startsWith("repeating-linear-gradient") || gradient.includes("255 255 255 / 1.5%"),
-        `decorative gradient: ${gradient.slice(0, 60)}`
-      );
+      for (const m of gradient.matchAll(/#([0-9a-f]{3,8})\b/gi)) {
+        let hex = m[1].toLowerCase();
+        if (hex.length <= 4) hex = hex.slice(0, 3).split("").map((c) => c + c).join("");
+        assert.ok(palette.has(hex.slice(0, 6)), `off-palette colour #${m[1]} in ${gradient.slice(0, 80)}`);
+      }
     }
   });
 });
@@ -412,10 +443,18 @@ describe("design-system invariants", () => {
 /* ================================================================= content safety */
 
 describe("content safety across every page", () => {
-  test("zero client JavaScript", () => {
+  test("client JavaScript is limited to the same-origin 3D loader, which collects nothing", () => {
     for (const page of pages) {
-      const scripts = [...page.html.matchAll(/<script(?![^>]*application\/ld\+json)[^>]*>/g)];
-      assert.equal(scripts.length, 0, `${page.route} ships ${scripts.length} script tag(s)`);
+      assertOnlyCosmeticsLoader(assert, page.html, page.route);
+    }
+    assertChunksCollectNothing(assert, dist);
+  });
+
+  test("every decorative 3D slot is hidden from assistive technology", () => {
+    for (const page of pages) {
+      for (const slot of page.html.matchAll(/<div[^>]*data-cosmetic="[^"]*"[^>]*>/g)) {
+        assert.ok(/aria-hidden="true"/.test(slot[0]), `${page.route}: a 3D slot is exposed to AT`);
+      }
     }
   });
 

@@ -40,7 +40,10 @@ const { locale, crumbs } = Astro.props;
     align-items: baseline;
     gap: var(--space-1);
     font-family: var(--type-family-ui);
-    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
+    font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
+    font-weight: var(--type-weight-medium);
+    letter-spacing: var(--type-tracking-label);
+    text-transform: uppercase;
     color: var(--color-text-muted);
     /* Never wraps to two lines. */
     flex-wrap: nowrap;
@@ -74,5 +77,11 @@ const { locale, crumbs } = Astro.props;
 
   .sep {
     color: var(--color-line-strong);
+  }
+
+  :global(html[lang="ar"]) .breadcrumb ol {
+    text-transform: none;
+    font-weight: var(--type-weight-regular);
+    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
   }
 </style>
