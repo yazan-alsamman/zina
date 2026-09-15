@@ -207,7 +207,7 @@ describe("the design system stayed a system", () => {
     for (const shadow of shadows) {
       if (shadow.trim() === "none") continue;
       assert.ok(!/#000|black|gr[ae]y|rgba?\(0[ ,]/i.test(shadow), `neutral shadow token: ${shadow}`);
-      assert.match(shadow, /rgb\((94 31 51|122 35 66)/, `shadow token is not wine-tinted: ${shadow}`);
+      assert.match(shadow, /rgb\((74 63 53|41 35 29)/, `shadow token is not mocha-tinted: ${shadow}`);
     }
   });
 

@@ -163,8 +163,8 @@ let seen = 0;
     position: absolute;
     inset: 0;
     background:
-      linear-gradient(180deg, rgb(46 17 25 / 82%) 0%, rgb(46 17 25 / 0%) 34%, rgb(46 17 25 / 0%) 52%, rgb(46 17 25 / 92%) 100%),
-      linear-gradient(90deg, rgb(46 17 25 / 70%) 0%, rgb(46 17 25 / 0%) 28%, rgb(46 17 25 / 0%) 72%, rgb(46 17 25 / 70%) 100%);
+      linear-gradient(180deg, rgb(41 35 29 / 82%) 0%, rgb(41 35 29 / 0%) 34%, rgb(41 35 29 / 0%) 52%, rgb(41 35 29 / 92%) 100%),
+      linear-gradient(90deg, rgb(41 35 29 / 70%) 0%, rgb(41 35 29 / 0%) 28%, rgb(41 35 29 / 0%) 72%, rgb(41 35 29 / 70%) 100%);
   }
 
   .film-copy {
@@ -180,7 +180,7 @@ let seen = 0;
     font-weight: var(--type-weight-medium);
     letter-spacing: var(--type-tracking-label);
     text-transform: uppercase;
-    color: #f3b8c6;
+    color: var(--palette-beige-lifted);
   }
 
   :global(html[lang="ar"]) .film-label {
@@ -197,7 +197,7 @@ let seen = 0;
     font-size: calc(var(--type-display-md) * var(--type-arabic-size-factor));
     line-height: calc(var(--type-leading-display-md) * var(--type-arabic-leading-factor));
     letter-spacing: var(--type-tracking-display);
-    color: #fbf1ee;
+    color: var(--color-white);
     text-wrap: balance;
   }
 
@@ -237,7 +237,7 @@ let seen = 0;
     pointer-events: none;
     /* The wine ground, at three opacities. Not a darker invented near-black: every gradient on
        this site resolves to a colour that exists in tokens.css, and the suite enforces it. */
-    background: linear-gradient(180deg, rgb(46 17 25 / 0%) 0%, rgb(46 17 25 / 36%) 62%, rgb(46 17 25 / 66%) 100%);
+    background: linear-gradient(180deg, rgb(41 35 29 / 0%) 0%, rgb(41 35 29 / 36%) 62%, rgb(41 35 29 / 66%) 100%);
   }
 
   :global(html.cinema-live) .film-reel {
@@ -271,8 +271,8 @@ let seen = 0;
   :global(html.cinema-live) .film-line,
   :global(html.cinema-live) .film-label {
     text-shadow:
-      0 2px 30px rgb(46 17 25 / 66%),
-      0 1px 4px rgb(46 17 25 / 46%);
+      0 2px 30px rgb(41 35 29 / 66%),
+      0 1px 4px rgb(41 35 29 / 46%);
   }
 
   :global(html.cinema-live) .film-copy {

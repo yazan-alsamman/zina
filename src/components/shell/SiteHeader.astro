@@ -230,18 +230,18 @@ const currentState = (href: string): "page" | "true" | undefined =>
     display: inline;
   }
 
-  /* While open, the header's own controls sit on the wine overlay. */
+  /* While open, the header's own controls sit on the mocha overlay. */
   .site-header:has(.menu-toggle:checked) .wordmark,
   .menu-toggle:checked + .menu-trigger {
-    color: #fbf1ee;
-    border-color: rgb(251 241 238 / 40%);
+    color: var(--color-white);
+    border-color: rgb(255 255 255 / 40%);
   }
 
   .primary-nav {
     display: none;
   }
 
-  /* Fullscreen overlay on the wine ground. Opaque — a contrast ratio over a shifting backdrop
+  /* Fullscreen overlay on the mocha ground. Opaque — a contrast ratio over a shifting backdrop
      cannot be measured. Items sit in the lower two-thirds, within thumb reach. */
   .menu-toggle:checked ~ .primary-nav {
     position: fixed;
@@ -285,14 +285,14 @@ const currentState = (href: string): "page" | "true" | undefined =>
     gap: var(--space-2);
     min-block-size: 44px;
     padding-block: var(--space-1);
-    color: #fbf1ee;
+    color: var(--color-white);
     text-decoration: none;
-    border-block-end: 1px solid rgb(251 241 238 / 12%);
+    border-block-end: 1px solid rgb(255 255 255 / 12%);
   }
 
   .nav-index {
     font-size: var(--type-record-sm);
-    color: #cfaab1;
+    color: var(--palette-beige-lifted); /* 5.08:1 on mocha */
   }
 
   .nav-label {
@@ -304,7 +304,7 @@ const currentState = (href: string): "page" | "true" | undefined =>
   .nav-list a:hover .nav-label,
   .nav-list a[aria-current] .nav-label {
     font-family: var(--type-family-accent);
-    color: #f3b8c6;
+    color: var(--palette-beige-lifted);
   }
 
   @media (prefers-reduced-motion: no-preference) {
@@ -327,14 +327,14 @@ const currentState = (href: string): "page" | "true" | undefined =>
     align-items: center;
     min-block-size: 44px;
     padding: 0.7rem 1.5rem;
-    border: 1px solid rgb(251 241 238 / 55%);
+    border: 1px solid rgb(255 255 255 / 55%);
     border-radius: var(--radius-control);
     font-family: var(--type-family-ui);
     font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
     font-weight: var(--type-weight-medium);
     letter-spacing: var(--type-tracking-label);
     text-transform: uppercase;
-    color: #fbf1ee;
+    color: var(--color-white);
     text-decoration: none;
     white-space: nowrap;
     transition:
@@ -350,13 +350,14 @@ const currentState = (href: string): "page" | "true" | undefined =>
   }
 
   .cta:hover {
-    background: #fbf1ee;
-    color: var(--palette-wine);
+    background: var(--color-warm-beige);
+    color: var(--color-black); /* 8.74:1 */
+    border-color: var(--color-warm-beige);
   }
 
   .switcher-slot :global(.switcher),
   .switcher-slot :global(.switcher a) {
-    color: #ecc9c9;
+    color: var(--color-light-grey); /* 8.50:1 on mocha */
   }
 
   /* ---------------------------------------------------------------- 1024 and up */
@@ -436,8 +437,10 @@ const currentState = (href: string): "page" | "true" | undefined =>
       position: absolute;
       inset-inline: 0;
       inset-block-end: 0;
-      block-size: 1px;
-      background: var(--color-accent-clay);
+      block-size: 2px;
+      /* The active/hover navigation state IS the warm beige. It is a rule, not type, so the
+         accent is free to be itself here — the label above it stays mocha for legibility. */
+      background: var(--color-accent-champagne);
       transform: scaleX(0);
       transform-origin: inline-start;
       transition: transform var(--motion-duration-settle) var(--motion-easing-silk);
@@ -462,8 +465,9 @@ const currentState = (href: string): "page" | "true" | undefined =>
 
     .cta:hover,
     .cta[aria-current] {
-      background: var(--color-text-primary);
-      color: var(--palette-ivory);
+      background: var(--color-cta-fill);
+      color: var(--color-cta-fg);
+      border-color: var(--color-cta-fill);
     }
 
     .switcher-slot :global(.switcher) {

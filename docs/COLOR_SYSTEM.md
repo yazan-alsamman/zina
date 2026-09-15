@@ -1,235 +1,292 @@
 # Colour System
 
-**Status:** Phase 2 decision. Specification only.
+**Status:** Phase 15 decision — "Quiet Luxury". Supersedes the Phase 11 "Blush Atelier" palette,
+which superseded the Phase 2 warm-ink palette.
+**Implementation:** `src/styles/tokens.css`
 **Verification:** `node tools/check-contrast.mjs` — every ratio below is **measured, not assumed**.
 
 ---
 
 ## 1. The idea
 
-**Ink and pigment.** A warm dark ground the colour of printing ink, ivory text the colour of good
-paper, and two functional accents drawn from cosmetics rather than from metal: a **clay** taken
-from pigment and skin, and a **mineral** taken from stone and glass.
+**Five colours, and nothing else.**
 
-No gold. No metal of any kind. The brief names black-and-gold as the cliché to avoid, and it is
-avoided at the root — by taking the accent from what the site is actually about.
+```
+WHITE  →  LIGHT GREY  →  WARM BEIGE  →  MOCHA BROWN  →  BLACK
+#FFFFFF    #EAEAEA       #B8A48F        #4A3F35         #000000
+```
+
+That arrow is three things at once: the visual hierarchy, the section ladder down a page, and the
+order in which the eye is meant to travel. A page opens on white, alternates into light grey,
+warms into beige for an accent band, and drops into mocha for the cinematic passages. Black is a
+**detail** colour — a verdict, an icon, a fine rule — and never a ground or a body tone.
+
+No hue is introduced that this list does not contain. There is no gold, no rose, no blue-grey, no
+"brand colour" sitting outside the system. The warmth of the identity comes from one axis — the
+beige-to-mocha axis — and everything else is the neutral it sits against.
 
 ---
 
 ## 2. Two decisions that define the palette
 
-### The ground is warm, and it is not black
+### Warm beige is a surface, never a foreground
 
-`#12100D`, not `#000000`. There is brown in it. At a glance it reads simply as dark; side by side
-with pure black it reads as ink rather than as absence.
+This is the single rule that makes a five-colour palette survive contact with real content.
 
-This single decision does more work than any other in the system. Pure black plus pure white is the
-default of software, of dashboards and of every dark-mode toggle — the exact registers the direction
-refuses. A warm ground makes photography of skin sit naturally instead of floating on a void, and it
-is the mechanism by which Territory C's warmth enters a dark design (`docs/VISUAL_TERRITORIES.md`).
+`#B8A48F` measures **2.40:1** on white. It is not a borderline value that could be waved through
+for large text — it is roughly half the AA threshold. So warm beige is never type, never a link,
+never a focus ring on a light page. It is:
 
-### The text is ivory, and it is not white
+- the fill a button flows into on hover (with **black** type on it — 8.74:1)
+- the rule that draws under a navigation item or a link
+- the ground of an accent band (again, black type)
+- decorative metal on an edge, a glow, a 3D cap
 
-`#F2EDE3`, not `#FFFFFF`. Measured at **16.28:1** against the ground — comfortably above the 7:1
-AAA threshold, and deliberately below the 21:1 that pure white on pure black would give.
+On a **dark** ground the rule inverts. Lifted 18% towards white — `#C5B4A3` — beige reaches
+**5.08:1** on mocha and becomes the accent voice of every dark section. The accent is not weaker
+in the dark; it simply changes which side of the contrast equation it is on.
 
-Maximum contrast is not the goal. 21:1 on a large area of body text produces halation for many
-readers and is genuinely fatiguing at length, and this site expects people to read 1,500-word
-reviews. 16.28:1 is far above requirement and materially more comfortable.
+The contrast harness records the two forbidden pairs explicitly, so the measurement that justifies
+the rule is in the output rather than in someone's memory:
+
+```
+Measured and FORBIDDEN. This is why warm beige is a surface and never a foreground
+on a light ground; these numbers are the rule, not a regression:
+  x Warm beige AS TEXT on white — forbidden: 2.40:1 (threshold 4.5:1)
+  x Warm beige AS A FOCUS RING on white — forbidden: 2.40:1 (threshold 3:1)
+```
+
+### Body text is mocha, not black
+
+`#4A3F35` on white is **10.23:1** — AAA with room to spare, and warm. Black on white is available
+at 21:1 and is deliberately **held back** for the loudest register: a verdict, an icon, a hairline
+that has to cut.
+
+Pure black body text on pure white is the default of software. Mocha body text is the reason the
+page reads as an editorial object rather than as an interface, and it costs nothing in
+accessibility: the whole reading ladder clears AAA.
 
 ---
 
-## 3. The palette
+## 3. Derived steps
 
-### Ground
+Five colours cannot furnish a layered editorial page on their own. A reading ladder needs
+intermediate text tones; a section ladder needs grounds between white and beige.
+
+Every intermediate value in the system is a **straight linear mix of two of the five**, and each
+one carries its mix in a comment in `tokens.css` so it can be rederived rather than guessed at.
+This is the only licence taken with the palette, and it is the one the brief grants for "a
+controlled tint derived from the approved palette".
+
+| Token | Value | Mix |
+|---|---|---|
+| `--palette-porcelain` | `#F6F4F2` | white 88% + beige 12% |
+| `--palette-linen` | `#E1DDDA` | light grey 82% + beige 18% |
+| `--palette-nude` | `#D9D2CA` | light grey 65% + beige 35% |
+| `--palette-sand` | `#CCC0B3` | light grey 40% + beige 60% |
+| `--palette-taupe` | `#817262` | mocha 50% + beige 50% |
+| `--palette-bark` | `#625549` | mocha 78% + beige 22% |
+| `--palette-umber` | `#5B4E43` | mocha 85% + beige 15% |
+| `--palette-beige-lifted` | `#C5B4A3` | beige 82% + white 18% |
+| `--palette-beige-shaded` | `#9D8B79` | beige 75% + mocha 25% |
+| `--palette-shadow` | `#29231D` | mocha 55% + black 45% |
+
+---
+
+## 4. The palette
+
+### Ground — the section ladder
 
 | Token | Value | Use |
 |---|---|---|
-| `color.ground.inset` | `#0B0A08` | Wells: conditions table, evidence strip. Recessed |
-| `color.ground.base` | `#12100D` | The page |
-| `color.ground.raised` | `#1A1714` | Disclosure band, quoted claim, related content |
-| `color.ground.overlay` | `#211D18` | Mobile menu, dialogs |
-
-The four levels are close together on purpose. Elevation is signalled by a hairline and by spacing,
-**never by a shadow** — shadows on a dark ground read as cheap or as software.
+| `--color-ground-base` | `#FFFFFF` | The page |
+| `--color-ground-card` | `#FFFFFF` | Review cards, floating captions |
+| `--color-ground-champagne` | `#F6F4F2` | The warm-white section |
+| `--color-ground-raised` | `#EAEAEA` | Alternating sections, disclosure band |
+| `--color-ground-inset` | `#E1DDDA` | Wells: conditions table, evidence strip |
+| `--color-ground-nude` | `#D9D2CA` | The warmest light section |
+| `--color-ground-accent` | `#B8A48F` | The accent band — **black type only** |
+| `--color-ground-overlay` | `#4A3F35` | Dark sections, footer, fullscreen menu |
 
 ### Text
 
-| Token | Value | On `ground.base` | Use |
+| Token | Value | On white | Use |
 |---|---|---|---|
-| `color.text.primary` | `#F2EDE3` | **16.28:1** | Body, headlines, verdict |
-| `color.text.secondary` | `#C3BAAC` | **9.89:1** | Subheads, secondary prose, captions |
-| `color.text.muted` | `#9A9184` | **6.11:1** | Metadata, labels, claim text |
-| `color.text.onAccent` | `#12100D` | — | Text on a clay surface: **7.37:1** |
+| `--color-text-primary` | `#4A3F35` | **10.23:1** | Headings, body, verdict |
+| `--color-text-secondary` | `#5B4E43` | **8.03:1** | Supporting prose |
+| `--color-text-muted` | `#625549` | **7.20:1** | Metadata, labels, captions |
+| `--color-text-strong` | `#000000` | **21.00:1** | The loudest editorial register |
+| `--color-text-on-accent` | `#FFFFFF` | 10.23:1 on mocha | Type on a dark or mocha surface |
 
-Even the muted tier clears AA for normal text at 6.11:1. Metadata is quiet by *tone*, never by being
-too faint to read.
+The ladder is deliberately **compressed**. In a monochrome brown system hierarchy is carried by
+size, tracking and space — not by fading text towards the ground. All three reading tones clear
+AAA on white, which is the point: nothing here is quiet because it is hard to see.
 
 ### Lines
 
-| Token | Value | Ratio | Use |
-|---|---|---|---|
-| `color.line.hairline` | `#2C2823` | 1.30:1 | Decorative separation only. Carries no information |
-| `color.line.strong` | `#75695C` | **3.56:1** | Meaningful boundaries: input borders, active states, claim/observation separation |
+| Token | Value | Use |
+|---|---|---|
+| `--color-line-hairline` | `#EAEAEA` | Decorative rules. Carries no information, so no minimum |
+| `--color-line-strong` | `#817262` | Meaningful boundaries. ≥3:1 on every light ground |
 
-**The distinction is a rule, not a nuance.** A line that separates two paragraphs is decorative and
-may be faint. A line that tells you a passage is a brand claim rather than an observation is
-carrying information and must clear 3:1 as a non-text element.
-
-> This is where the specification was wrong first time. `line.strong` was originally `#4A4238` and
-> `tools/check-contrast.mjs` measured it at **1.92:1** — well under the 3:1 non-text minimum. It was
-> lightened to `#75695C` (3.56:1). That failure is exactly why contrast is calculated rather than
-> eyeballed.
+On the light grey, linen and nude grounds `#EAEAEA` would vanish, so those tonal sections re-map
+the hairline one rung down the ladder. The token's **role** is unchanged; only its value moves.
 
 ### Accents
 
-| Token | Value | Ratio | Use |
-|---|---|---|---|
-| `color.accent.clay` | `#D9906A` | **7.37:1** | Links, focus ring, verdict rule, CTA |
-| `color.accent.clay.hover` | `#E9A47E` | **9.11:1** | Hover and active |
-| `color.accent.mineral` | `#A3BCAF` | **9.38:1** | Observation marker, evidence rule, method stages |
+| Token | Value | Use |
+|---|---|---|
+| `--color-accent-clay` | `#4A3F35` | Links, CTAs, the verdict rule |
+| `--color-accent-clay-hover` | `#000000` | The link hover **text** |
+| `--color-accent-mineral` | `#5B4E43` | The observed voice |
+| `--color-accent-champagne` | `#B8A48F` | Decorative surface and metal — **never text** |
 
-**Clay** is warm, human, adjacent to skin and pigment. It is the *editorial* accent: interaction and
-judgement.
+### Controls
 
-**Mineral** is cool, quiet and slightly green — stone rather than sky. It is the *observed* accent:
-timestamps, evidence rules, method markers. Cool against a warm ground is what makes it read as
-instrument rather than as decoration, and its desaturation is what keeps it from reading as
-clinical.
+The CTA fill is a **separate token** from the link-hover text, because a button may flow into warm
+beige and switch to black type where a run of prose cannot.
 
-Two accents, two jobs. Nothing else in the system is coloured.
+| Token | Value | |
+|---|---|---|
+| `--color-cta-fill` | `#4A3F35` | Primary CTA background |
+| `--color-cta-fg` | `#FFFFFF` | 10.23:1 |
+| `--color-cta-fill-hover` | `#B8A48F` | The control fills with warm beige |
+| `--color-cta-fg-hover` | `#000000` | 8.74:1 |
+
+- **Primary:** mocha ground, white type. Fills to beige with black type.
+- **Secondary** (`.btn--secondary`): beige ground, black type. Fills to mocha with white type.
+- **Ghost** (`.btn`): transparent, mocha border, mocha type. Fills to beige with black type.
 
 ### Status
 
-| Token | Value | Ratio | Use |
-|---|---|---|---|
-| `color.status.success` | `#93B189` | **8.04:1** | Form success |
-| `color.status.warning` | `#DCA95E` | **8.94:1** | Disclosure pending verification |
-| `color.status.error` | `#E08A80` | **7.34:1** | Form errors |
+Deep, almost-neutral tints of the mocha family. They exist because disclosure state is a **legal**
+signal rather than decoration — but the label text carries the meaning, and the colour is only
+allowed to be a temperature. Nothing here is a saturated UI red or green.
 
-Muted and desaturated so they belong to the palette rather than arriving from a component library.
-`warning` carries real semantic weight here: it is the colour of a review whose disclosure is
-`unknown-pending-verification`.
+| Token | Value | On white |
+|---|---|---|
+| `--color-status-success` | `#3F4A38` | **9.34:1** |
+| `--color-status-warning` | `#6B5326` | **7.27:1** |
+| `--color-status-error` | `#6B3A32` | **9.22:1** |
 
 ### Evidence semantics
 
-The colour half of `docs/EVIDENCE_LANGUAGE.md`.
+Quietest to loudest — and the loudest is where black earns its place.
 
-| Token | Value | Ratio | Meaning |
-|---|---|---|---|
-| `color.evidence.claim` | `#9A9184` | **5.74:1** on raised | What the brand says. Deliberately the quietest voice |
-| `color.evidence.observation` | `#A3BCAF` | **9.38:1** | What Zina saw |
-| `color.evidence.verdict` | `#F2EDE3` | **15.30:1** on raised | What Zina concluded |
-
-**The hierarchy is inverted from convention on purpose.** Marketing copy is the *least* emphasised
-text on the page; the reviewer's own conclusion is the most. That inversion is the argument of the
-site expressed in colour, and it is the first thing to protect if anyone proposes "making the
-product claims stand out more".
-
----
-
-## 4. Measured contrast
-
-Full output: `node tools/check-contrast.mjs`. **24 required pairs, all passing.**
-
-| Pair | Ratio | Min | Result |
-|---|---|---|---|
-| Body text on ground | 16.28:1 | 4.5 | PASS (AAA) |
-| Body text on raised | 15.30:1 | 4.5 | PASS (AAA) |
-| Body text on inset | 16.96:1 | 4.5 | PASS (AAA) |
-| Secondary on ground | 9.89:1 | 4.5 | PASS (AAA) |
-| Secondary on raised | 9.30:1 | 4.5 | PASS (AAA) |
-| Muted on ground | 6.11:1 | 4.5 | PASS |
-| Muted on raised | 5.74:1 | 4.5 | PASS |
-| Clay as link on ground | 7.37:1 | 4.5 | PASS (AAA) |
-| Clay as link on raised | 6.92:1 | 4.5 | PASS |
-| Mineral as text on ground | 9.38:1 | 4.5 | PASS (AAA) |
-| Mineral as text on raised | 8.81:1 | 4.5 | PASS (AAA) |
-| Dark text on clay button | 7.37:1 | 4.5 | PASS (AAA) |
-| Dark text on clay hover | 9.11:1 | 4.5 | PASS (AAA) |
-| Claim text on raised | 5.74:1 | 4.5 | PASS |
-| Observation text | 9.38:1 | 4.5 | PASS (AAA) |
-| Verdict text on raised | 15.30:1 | 4.5 | PASS (AAA) |
-| Success / Warning / Error | 8.04 / 8.94 / 7.34 | 4.5 | PASS |
-| **Meaningful border (non-text)** | **3.56:1** | 3.0 | PASS |
-| Focus ring (non-text) | 7.37:1 | 3.0 | PASS |
-| Observation rule (non-text) | 9.38:1 | 3.0 | PASS |
-| Disclosure band edge (non-text) | 8.40:1 | 3.0 | PASS |
-
-**Every text pair in the system clears AA. Nine clear AAA.** The lowest text ratio anywhere is
-5.74:1, on deliberately recessed claim text.
-
-`line.hairline` at 1.30:1 is the only element below 3:1, and it is explicitly decorative — it never
-carries information, and removing it would change nothing a user needs to know. Documented and
-intentional.
-
----
-
-## 5. Colour and photography
-
-The ground was chosen partly so that skin renders truthfully against it.
-
-- A warm ground flatters warm and deep skin tones. A blue-black ground pushes them toward grey — a
-  real problem for a site whose stated expertise is shade accuracy for medium-deep warm undertones.
-- Photography carries the saturation. The interface is almost monochrome so that images are the only
-  colourful thing on the page.
-- **Swatch and shade imagery is never colour-corrected toward the palette.** A shade swatch is
-  evidence, and grading it to match the brand would be falsifying the thing being reviewed. Swatch
-  images are graded for accuracy and sit visually apart from graded editorial photography.
-
----
-
-## 6. Colour is never the only signal
-
-Required for accessibility, and honest anyway.
-
-| Distinction | Colour | Plus |
+| Token | Resolves to | On light grey |
 |---|---|---|
-| Claim / observation / verdict | muted / mineral / ivory | Typeface, rule style, indentation, label |
-| Link in prose | clay | Underline, always |
-| Focus | clay ring | 2px ring plus 2px offset |
-| Disclosure type | warning / neutral | Explicit text label |
-| Form error | error | Icon plus text |
-| Active nav item | clay | Weight change plus rule |
-
-A reader with a colour-vision deficiency must be able to tell a brand claim from an observation.
-Colour is the fastest cue; it is never the only one.
+| `--color-evidence-claim` | `#625549` | **5.99:1** — what the brand says |
+| `--color-evidence-observation` | `#5B4E43` | 6.67:1 — what Zina saw |
+| `--color-evidence-verdict` | `#000000` | **17.46:1** — what Zina concluded |
 
 ---
 
-## 7. Light mode
+## 5. Measured contrast
 
-**Not designed in Phase 2. Dark is the brand.**
+`node tools/check-contrast.mjs` verifies **46 required pairs** across the whole ground ladder.
+All pass. Selected results:
 
-The rationale: this is a committed art direction, not a theme, and the dark ground is the documented
-editorial signal in a category that is three-quarters pale
-(`docs/COMPETITIVE_RESEARCH.md` §3). A light variant built now would halve the attention available
-for getting the dark one right.
+| Pair | Ratio | Min |
+|---|---|---|
+| Body text on white | 10.23:1 | 4.5 |
+| Body text on light grey | 8.50:1 | 4.5 |
+| Body text on nude | 6.83:1 | 4.5 |
+| Muted text on nude | 4.81:1 | 4.5 |
+| Black text on the warm beige band | 8.74:1 | 4.5 |
+| White text on mocha | 10.23:1 | 4.5 |
+| Lifted beige text on mocha | 5.08:1 | 4.5 |
+| Meaningful border on nude (non-text) | 3.10:1 | 3.0 |
+| Meaningful border on mocha (non-text) | 3.12:1 | 3.0 |
+| Focus ring on white (non-text) | 10.23:1 | 3.0 |
 
-The counter-argument is real and should be recorded: some readers genuinely prefer or need light
-backgrounds for long-form reading, and there is no `prefers-color-scheme` response in this
-specification.
-
-**Mitigation.** Every token is semantic (`color.ground.base`, not `ink-900`), so a light theme is a
-token-set swap rather than a redesign. The decision is deferred to Phase 4 with the cost already
-paid. Flagged as open question Q-4.
-
-**Not deferred:** Windows High Contrast / `forced-colors` mode must work correctly from the start.
-That is not a theme, it is an accessibility requirement, and it is specified in
-`docs/ACCESSIBILITY_ART_DIRECTION.md`.
+The reading ladder on white: **primary 10.23 · secondary 8.03 · muted 7.20 · strong 21.00**.
 
 ---
 
-## 8. What the palette refuses
+## 6. Dark sections
 
-- **Gold, brass, bronze, copper — any metal.** The cliché named in the brief.
-- **Pure `#000` and pure `#FFF`.** Section 2.
-- **Gradients**, except a single near-invisible vertical scrim behind text over photography, and
-  never as decoration.
-- **A third accent.** Two accents with two jobs. A third would have no job.
-- **Saturated colour anywhere in the interface.** Saturation belongs to photography.
-- **Pink as a brand colour.** The generic beauty signal the brand direction rejects. Pink may appear
-  in a product photograph; it is never interface.
-- **Colour-coded product categories.** Foundation is not blue and mascara is not purple. Categories
-  are distinguished typographically.
-- **Any colour that encodes a rating.** There are no ratings. No green-to-red scale, ever.
+Where the site goes cinematic — the footer, the closing statement, the fullscreen menu, the film
+stage — the ground is mocha and the tokens re-map so that components inside stay legible without
+knowing where they are:
+
+| Role | Value | On mocha |
+|---|---|---|
+| Primary text | `#FFFFFF` | 10.23:1 |
+| Secondary text | `#EAEAEA` | 8.50:1 |
+| Muted text / accent | `#C5B4A3` | 5.08:1 |
+| Meaningful border | `#9D8B79` | 3.12:1 |
+
+These sections are used **strategically, not everywhere**. They are the punctuation of a light
+page, and they are lit from the top right by their own warm beige rather than by a colour cast.
+
+---
+
+## 7. Colour and photography
+
+The photography is not recoloured. No filter, no duotone, no overlay heavy enough to alter skin.
+
+What changed is the UI **around** the images: white and light grey grounds, mocha captions, beige
+rules. Where a component already carried an overlay for legibility — a caption sitting over an
+image, a film frame's vignette — that overlay was re-tinted from wine to mocha/`#29231D` at the
+same opacity it always had.
+
+The 3D cosmetic products are a different case and **were** re-toned. They are rendered from code,
+not photographed, so their colour is part of the brand system rather than part of the imagery. The
+tint **keys** (`blush`, `rose`, `nude`, `champagne`, `wine`) are unchanged — they are an API the
+models, the pages and the tests all address — while their values now walk the same ladder as the
+page.
+
+---
+
+## 8. Shadows
+
+Low, warm, diffuse, and tinted with **mocha** rather than grey. A neutral grey shadow under a warm
+beige surface is the fastest way to make this palette look cheap, so there is no grey anywhere in
+the ladder — and no pure black either. The deepest tint is `--palette-shadow` (`#29231D`), mocha
+carried 45% towards black.
+
+Opacities are deliberately low. The identity is flat and editorial with controlled depth, not
+lifted. Enforced by tests in `tests/output.test.mjs` and `tests/phase12.test.mjs`.
+
+---
+
+## 9. Colour is never the only signal
+
+Every place colour carries meaning, something else carries it too:
+
+- **Disclosure state** — the band states its status in words; colour is a secondary cue
+- **Evidence tiers** — claim, observation and verdict differ in position, label and type treatment
+- **Navigation active state** — a drawn rule *and* `aria-current`
+- **Links** — underlined by default, and the underline is never removed on hover
+- **Focus** — a 2px ring at ≥3:1, plus offset
+
+This is why the status tints can afford to be nearly neutral: they are reinforcement, not the
+message.
+
+---
+
+## 10. What the palette refuses
+
+- **No colour outside the five**, and no derived value that is not a documented mix of two of them
+- **No warm beige as type, link or focus ring on a light ground** — 2.40:1, measured
+- **No saturated status colours** — no UI red, green or amber
+- **No colourful or flashy gradients** — every gradient moves between two *neighbouring* rungs
+- **No grey or black shadows** — the ladder is mocha-tinted throughout
+- **No recolouring of the photography**
+- **No black-dominated interface** — black is a detail, not a ground
+
+---
+
+## 11. Verification
+
+```bash
+node tools/check-contrast.mjs   # 46 required pairs, all measured
+npm test                        # gradients, shadows and radii must stay on-system
+```
+
+`tests/global.test.mjs` asserts that **every colour in every decorative gradient** in the shipped
+CSS exists as a literal value in `tokens.css`, which is what stops a one-off hex from drifting
+back into a component. After the Phase 15 migration the entire built site — HTML, CSS and the 3D
+bundle — contains no hex or `rgb()` value outside this system, with two deliberate exceptions:
+the greyscale canvases used as bump/roughness maps for the pressed-powder texture, and the `#000`
+luminance mask on the marquee. Neither is colour.

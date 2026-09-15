@@ -396,7 +396,7 @@ describe("no prohibited dependencies or techniques", () => {
     }
   });
 
-  test("shadows are tokens or warm wine-tinted light — never neutral grey or black elevation", () => {
+  test("shadows are tokens or warm mocha-tinted light, never neutral grey or black elevation", () => {
     // Phase 12: external stylesheets AND the inline <style> blocks Astro puts in each page's
     // head, which is where component CSS actually lives. See tests/helpers/css.mjs.
     const css = shippedCss(dist, pages);
@@ -406,7 +406,7 @@ describe("no prohibited dependencies or techniques", () => {
       for (const layer of shadow.split(/,(?![^(]*\))/)) {
         if (/^inset 0 0 0 1px/.test(layer.trim()) || /CanvasText/.test(layer)) continue;
         assert.ok(
-          /#(5e1f33|7a2342)[0-9a-f]{0,2}\b|rgb\((94 31 51|122 35 66)/i.test(layer),
+          /#(4a3f35|29231d)[0-9a-f]{0,2}\b|rgb\((74 63 53|41 35 29)/i.test(layer),
           `neutral or off-palette shadow in output: ${layer}`
         );
       }

@@ -121,9 +121,9 @@ function shadowTexture(): CanvasTexture {
   canvas.width = canvas.height = 128;
   const ctx = canvas.getContext("2d")!;
   const gradient = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
-  gradient.addColorStop(0, "rgba(94,31,51,0.55)");
-  gradient.addColorStop(0.5, "rgba(94,31,51,0.18)");
-  gradient.addColorStop(1, "rgba(94,31,51,0)");
+  gradient.addColorStop(0, "rgba(74,63,53,0.5)");
+  gradient.addColorStop(0.5, "rgba(74,63,53,0.16)");
+  gradient.addColorStop(1, "rgba(74,63,53,0)");
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, 128, 128);
   return new CanvasTexture(canvas);
@@ -223,11 +223,11 @@ export function startScene(elements: HTMLElement[]): void {
        a large warm softbox above and to the right, a soft ivory fill low on the left, and a pink
        rim behind that separates glass from the page. On the wine ground the rim carries more of
        the work, because there is no bright page left to silhouette against. */
-    const key = new DirectionalLight("#fff1ea", onWine ? 1.75 : 1.6);
+    const key = new DirectionalLight("#ffffff", onWine ? 1.75 : 1.6);
     key.position.set(2.5, 3, 4);
-    const fill = new DirectionalLight("#fdeee6", onWine ? 0.3 : 0.45);
+    const fill = new DirectionalLight("#f6f4f2", onWine ? 0.3 : 0.45);
     fill.position.set(-2.6, -0.6, 2.2);
-    const rim = new DirectionalLight(onWine ? "#ffd4de" : "#ffc7d3", onWine ? 1.9 : 1.1);
+    const rim = new DirectionalLight(onWine ? "#c5b4a3" : "#b8a48f", onWine ? 1.9 : 1.1);
     rim.position.set(-3, 1.5, -2.5);
     scene.add(key, fill, rim);
 

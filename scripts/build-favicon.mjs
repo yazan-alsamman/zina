@@ -40,9 +40,10 @@ import { fileURLToPath } from "node:url";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const publicDir = join(root, "public");
 
-/* The two brand values, matching --palette-deep-rose and --palette-ivory in src/styles/tokens.css. */
-const ROSE = "#9c3556";
-const IVORY = "#fbf6f2";
+/* The two brand values, matching --color-mocha-brown and --color-white in src/styles/tokens.css.
+   The mark is the arch in white on a mocha tile — the palette at its two extremes. */
+const MOCHA = "#4a3f35";
+const WHITE = "#ffffff";
 
 /**
  * The arch, drawn in a 64-unit box: a rectangle whose top is a full semicircle.
@@ -62,8 +63,8 @@ function markSvg(size) {
   // Tile corner radius scales with the icon so it matches the identity's soft geometry.
   const tile = 12;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${S} ${S}">
-  <rect width="${S}" height="${S}" rx="${tile}" fill="${ROSE}"/>
-  <path d="M${inset} ${top + r} a${r} ${r} 0 0 1 ${w} 0 V${bottom} H${inset} Z" fill="${IVORY}"/>
+  <rect width="${S}" height="${S}" rx="${tile}" fill="${MOCHA}"/>
+  <path d="M${inset} ${top + r} a${r} ${r} 0 0 1 ${w} 0 V${bottom} H${inset} Z" fill="${WHITE}"/>
 </svg>`;
 }
 

@@ -35,16 +35,16 @@ const ground = Buffer.from(`
 <svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#f8f0ea"/><stop offset="1" stop-color="#f0dad6"/>
+      <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#eaeaea"/>
     </linearGradient>
     <radialGradient id="glow" cx="0.78" cy="0.35" r="0.55">
-      <stop offset="0" stop-color="#ebc9c8" stop-opacity="0.9"/><stop offset="1" stop-color="#ebc9c8" stop-opacity="0"/>
+      <stop offset="0" stop-color="#b8a48f" stop-opacity="0.32"/><stop offset="1" stop-color="#b8a48f" stop-opacity="0"/>
     </radialGradient>
   </defs>
   <rect width="${W}" height="${H}" fill="url(#g)"/>
   <rect width="${W}" height="${H}" fill="url(#glow)"/>
   <rect x="${PORTRAIT_X - 34}" y="${PORTRAIT_Y - 34}" width="${PORTRAIT_W + 68}" height="${PORTRAIT_H + 120}"
-        rx="${(PORTRAIT_W + 68) / 2}" fill="none" stroke="#c9a27e" stroke-opacity="0.6"/>
+        rx="${(PORTRAIT_W + 68) / 2}" fill="none" stroke="#b8a48f" stroke-opacity="0.75"/>
 </svg>`);
 
 // The arch mask: a rectangle whose top corners are fully rounded.
@@ -62,11 +62,11 @@ const portrait = await sharp(source)
 const type = Buffer.from(`
 <svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
   <!-- Existing content only: the confirmed name and the professional title from person.json. -->
-  <text x="90" y="250" font-family="Cormorant Garamond, Georgia, 'Times New Roman', serif" font-size="84" fill="#2b1a1f">Zina</text>
-  <text x="90" y="340" font-family="Cormorant Garamond, Georgia, 'Times New Roman', serif" font-size="84" fill="#2b1a1f">Almokri</text>
-  <rect x="92" y="382" width="64" height="2" fill="#9c3556"/>
-  <text x="90" y="432" font-family="Helvetica, Arial, sans-serif" font-size="21" letter-spacing="4" fill="#9c3556">BEAUTY CREATOR AND</text>
-  <text x="90" y="466" font-family="Helvetica, Arial, sans-serif" font-size="21" letter-spacing="4" fill="#9c3556">PRODUCT TESTING SPECIALIST</text>
+  <text x="90" y="250" font-family="Cormorant Garamond, Georgia, 'Times New Roman', serif" font-size="84" fill="#4a3f35">Zina</text>
+  <text x="90" y="340" font-family="Cormorant Garamond, Georgia, 'Times New Roman', serif" font-size="84" fill="#4a3f35">Almokri</text>
+  <rect x="92" y="382" width="64" height="2" fill="#b8a48f"/>
+  <text x="90" y="432" font-family="Helvetica, Arial, sans-serif" font-size="21" letter-spacing="4" fill="#625549">BEAUTY CREATOR AND</text>
+  <text x="90" y="466" font-family="Helvetica, Arial, sans-serif" font-size="21" letter-spacing="4" fill="#625549">PRODUCT TESTING SPECIALIST</text>
 </svg>`);
 
 await sharp(ground)

@@ -49,8 +49,8 @@ import { makePost } from "./post";
 import { captionOpacity, clamp01, forPortraitViewport, lerp, SCENES, span, type Scene as Beat } from "./timeline";
 
 /** Night, and morning. Everything between is an interpolation of these two. */
-const HAZE_NIGHT = { top: new Color("#1d0c15"), bottom: new Color("#070305"), glow: new Color("#5e2138") };
-const HAZE_DAY = { top: new Color("#f6e7e3"), bottom: new Color("#e3cac4"), glow: new Color("#ffd9cf") };
+const HAZE_NIGHT = { top: new Color("#29231d"), bottom: new Color("#0a0806"), glow: new Color("#817262") };
+const HAZE_DAY = { top: new Color("#eaeaea"), bottom: new Color("#d9d2ca"), glow: new Color("#c5b4a3") };
 
 export interface CinemaMounts {
   /** The element the canvas is pinned inside. */
@@ -103,9 +103,9 @@ export function startCinema(mounts: CinemaMounts): void {
 
   /* A three-point rig that travels with the story. The key swings from behind the subject at the
      opening (rim only — she is a silhouette) round to the front by the beauty moment. */
-  const key = new DirectionalLight("#fff0e6", 1.2);
-  const fill = new DirectionalLight("#ffd9d2", 0.25);
-  const rim = new DirectionalLight("#ffc2cf", 2.2);
+  const key = new DirectionalLight("#ffffff", 1.2);
+  const fill = new DirectionalLight("#e1ddda", 0.25);
+  const rim = new DirectionalLight("#c5b4a3", 2.2);
   fill.position.set(-3, -0.6, 2);
   scene.add(key, fill, rim);
 

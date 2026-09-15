@@ -103,7 +103,7 @@ export function makeDust(count: number): { points: Points; material: ShaderMater
       uTime: { value: 0 },
       uSize: { value: 1 },
       uDensity: { value: 1 },
-      uColor: { value: new Color("#ffe6dc") },
+      uColor: { value: new Color("#f6f4f2") },
     },
   });
 
@@ -122,10 +122,10 @@ function shaftTexture(): CanvasTexture {
   canvas.height = 256;
   const ctx = canvas.getContext("2d")!;
   const gradient = ctx.createLinearGradient(0, 0, 0, 256);
-  gradient.addColorStop(0, "rgba(255,240,232,0)");
-  gradient.addColorStop(0.35, "rgba(255,236,226,0.5)");
-  gradient.addColorStop(0.62, "rgba(255,228,220,0.34)");
-  gradient.addColorStop(1, "rgba(255,226,216,0)");
+  gradient.addColorStop(0, "rgba(246,244,242,0)");
+  gradient.addColorStop(0.35, "rgba(246,244,242,0.5)");
+  gradient.addColorStop(0.62, "rgba(217,210,202,0.34)");
+  gradient.addColorStop(1, "rgba(217,210,202,0)");
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, 64, 256);
 
@@ -192,9 +192,9 @@ export function makeHaze(): { mesh: Mesh; material: ShaderMaterial } {
     transparent: true,
     depthWrite: false,
     uniforms: {
-      uTop: { value: new Color("#2a1220") },
-      uBottom: { value: new Color("#0b0508") },
-      uGlow: { value: new Color("#7d3550") },
+      uTop: { value: new Color("#4a3f35") },
+      uBottom: { value: new Color("#14110e") },
+      uGlow: { value: new Color("#b8a48f") },
       uGlowAt: { value: 0.5 },
       uGlowSize: { value: 0.55 },
       uOpacity: { value: 1 },

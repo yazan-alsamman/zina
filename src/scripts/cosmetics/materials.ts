@@ -22,22 +22,32 @@ import {
   SRGBColorSpace,
 } from "three";
 
+/**
+ * The product palette, re-toned to the five-colour identity in src/styles/tokens.css.
+ *
+ * These are RENDERED PRODUCTS, not photographs, so their colour is part of the brand system
+ * rather than part of the imagery the redesign leaves alone. The KEYS are unchanged — they are
+ * an API the models, the tint map and the page slots all address — while the values now walk the
+ * same ladder as the page: white, light grey, warm beige, mocha, black.
+ *
+ * Nothing here is a hue the stylesheet does not have.
+ */
 export const palette = {
-  blush: "#f1cfcc",
-  petal: "#e8b4b8",
-  rose: "#d48c9a",
-  deepRose: "#a8375c",
-  burgundy: "#6e1d36",
-  wine: "#3a1422",
-  nude: "#e3bfa6",
-  foundation: "#d6a283",
-  cream: "#f7ede6",
-  champagne: "#dcc09a",
-  roseGold: "#e2b09c",
-  pearl: "#f6e6e2",
-  porcelain: "#f4e8e4",
-  clay: "#e0c3b6",
-  ash: "#cbb4b4",
+  blush: "#eaeaea", // light grey
+  petal: "#ded8d3",
+  rose: "#c5b4a3", // beige lifted towards white
+  deepRose: "#b8a48f", // warm beige — the accent cap
+  burgundy: "#817262", // mocha 50% + beige 50%
+  wine: "#4a3f35", // mocha — the darkest lacquer
+  nude: "#d9d2ca",
+  foundation: "#ccc0b3",
+  cream: "#f6f4f2", // porcelain
+  champagne: "#b8a48f", // the metal IS the warm beige
+  roseGold: "#c5b4a3",
+  pearl: "#ffffff",
+  porcelain: "#f6f4f2",
+  clay: "#e1ddda", // linen
+  ash: "#d9d2ca",
 };
 
 const cache = new Map<string, MeshPhysicalMaterial>();
@@ -79,7 +89,7 @@ export function metal(color: string = palette.roseGold, roughness = 0.24): MeshP
  */
 export function mirror(): MeshPhysicalMaterial {
   return cached("mirror", () =>
-    new MeshPhysicalMaterial({ color: "#f0cfc6", metalness: 0.95, roughness: 0.11, envMapIntensity: 1.15 })
+    new MeshPhysicalMaterial({ color: "#d9d2ca", metalness: 0.95, roughness: 0.11, envMapIntensity: 1.15 })
   );
 }
 
@@ -106,7 +116,7 @@ export function matte(color: string): MeshPhysicalMaterial {
       roughness: 0.62,
       sheen: 0.6,
       sheenRoughness: 0.5,
-      sheenColor: new Color("#ffe3e3"),
+      sheenColor: new Color("#f6f4f2"),
       envMapIntensity: 0.9,
     })
   );
@@ -133,7 +143,7 @@ export function pearl(color: string = palette.pearl): MeshPhysicalMaterial {
  * Glass as a PAIR of materials: render the back shell first, then the contents, then the front
  * shell. `frosted` raises roughness and opacity for acid-etched jars and foundation bottles.
  */
-export function glass(tint = "#fff4f2", frosted = false): { back: MeshPhysicalMaterial; front: MeshPhysicalMaterial } {
+export function glass(tint = "#ffffff", frosted = false): { back: MeshPhysicalMaterial; front: MeshPhysicalMaterial } {
   const base = {
     color: tint,
     metalness: 0,
@@ -235,7 +245,7 @@ export function pressedPowder(color: string): MeshPhysicalMaterial {
       bumpScale: 2.2,
       sheen: 0.8,
       sheenRoughness: 0.8,
-      sheenColor: new Color("#fff1ee"),
+      sheenColor: new Color("#f6f4f2"),
     });
   });
 }
@@ -255,7 +265,7 @@ export function ceramic(color: string = palette.porcelain): MeshPhysicalMaterial
       clearcoatRoughness: 0.35,
       sheen: 0.25,
       sheenRoughness: 0.6,
-      sheenColor: new Color("#fff2ec"),
+      sheenColor: new Color("#f6f4f2"),
       envMapIntensity: 0.95,
     })
   );
@@ -282,7 +292,7 @@ export function brushedMetal(color: string = palette.champagne): MeshPhysicalMat
  * SATIN GLASS — acid-etched, between clear and fully frosted. Used where a bottle should read as
  * glass but its contents must not: mist bottles, ampoules, powder jars.
  */
-export function satinGlass(tint = "#f7ece8"): { back: MeshPhysicalMaterial; front: MeshPhysicalMaterial } {
+export function satinGlass(tint = "#f6f4f2"): { back: MeshPhysicalMaterial; front: MeshPhysicalMaterial } {
   const base = {
     color: tint,
     metalness: 0,
@@ -319,7 +329,7 @@ export function loosePowder(color: string): MeshPhysicalMaterial {
       depthWrite: false,
       sheen: 1,
       sheenRoughness: 1,
-      sheenColor: new Color("#fff6f2"),
+      sheenColor: new Color("#ffffff"),
       envMapIntensity: 0.5,
     })
   );
@@ -334,7 +344,7 @@ export function flocked(color: string): MeshPhysicalMaterial {
       roughness: 0.98,
       sheen: 0.95,
       sheenRoughness: 0.75,
-      sheenColor: new Color("#ffd9d9"),
+      sheenColor: new Color("#e1ddda"),
       envMapIntensity: 0.55,
     })
   );
@@ -363,7 +373,7 @@ export function bristle(color: string): MeshPhysicalMaterial {
       roughness: 0.85,
       sheen: 0.85,
       sheenRoughness: 0.4,
-      sheenColor: new Color("#fff0ea"),
+      sheenColor: new Color("#f6f4f2"),
       envMapIntensity: 0.7,
     })
   );

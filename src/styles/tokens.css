@@ -1,19 +1,36 @@
 /**
- * DESIGN TOKENS — "Blush Atelier" identity.
- *   Phase 11 established it (docs/PHASE_11_VISUAL_REDESIGN.md).
- *   Phase 12 deepened it (docs/PHASE_12_EXPERIENCE.md): a four-tier motion scale, a four-step
- *   warm shadow ladder, breakpoint tokens shared with the 3D scene, editorial type tokens and the
- *   product-scale ladder the cosmetic slots are sized from.
+ * DESIGN TOKENS — the "Quiet Luxury" identity.
  *
- * Phase 11 replaced the Phase 2 warm-ink palette with a luxury beauty identity: layered ivory,
- * blush, powder, champagne and nude grounds; near-black plum text; deep rose and burgundy
- * accents. Every text/ground pair here is verified by `node tools/check-contrast.mjs` — do not
- * change a colour without re-running it.
+ * Phase 15 replaced the Phase 11 "Blush Atelier" palette (ivory, blush, deep rose, wine) with a
+ * five-colour editorial system. NOTHING outside these five is invented:
+ *
+ *     WHITE  #ffffff  ->  LIGHT GREY  #eaeaea  ->  WARM BEIGE  #b8a48f
+ *                     ->  MOCHA BROWN #4a3f35  ->  BLACK       #000000
+ *
+ * That arrow is the visual hierarchy of the whole site, and it is also the section ladder: a page
+ * opens on white, alternates into light grey, warms into beige for an accent band, and drops into
+ * mocha for the cinematic passages. Black is a DETAIL colour — the verdict, an icon, a fine rule —
+ * and never a ground or a body tone.
+ *
+ * Every intermediate value in this file is a straight linear MIX of two of the five, and each one
+ * carries the mix in its comment so it can be rederived rather than guessed at. That is the only
+ * licence taken with the palette, and it is the one the brief grants for "a controlled tint
+ * derived from the approved palette".
+ *
+ * THE RULE THAT GOVERNS THE ACCENT: warm beige is a SURFACE on light grounds and a FOREGROUND on
+ * dark ones. #b8a48f measures 2.40:1 on white, so it can never be text, a link or a focus ring on
+ * a light page — it is the fill a button flows into, the rule beneath a link, the metal on a
+ * decorative edge. Lifted 18% towards white it reaches 5.08:1 on mocha and becomes the accent
+ * voice of every dark section.
+ *
+ * Every text/ground pair here is verified by `node tools/check-contrast.mjs` — do not change a
+ * colour without re-running it.
  *
  * SEMANTIC NAMES ARE PRESERVED. Components across the site reference --color-ground-base,
  * --color-accent-clay and friends; those names keep their ROLE (the page ground, the editorial
  * accent) while their values changed. That is what lets one file re-skin 85 pages consistently.
- * `clay` now resolves to deep rose and `mineral` to muted plum.
+ * `clay` now resolves to mocha brown and `mineral` to umber; the legacy `--palette-*` spellings
+ * are aliased into the new ladder rather than deleted, so no component had to be rewritten.
  *
  * Refusals that SURVIVE the redesign:
  *   --type-tracking-arabic   fixed at 0, never overridable — tracking severs Arabic letterforms
@@ -24,95 +41,136 @@
 
 :root {
   /* ---------------------------------------------------------------- colour: brand palette
-   * Raw brand values. Components should prefer the semantic tokens below; these exist for
-   * decorative surfaces (organic shapes, gradients, the 3D scene's CSS fallback). */
-  --palette-ivory: #fbf6f2;
-  --palette-cream: #f8f0ea;
-  --palette-blush: #f6e7e3;
-  --palette-powder: #f0dad6;
-  --palette-petal: #ebc9c8;
-  --palette-rose: #d9a3ab;
-  --palette-dusty-rose: #c08591;
-  --palette-champagne: #f3e9de;
-  --palette-champagne-metal: #c9a27e;
-  --palette-nude: #ebd9cf;
-  --palette-peach: #f7e3d9;
-  --palette-deep-rose: #9c3556;
-  --palette-burgundy: #7a2342;
-  --palette-wine: #2e1119;
-  --palette-plum: #74405f;
-  /* Phase 12 — one further step at the light end, for the sheen that crosses a control. */
-  --palette-porcelain: #fdf9f6;
+   *
+   * THE FIVE. These are the identity, and nothing outside them is invented.
+   * Every other colour in this file is a documented MIX of two of these five. */
+  --color-white: #ffffff;
+  --color-light-grey: #eaeaea;
+  --color-warm-beige: #b8a48f;
+  --color-mocha-brown: #4a3f35;
+  --color-black: #000000;
 
-  /* ---------------------------------------------------------------- colour: ground */
-  --color-ground-base: var(--palette-ivory); /* the page — warm ivory, NOT white */
-  --color-ground-raised: var(--palette-blush); /* disclosure band, claim block, related content */
-  --color-ground-inset: var(--palette-powder); /* conditions well, evidence strip */
-  --color-ground-overlay: var(--palette-wine); /* the fullscreen menu */
-  --color-ground-champagne: var(--palette-champagne);
-  --color-ground-nude: var(--palette-nude);
-  --color-ground-card: #fffaf7; /* review cards and floating captions */
+  /* THE DERIVED STEPS. Five colours cannot furnish a layered editorial page on their own: a
+   * reading ladder needs intermediate text tones, and a section ladder needs grounds between
+   * white and beige. Each value below is a straight linear mix of two of the five, and the
+   * comment states the mix so it can be rederived rather than guessed at.
+   * Verified by `node tools/check-contrast.mjs` — do not change one without re-running it. */
+  --palette-porcelain: #f6f4f2; /* white 88% + beige 12% — warm white */
+  --palette-linen: #e1ddda; /* light grey 82% + beige 18% */
+  --palette-nude: #d9d2ca; /* light grey 65% + beige 35% */
+  --palette-sand: #ccc0b3; /* light grey 40% + beige 60% — decorative bands only */
+  --palette-taupe: #817262; /* mocha 50% + beige 50% — meaningful borders */
+  --palette-bark: #625549; /* mocha 78% + beige 22% — recessed text */
+  --palette-umber: #5b4e43; /* mocha 85% + beige 15% — secondary text */
+  --palette-beige-lifted: #c5b4a3; /* beige 82% + white 18% — beige raised for dark grounds */
+  --palette-beige-shaded: #9d8b79; /* beige 75% + mocha 25% — borders on dark grounds */
+  --palette-shadow: #29231d; /* mocha 55% + black 45% — the deepest shadow tint */
 
-  /* ---------------------------------------------------------------- colour: text */
-  --color-text-primary: #2b1a1f; /* 15.40:1 on ivory — plum near-black, never #000 */
-  --color-text-secondary: #5a444b; /* 8.28:1 */
-  --color-text-muted: #75595f; /* 5.84:1 on ivory, 4.69:1 on powder */
-  --color-text-on-accent: #fff8f5; /* 6.54:1 on deep rose */
+  /* Legacy spellings kept so that no component had to be rewritten. They now resolve into the
+   * new ladder; the NAME is a role, the VALUE is this palette. */
+  --palette-ivory: var(--color-white);
+  --palette-cream: var(--palette-porcelain);
+  --palette-blush: var(--color-light-grey);
+  --palette-powder: var(--palette-linen);
+  --palette-petal: var(--palette-nude);
+  --palette-champagne: var(--palette-porcelain);
+  --palette-champagne-metal: var(--color-warm-beige);
+  --palette-wine: var(--color-mocha-brown);
+
+  /* ---------------------------------------------------------------- colour: ground
+   * The section ladder, lightest to darkest:
+   *   WHITE -> PORCELAIN -> LIGHT GREY -> LINEN -> NUDE -> WARM BEIGE -> MOCHA -> BLACK */
+  --color-ground-base: var(--color-white); /* the page */
+  --color-ground-card: var(--color-white); /* review cards and floating captions */
+  --color-ground-raised: var(--color-light-grey); /* alternating sections, disclosure band */
+  --color-ground-inset: var(--palette-linen); /* conditions well, evidence strip */
+  --color-ground-champagne: var(--palette-porcelain); /* the warm-white section */
+  --color-ground-nude: var(--palette-nude); /* the warmest light section */
+  --color-ground-accent: var(--color-warm-beige); /* the beige section — black text only */
+  --color-ground-overlay: var(--color-mocha-brown); /* dark sections, footer, fullscreen menu */
+
+  /* ---------------------------------------------------------------- colour: text
+   * A deliberately COMPRESSED ladder. In a monochrome brown system the hierarchy is carried by
+   * size, tracking and space — not by fading text towards the ground. All three tones clear AAA
+   * on white. Ratios quoted are against the page ground. */
+  --color-text-primary: var(--color-mocha-brown); /* 10.23:1 — headings and body */
+  --color-text-secondary: var(--palette-umber); /* 8.03:1 */
+  --color-text-muted: var(--palette-bark); /* 7.20:1 — metadata and labels */
+  --color-text-strong: var(--color-black); /* 21:1 — the loudest editorial register */
+  --color-text-on-accent: var(--color-white); /* 10.23:1 on mocha */
 
   /* ---------------------------------------------------------------- colour: line */
-  --color-line-hairline: #ead7d3; /* decorative only, carries no information */
-  --color-line-strong: #8c6b71; /* ≥3:1 on ivory, blush and card — meaningful boundaries */
+  --color-line-hairline: var(--color-light-grey); /* decorative only, carries no information */
+  --color-line-strong: var(--palette-taupe); /* >=3:1 on every light ground — real boundaries */
 
-  /* ---------------------------------------------------------------- colour: accent */
-  --color-accent-clay: var(--palette-deep-rose); /* 6.40:1 — links, CTAs, verdict rule */
-  --color-accent-clay-hover: var(--palette-burgundy); /* 9.12:1 */
-  --color-accent-mineral: var(--palette-plum); /* 7.41:1 — the observed voice */
-  --color-accent-champagne: var(--palette-champagne-metal); /* decorative metal, never text */
+  /* ---------------------------------------------------------------- colour: accent
+   *
+   * THE ONE RULE THAT MAKES THIS PALETTE WORK:
+   *   warm beige is a SURFACE on light grounds and a FOREGROUND on dark ones.
+   * #b8a48f on white is 2.40:1. It can never be text, a link or a focus ring on a light page —
+   * it is the fill a button flows into, the rule under a link, the metal on a decorative edge.
+   * On mocha it is lifted 18% towards white and becomes a legible accent at 5.08:1. */
+  --color-accent-clay: var(--color-mocha-brown); /* 10.23:1 — links, CTAs, verdict rule */
+  --color-accent-clay-hover: var(--color-black); /* 21:1 — the link hover TEXT */
+  --color-accent-mineral: var(--palette-umber); /* 8.03:1 — the observed voice */
+  --color-accent-champagne: var(--color-warm-beige); /* decorative surface and metal, never text */
 
-  /* ---------------------------------------------------------------- colour: status */
-  --color-status-success: #3d6a4c;
-  --color-status-warning: #86570f;
-  --color-status-error: #a1303a;
+  /* The CTA fill is a separate token from the link-hover TEXT above, because a button may flow
+   * into warm beige (and switch to black type) where a run of prose cannot. */
+  --color-cta-fill: var(--color-mocha-brown);
+  --color-cta-fill-hover: var(--color-warm-beige);
+  --color-cta-fg: var(--color-white);
+  --color-cta-fg-hover: var(--color-black); /* 8.74:1 on warm beige */
 
-  /* ---------------------------------------------------------------- colour: evidence */
-  --color-evidence-claim: var(--color-text-muted); /* what the brand says — quietest */
+  /* ---------------------------------------------------------------- colour: status
+   * Deep, almost-neutral tints of the mocha family. They exist because disclosure state is a
+   * legal signal rather than decoration — but the LABEL TEXT carries the meaning, and the colour
+   * is only allowed to be a temperature. Nothing here is a saturated UI red or green. */
+  --color-status-success: #3f4a38; /* 9.34:1 */
+  --color-status-warning: #6b5326; /* 7.27:1 */
+  --color-status-error: #6b3a32; /* 9.22:1 */
+
+  /* ---------------------------------------------------------------- colour: evidence
+   * Quietest to loudest: recessed brown -> secondary brown -> black. */
+  --color-evidence-claim: var(--color-text-muted); /* what the brand says */
   --color-evidence-observation: var(--color-accent-mineral); /* what Zina saw */
-  --color-evidence-verdict: var(--color-text-primary); /* what Zina concluded — loudest */
+  --color-evidence-verdict: var(--color-text-strong); /* what Zina concluded */
 
   /* ---------------------------------------------------------------- colour: disclosure */
   --color-disclosure-independent: var(--color-text-muted);
   --color-disclosure-editorial: var(--color-text-muted);
   --color-disclosure-gifted: var(--color-accent-mineral);
-  --color-disclosure-sponsored: var(--color-accent-clay);
-  --color-disclosure-paid: var(--color-accent-clay);
+  --color-disclosure-sponsored: var(--color-text-strong);
+  --color-disclosure-paid: var(--color-text-strong);
   --color-disclosure-pending: var(--color-status-warning);
 
   /* ---------------------------------------------------------------- colour: focus */
-  --color-focus-ring: var(--palette-deep-rose);
-  --color-focus-ring-on-accent: var(--color-text-primary);
+  --color-focus-ring: var(--color-mocha-brown);
+  --color-focus-ring-on-accent: var(--color-black);
 
   /* ---------------------------------------------------------------- surfaces: gradients
-   * Soft tonal light, never a saturated sweep. Each one moves between two neighbouring
-   * grounds, so a section edge reads as a change of light rather than a cut. */
-  --gradient-ivory-blush: linear-gradient(180deg, var(--palette-ivory) 0%, var(--palette-blush) 100%);
-  --gradient-blush-ivory: linear-gradient(180deg, var(--palette-blush) 0%, var(--palette-ivory) 100%);
-  --gradient-powder-champagne: linear-gradient(160deg, var(--palette-powder) 0%, var(--palette-champagne) 100%);
+   * Tonal light, never a saturated sweep. Each one moves between two NEIGHBOURING rungs of the
+   * ladder above, so a section edge reads as a change of light rather than a cut. */
+  --gradient-ivory-blush: linear-gradient(180deg, #ffffff 0%, #eaeaea 100%);
+  --gradient-blush-ivory: linear-gradient(180deg, #eaeaea 0%, #ffffff 100%);
+  --gradient-powder-champagne: linear-gradient(160deg, #e1ddda 0%, #f6f4f2 100%);
   --gradient-hero:
-    radial-gradient(60% 70% at 72% 38%, rgb(235 201 200 / 85%) 0%, rgb(235 201 200 / 0%) 70%),
-    radial-gradient(45% 50% at 12% 88%, rgb(243 233 222 / 90%) 0%, rgb(243 233 222 / 0%) 70%),
-    linear-gradient(180deg, var(--palette-cream) 0%, var(--palette-blush) 100%);
-  --gradient-glow: radial-gradient(closest-side, rgb(217 163 171 / 55%), rgb(217 163 171 / 0%));
-  --gradient-champagne-glow: radial-gradient(closest-side, rgb(201 162 126 / 35%), rgb(201 162 126 / 0%));
+    radial-gradient(60% 70% at 72% 38%, rgb(184 164 143 / 30%) 0%, rgb(184 164 143 / 0%) 70%),
+    radial-gradient(45% 50% at 12% 88%, rgb(234 234 234 / 90%) 0%, rgb(234 234 234 / 0%) 70%),
+    linear-gradient(180deg, #ffffff 0%, #f6f4f2 100%);
+  --gradient-glow: radial-gradient(closest-side, rgb(184 164 143 / 32%), rgb(184 164 143 / 0%));
+  --gradient-champagne-glow: radial-gradient(closest-side, rgb(184 164 143 / 24%), rgb(184 164 143 / 0%));
+  /* The dark section. A mocha ground lit from the top right by its own warm beige. */
   --gradient-wine:
-    radial-gradient(70% 90% at 85% 10%, rgb(156 53 86 / 45%) 0%, rgb(156 53 86 / 0%) 70%),
-    linear-gradient(180deg, #3a1522 0%, var(--palette-wine) 100%);
-  /* Phase 12. A light leak is the champagne bounce spilling into frame; the sheen is the single
-     pale band that crosses a control on hover, matching the highlight the 3D caps carry. */
+    radial-gradient(70% 90% at 85% 10%, rgb(184 164 143 / 18%) 0%, rgb(184 164 143 / 0%) 70%),
+    linear-gradient(180deg, #4a3f35 0%, #29231d 100%);
+  /* A light leak is the beige bounce spilling into frame; the sheen is the single pale band that
+     crosses a control on hover, matching the highlight the 3D caps carry. */
   --gradient-light-leak:
-    radial-gradient(closest-side, rgb(243 233 222 / 72%) 0%, rgb(235 201 200 / 28%) 55%, rgb(235 201 200 / 0%) 100%);
+    radial-gradient(closest-side, rgb(246 244 242 / 85%) 0%, rgb(184 164 143 / 22%) 55%, rgb(184 164 143 / 0%) 100%);
   --gradient-sheen:
-    linear-gradient(100deg, rgb(253 249 246 / 0%) 0%, rgb(253 249 246 / 42%) 50%, rgb(253 249 246 / 0%) 100%);
-  --gradient-rose-metal: linear-gradient(135deg, #e9c3b4 0%, #c79a86 45%, #f3dccf 60%, #b88471 100%);
+    linear-gradient(100deg, rgb(255 255 255 / 0%) 0%, rgb(255 255 255 / 55%) 50%, rgb(255 255 255 / 0%) 100%);
+  --gradient-rose-metal: linear-gradient(135deg, #c5b4a3 0%, #9d8b79 45%, #e1ddda 60%, #817262 100%);
 
   /* ---------------------------------------------------------------- typography: family
    *
@@ -251,19 +309,21 @@
   --border-rule-verdict: 2px solid var(--color-accent-clay);
 
   /* ---------------------------------------------------------------- shadow
-   * Low, warm and diffuse — a product-photography shadow, tinted with wine rather than grey. */
+   * Low, warm and diffuse — a product-photography shadow, tinted with MOCHA rather than grey.
+   * A neutral grey shadow under a warm beige surface is the single fastest way to make this
+   * palette look cheap, so there is deliberately no grey anywhere in this ladder. Nor is there
+   * pure black: the deepest tint is mocha carried 45% towards black (--palette-shadow). */
   --shadow-none: none;
-  /* Four steps, all wine-tinted. `subtle` is a contact shadow, `hero` a full studio fall-off.
-     There is deliberately no neutral grey anywhere in this ladder — a grey shadow under a blush
-     photograph is the single fastest way to make a warm palette look cheap. */
-  --shadow-subtle: 0 10px 22px -16px rgb(94 31 51 / 22%);
-  --shadow-soft: 0 24px 48px -28px rgb(94 31 51 / 28%);
-  --shadow-float: 0 40px 80px -40px rgb(94 31 51 / 38%), 0 12px 24px -16px rgb(94 31 51 / 18%);
+  /* Four steps. `subtle` is a contact shadow, `hero` a full studio fall-off. The opacities are
+     low on purpose — this identity is flat and editorial, with controlled depth, not lifted. */
+  --shadow-subtle: 0 10px 22px -16px rgb(74 63 53 / 18%);
+  --shadow-soft: 0 24px 48px -28px rgb(74 63 53 / 22%);
+  --shadow-float: 0 40px 80px -40px rgb(74 63 53 / 30%), 0 12px 24px -16px rgb(74 63 53 / 14%);
   --shadow-hero:
-    0 72px 120px -56px rgb(94 31 51 / 42%),
-    0 28px 56px -32px rgb(94 31 51 / 26%),
-    0 4px 12px -8px rgb(122 35 66 / 16%);
-  --shadow-control: 0 10px 24px -14px rgb(122 35 66 / 55%);
+    0 72px 120px -56px rgb(74 63 53 / 34%),
+    0 28px 56px -32px rgb(74 63 53 / 20%),
+    0 4px 12px -8px rgb(41 35 29 / 14%);
+  --shadow-control: 0 10px 24px -14px rgb(41 35 29 / 34%);
 
   /* ---------------------------------------------------------------- motion
    * Luxury is slow. Entrances are long and decelerating; nothing bounces or overshoots. */
