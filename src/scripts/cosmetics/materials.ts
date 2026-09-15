@@ -1,5 +1,10 @@
 /**
- * COSMETIC MATERIALS — physically based finishes for the Phase 11 3D system.
+ * COSMETIC MATERIALS — physically based finishes for the Phase 11/12 3D system.
+ *
+ * Phase 12 extends the library with the finishes the wider packaging catalogue needs: ceramic,
+ * brushed metal, satin (acid-etched) glass, translucent loose powder, flocked foam and a soft
+ * lacquered wood. Everything is still cached and shared — a finish is built once per colour and
+ * reused by every model and every slot on the page.
  *
  * Every finish is a MeshPhysicalMaterial lit by a PMREM studio environment (see scene.ts), so the
  * realism comes from reflections and fresnel rather than from textures. Glass deliberately avoids
@@ -30,6 +35,9 @@ export const palette = {
   champagne: "#dcc09a",
   roseGold: "#e2b09c",
   pearl: "#f6e6e2",
+  porcelain: "#f4e8e4",
+  clay: "#e0c3b6",
+  ash: "#cbb4b4",
 };
 
 const cache = new Map<string, MeshPhysicalMaterial>();
@@ -124,15 +132,23 @@ export function glass(tint = "#fff4f2", frosted = false): { back: MeshPhysicalMa
     ior: 1.5,
     transparent: true,
     depthWrite: false,
-    // Clear glass reads through its REFLECTIONS, not its body: thin shells, strong environment.
-    envMapIntensity: frosted ? 0.7 : 1.5,
+    /* Clear glass reads through its REFLECTIONS, not its body: thin shells, strong environment.
+     * Phase 12 raised the clear pair from 0.05/0.10 to 0.12/0.20. At the lower figures a clear
+     * bottle standing on an IVORY page had no visible walls at all — a dropper read as a floating
+     * label under a floating cap, because the only things with any opacity were the liquid and
+     * the printed band. Glass on a pale ground needs enough body to hold its own silhouette. */
+    envMapIntensity: frosted ? 1.05 : 1.6,
   };
+  /* Phase 12: the frosted pair was opaque enough (0.3 / 0.4) that a large frosted bottle read as
+     a milky brick with a hard-edged block of liquid inside it. Acid-etched glass is a VEIL: it
+     scatters, it does not hide. Lower opacity plus a higher environment intensity puts the
+     highlight back on the shoulders, which is where the eye reads a bottle's form. */
   return {
     back: cached(`glass-back:${tint}:${frosted}`, () =>
-      new MeshPhysicalMaterial({ ...base, side: BackSide, opacity: frosted ? 0.3 : 0.05 })
+      new MeshPhysicalMaterial({ ...base, side: BackSide, opacity: frosted ? 0.18 : 0.12 })
     ),
     front: cached(`glass-front:${tint}:${frosted}`, () =>
-      new MeshPhysicalMaterial({ ...base, side: FrontSide, opacity: frosted ? 0.4 : 0.1 })
+      new MeshPhysicalMaterial({ ...base, side: FrontSide, opacity: frosted ? 0.26 : 0.2 })
     ),
   };
 }
@@ -143,12 +159,15 @@ export function liquid(color: string, opacity = 0.9): MeshPhysicalMaterial {
     new MeshPhysicalMaterial({
       color,
       metalness: 0,
-      roughness: 0.12,
-      clearcoat: 0.6,
+      roughness: 0.1,
+      clearcoat: 0.75,
+      clearcoatRoughness: 0.08,
       transparent: true,
       opacity,
       depthWrite: false,
-      envMapIntensity: 0.8,
+      /* Liquid seen through glass carries a highlight of its own — without it the fill reads as
+         a solid block of colour sitting inside a bottle rather than as something poured. */
+      envMapIntensity: 1.15,
     })
   );
 }
@@ -208,6 +227,135 @@ export function pressedPowder(color: string): MeshPhysicalMaterial {
       sheenColor: new Color("#fff1ee"),
     });
   });
+}
+
+/**
+ * CERAMIC — glazed stoneware for balm pots, toner bottles and pump bodies. Denser and less
+ * plasticky than `gloss`: a shallow clearcoat over a slightly rough body, so the highlight is a
+ * broad sheen rather than a hard specular dot.
+ */
+export function ceramic(color: string = palette.porcelain): MeshPhysicalMaterial {
+  return cached(`ceramic:${color}`, () =>
+    new MeshPhysicalMaterial({
+      color,
+      metalness: 0,
+      roughness: 0.45,
+      clearcoat: 0.55,
+      clearcoatRoughness: 0.35,
+      sheen: 0.25,
+      sheenRoughness: 0.6,
+      sheenColor: new Color("#fff2ec"),
+      envMapIntensity: 0.95,
+    })
+  );
+}
+
+/**
+ * BRUSHED METAL — ferrules, palette hinges, sifter rims. Same metalness as `metal` but a much
+ * rougher body and no clearcoat, so it scatters the studio softbox into a long soft streak
+ * instead of mirroring it.
+ */
+export function brushedMetal(color: string = palette.champagne): MeshPhysicalMaterial {
+  return cached(`brushed:${color}`, () =>
+    new MeshPhysicalMaterial({
+      color,
+      metalness: 1,
+      roughness: 0.52,
+      clearcoat: 0,
+      envMapIntensity: 1.05,
+    })
+  );
+}
+
+/**
+ * SATIN GLASS — acid-etched, between clear and fully frosted. Used where a bottle should read as
+ * glass but its contents must not: mist bottles, ampoules, powder jars.
+ */
+export function satinGlass(tint = "#f7ece8"): { back: MeshPhysicalMaterial; front: MeshPhysicalMaterial } {
+  const base = {
+    color: tint,
+    metalness: 0,
+    roughness: 0.22,
+    clearcoat: 0.75,
+    clearcoatRoughness: 0.18,
+    ior: 1.5,
+    transparent: true,
+    depthWrite: false,
+    envMapIntensity: 1.1,
+  };
+  return {
+    back: cached(`satinglass-back:${tint}`, () =>
+      new MeshPhysicalMaterial({ ...base, side: BackSide, opacity: 0.16 })
+    ),
+    front: cached(`satinglass-front:${tint}`, () =>
+      new MeshPhysicalMaterial({ ...base, side: FrontSide, opacity: 0.26 })
+    ),
+  };
+}
+
+/**
+ * TRANSLUCENT LOOSE POWDER — the veil inside a sifter jar. Barely-there, unlit-looking, with a
+ * strong sheen so it reads as suspended pigment rather than a solid.
+ */
+export function loosePowder(color: string): MeshPhysicalMaterial {
+  return cached(`loose:${color}`, () =>
+    new MeshPhysicalMaterial({
+      color,
+      metalness: 0,
+      roughness: 1,
+      transparent: true,
+      opacity: 0.62,
+      depthWrite: false,
+      sheen: 1,
+      sheenRoughness: 1,
+      sheenColor: new Color("#fff6f2"),
+      envMapIntensity: 0.5,
+    })
+  );
+}
+
+/** FLOCKED FOAM — a beauty sponge. Almost no specular, a velvet rim from sheen alone. */
+export function flocked(color: string): MeshPhysicalMaterial {
+  return cached(`flocked:${color}`, () =>
+    new MeshPhysicalMaterial({
+      color,
+      metalness: 0,
+      roughness: 0.98,
+      sheen: 0.95,
+      sheenRoughness: 0.75,
+      sheenColor: new Color("#ffd9d9"),
+      envMapIntensity: 0.55,
+    })
+  );
+}
+
+/** LACQUERED WOOD — brush handles. A warm body under a satin varnish, never a plastic shine. */
+export function lacquer(color: string): MeshPhysicalMaterial {
+  return cached(`lacquer:${color}`, () =>
+    new MeshPhysicalMaterial({
+      color,
+      metalness: 0,
+      roughness: 0.34,
+      clearcoat: 0.7,
+      clearcoatRoughness: 0.22,
+      envMapIntensity: 1,
+    })
+  );
+}
+
+/** BRISTLE — a brush head. Soft, directional, slightly translucent at the tip. */
+export function bristle(color: string): MeshPhysicalMaterial {
+  return cached(`bristle:${color}`, () =>
+    new MeshPhysicalMaterial({
+      color,
+      metalness: 0,
+      roughness: 0.85,
+      sheen: 0.85,
+      sheenRoughness: 0.4,
+      sheenColor: new Color("#fff0ea"),
+      envMapIntensity: 0.7,
+    })
+  );
 }
 
 /**

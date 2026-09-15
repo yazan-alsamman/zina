@@ -70,7 +70,7 @@ const schemas = [jsonLd(breadcrumbSchema(crumbs))];
   schemas={schemas}
   switcherHref={path.brandsIndex(locale === "en" ? "ar" : "en")}
 >
-  <PageHero locale={locale} compact cosmetics={[{ kind: "compact", tint: "blush" }]}>
+  <PageHero locale={locale} compact cosmetics={[{ kind: "palette", tint: "nude" }]}>
     <Breadcrumbs locale={locale} crumbs={crumbs} />
 
     <h1 class="display-lg title">{t(locale, "brands")}</h1>

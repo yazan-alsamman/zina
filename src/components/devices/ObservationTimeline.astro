@@ -21,6 +21,12 @@
  *
  * FORBIDDEN: accordion, tabs, tooltip, "show more", coloured pass/fail markers, any motion that
  * gates the content. The observations are the article.
+ *
+ * PHASE 12 raises the index into the editorial register: the hour is set large, the aspect small
+ * and tracked beneath it, and a hairline thread runs the sequence the way the homepage's story
+ * steps do. The TIER IS UNCHANGED — the hour is still `.record` (tabular Jost), because it is a
+ * measurement, and the Phase 11 decision that measurements are never set in the display serif
+ * stands. What changed is scale and spacing, not voice.
  */
 import type { Locale, ReviewObservation } from "../../../content/schema/types";
 import { recordMarker } from "../../lib/bidi";
@@ -58,6 +64,11 @@ const { observations, headingId } = Astro.props;
     display: grid;
     gap: var(--space-1);
     position: relative;
+  }
+
+  .at {
+    font-size: calc(var(--type-body-md) * var(--type-arabic-size-factor));
+    color: var(--color-accent-mineral);
   }
 
   /* ---------------------------------------------------------------- below 1024
@@ -106,12 +117,21 @@ const { observations, headingId } = Astro.props;
 
     .marker {
       flex-direction: column;
+      align-items: flex-start;
       gap: var(--space-0-5);
-      padding-block-start: 0.15em;
+      padding-block-start: 0;
+    }
+
+    /* The hour carries the column at editorial scale; the aspect sits under it as a small
+       tracked caption. Together they read as a margin note in a printed record. */
+    .at {
+      font-size: calc(1.6rem * var(--type-arabic-size-factor));
+      line-height: 1.1;
     }
 
     .note {
       padding-inline-start: var(--space-3);
+      padding-block-start: 0.4rem;
     }
   }
 

@@ -8,8 +8,21 @@
  *   - the night-time automotive series (photo 1, 3, 12, 17–20, 22) reads as lifestyle rather than
  *     beauty, competes with the pink identity through saturated red interiors, and one frame shows
  *     a legible licence plate
- *   - near-duplicates of selected frames (photo 11 and 16 duplicate the red editorial; photo 6
- *     duplicates the monochrome studio series)
+ *   - near-duplicates of selected frames (photo 11 duplicates the red editorial)
+ *
+ * PHASE 12 RE-REVIEW. Two of the eleven exclusions were reconsidered and reversed, because the
+ * Phase 12 compositions ask for two things the original eleven could not supply:
+ *
+ *   - `beautyCloseup` (photo 16) was filed as a duplicate of the red editorial. It is not: the
+ *     red editorial is a wide, full-length fashion frame, and this is a tight BEAUTY frame —
+ *     complexion, brow, lash and highlighter legible at full-bleed width. For a publication whose
+ *     whole subject is how a formula behaves on skin, it is the single most on-brief photograph
+ *     in the set, and nothing else in the eleven can carry a full-bleed band.
+ *   - `studioFullLength` (photo 6) was filed as a duplicate of the monochrome studio series. The
+ *     series is waist-up; this is the only full-length frame, and the only one with enough empty
+ *     ground for oversized type to cross it without covering her.
+ *
+ * The automotive series remains excluded, unchanged and for the original reasons.
  *
  * Every photograph is imported through astro:assets, so the build emits AVIF and WebP at several
  * widths with intrinsic dimensions — no layout shift, no oversized download.
@@ -31,6 +44,8 @@ import studioMonochrome from "../assets/photography/zina-studio-monochrome.jpg";
 import studioSeated from "../assets/photography/zina-studio-seated.jpg";
 import studioMonochromeProfile from "../assets/photography/zina-studio-monochrome-profile.jpg";
 import studioWarmSeated from "../assets/photography/zina-studio-warm-seated.jpg";
+import beautyCloseup from "../assets/photography/zina-beauty-closeup.jpg";
+import studioFullLength from "../assets/photography/zina-studio-full-length.jpg";
 
 export interface Photograph {
   src: ImageMetadata;
@@ -129,6 +144,24 @@ export const photography = {
       ar: "صورة استوديو لزينا المقري جالسة أمام خلفية بنية دافئة",
     },
     focus: "50% 35%",
+  },
+  /** PHASE 12. The beauty frame: the only photograph where the makeup itself is legible. */
+  beautyCloseup: {
+    src: beautyCloseup,
+    alt: {
+      en: "Close-up beauty portrait of Zina Almokri in a red beaded dress, her makeup and complexion visible in detail",
+      ar: "صورة جمالية مقربة لزينا المقري بفستان أحمر مطرز، يظهر فيها مكياجها وبشرتها بالتفصيل",
+    },
+    focus: "42% 26%",
+  },
+  /** PHASE 12. The only full-length frame — the one with room for type to cross it. */
+  studioFullLength: {
+    src: studioFullLength,
+    alt: {
+      en: "Full-length black and white studio photograph of Zina Almokri in a tailored blazer and trousers, leaning against a stool",
+      ar: "صورة استوديو كاملة بالأبيض والأسود لزينا المقري بسترة وبنطال مفصلين، تستند إلى كرسي",
+    },
+    focus: "50% 45%",
   },
 } satisfies Record<string, Photograph>;
 

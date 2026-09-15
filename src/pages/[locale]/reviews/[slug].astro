@@ -382,6 +382,7 @@ const heroCosmetic = cosmeticForCategory(record.entity.category);
       summary={content.verdict.summary}
       bestFor={content.verdict.bestFor}
       wouldRepurchase={content.verdict.wouldRepurchase}
+      cosmetic={heroCosmetic}
     />
 
     <div class="container">
@@ -675,15 +676,19 @@ const heroCosmetic = cosmeticForCategory(record.entity.category);
       margin-inline-start: 0;
     }
 
-    .plates[data-count="2"],
-    .plates[data-count="4"] {
+    /*
+     * PLATES PAIR UP FROM TWO ONWARD, at their own unchanged ratio.
+     *
+     * A set of three used to stack full-bleed down the page, which at a laptop's 1366×768 gave
+     * one plate per screen — and while the photography does not exist, that is one screen of
+     * empty tonal field per plate. Two to a row halves the height of every plate without
+     * touching its SHAPE, and shape is the thing that must not vary: an hour-0 frame and an
+     * hour-8 frame are only comparable if they are the same rectangle. The Phase 11 code varied
+     * the ratio to 1/1 for even counts, which quietly broke that; it no longer does.
+     */
+    .plates:not([data-count="1"]) {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 2px;
-    }
-
-    .plates[data-count="2"] :global(.frame),
-    .plates[data-count="4"] :global(.frame) {
-      aspect-ratio: 1 / 1;
+      gap: var(--space-4) var(--space-3);
     }
   }
 </style>

@@ -8,6 +8,7 @@
 import { test, describe, before } from "node:test";
 import assert from "node:assert/strict";
 import { assertOnlyCosmeticsLoader, assertChunksCollectNothing } from "./helpers/client-js.mjs";
+import { shippedCss } from "./helpers/css.mjs";
 import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";

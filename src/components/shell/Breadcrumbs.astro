@@ -64,7 +64,12 @@ const { locale, crumbs } = Astro.props;
     white-space: nowrap;
   }
 
+  /* 26px tall, clearing the 24×24 CSS pixel target minimum (WCAG 2.5.8). The extra height is
+     padding, so the baseline the crumbs sit on is unchanged. */
   .breadcrumb a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 26px;
     color: var(--color-text-muted);
     text-decoration: none;
     white-space: nowrap;

@@ -45,6 +45,7 @@ const padded = String(number).padStart(2, "0");
     width={asset.width}
     height={asset.height}
     ratio="3 / 2"
+    reservedLabel={asset.src && !asset.src.startsWith("/mock-media/") ? undefined : t(locale, "plateReserved")}
   />
   <figcaption class="caption">
     <p class="plate-number record">

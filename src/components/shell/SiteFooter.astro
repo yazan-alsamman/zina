@@ -65,7 +65,8 @@ const year = new Date().getFullYear();
 
 <footer class="site-footer tone-wine">
   <span class="organic organic--glow footer-glow" aria-hidden="true"></span>
-  <FloatingCosmetic kind="perfume" tint="rose" depth={0.3} yaw={0.4} desktopOnly class="footer-cosmetic" />
+  <FloatingCosmetic kind="perfume" tint="rose" layer="mid" depth={0.4} yaw={0.4} spin={0.6} light="wine" desktopOnly class="footer-cosmetic" />
+  <FloatingCosmetic kind="vial" tint="champagne" layer="back" depth={0.2} yaw={-0.5} spin={0.3} priority={-0.6} light="wine" wideOnly class="footer-cosmetic footer-cosmetic--far" />
 
   <div class="container container--wide">
     <div class="footer-top">
@@ -151,6 +152,15 @@ const year = new Date().getFullYear();
     inset-inline-start: 34%;
   }
 
+  /* Far upstage, small and low-priority — it only ever appears when the budget has room. */
+  .footer-cosmetic--far {
+    inline-size: 7.5rem;
+    inset-block-start: auto;
+    inset-block-end: 26%;
+    inset-inline-start: auto;
+    inset-inline-end: 8%;
+  }
+
   .container {
     position: relative;
     z-index: 1;
@@ -187,19 +197,30 @@ const year = new Date().getFullYear();
 
   .group ul {
     display: grid;
-    gap: 0.6rem;
+    gap: 0.35rem;
   }
 
+  /* A navigation link is a TARGET, not a run of text: 28px tall, which clears the 24×24 CSS
+     pixel minimum (WCAG 2.5.8) with room for a fingertip that lands slightly off. */
   .group a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 28px;
+    padding-block: 0.15rem;
     font-family: var(--type-family-ui);
     font-size: calc(var(--type-ui-md) * var(--type-arabic-size-factor));
     color: var(--color-text-secondary);
     text-decoration: none;
+    /* The underline is drawn from the reading edge on hover rather than switched on. */
+    background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 0 1px;
+    transition:
+      background-size var(--motion-duration-settle) var(--motion-easing-silk),
+      color var(--motion-duration-micro) var(--motion-easing-attend);
   }
 
   .group a:hover {
     color: var(--color-text-primary);
-    text-decoration: underline;
+    background-size: 100% 1px;
   }
 
   .footer-wordmark {
@@ -232,10 +253,16 @@ const year = new Date().getFullYear();
     color: var(--color-text-secondary);
   }
 
+  .social a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 28px;
+  }
+
   .social {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-3);
+    gap: var(--space-2) var(--space-3);
     font-family: var(--type-family-ui);
     font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
     letter-spacing: var(--type-tracking-label);

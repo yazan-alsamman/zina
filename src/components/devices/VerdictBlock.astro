@@ -13,9 +13,16 @@
  *
  * NO SCORE. NO STARS. NO BADGE. NO NUMBER. Removed by Phase 1 decision and enforced by
  * tools/validate-content.mjs, which fails the build on any rating, score or stars field.
+ *
+ * PHASE 12: the caller may hand the block the review's category package, which settles in the
+ * card's empty half — the last stop of the product journey that began on the review's opening
+ * stage. It is the one foreground object on a review page, it is decorative and aria-hidden like
+ * every other, and it appears only where the card is wide enough to have an empty half.
  */
 import type { Locale } from "../../../content/schema/types";
+import type { CosmeticKind, CosmeticTint } from "../../scripts/cosmetics/models";
 import { t } from "../../lib/ui-strings";
+import FloatingCosmetic from "../beauty/FloatingCosmetic.astro";
 
 interface Props {
   locale: Locale;
@@ -23,9 +30,10 @@ interface Props {
   summary: string;
   bestFor: string;
   wouldRepurchase: string;
+  cosmetic?: { kind: CosmeticKind; tint?: CosmeticTint };
 }
 
-const { locale, headingId, summary, bestFor, wouldRepurchase } = Astro.props;
+const { locale, headingId, summary, bestFor, wouldRepurchase, cosmetic } = Astro.props;
 ---
 
 {/* Phase 11: the verdict is the page's emotional peak, so it takes the wine surface — the one
@@ -34,6 +42,23 @@ const { locale, headingId, summary, bestFor, wouldRepurchase } = Astro.props;
   <div class="container">
     <div class="inner tone-wine">
       <span class="organic organic--glow verdict-glow" aria-hidden="true"></span>
+      {
+        cosmetic && (
+          <FloatingCosmetic
+            kind={cosmetic.kind}
+            tint={cosmetic.tint}
+            layer="fore"
+            depth={0.7}
+            yaw={-0.35}
+            spin={1}
+            approach={0.6}
+            priority={2.2}
+            light="wine"
+            wideOnly
+            class="verdict-cosmetic"
+          />
+        )
+      }
       <h2 class="label verdict-label" id={headingId}>{t(locale, "verdict")}</h2>
       <p class="summary display-md">{summary}</p>
       <dl class="supporting">
@@ -76,6 +101,13 @@ const { locale, headingId, summary, bestFor, wouldRepurchase } = Astro.props;
   .verdict-label {
     position: relative;
     color: var(--color-accent-clay);
+  }
+
+  /* The card's empty half. Below 1024 there is no empty half, and `wideOnly` removes the slot. */
+  .verdict-cosmetic {
+    inline-size: 22%;
+    inset-block-end: 8%;
+    inset-inline-end: 8%;
   }
 
   .summary {

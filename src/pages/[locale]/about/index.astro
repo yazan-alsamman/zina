@@ -98,7 +98,7 @@ const methodName = methodRecord.locales[locale]?.name ?? t(locale, "method");
   schemas={schemas}
   switcherHref={path.about(locale === "en" ? "ar" : "en")}
 >
-  <PageHero locale={locale} photo="studioWarmProfile" cosmetics={[{ kind: "jar", tint: "blush" }, { kind: "lipstick", tint: "rose" }]}>
+  <PageHero locale={locale} mark="05" photo="studioWarmProfile" cosmetics={[{ kind: "mist", tint: "blush" }, { kind: "lipcase", tint: "rose" }]}>
     <Breadcrumbs locale={locale} crumbs={crumbs} />
 
     <h1 class="display-lg title">{name}</h1>
@@ -139,7 +139,7 @@ const methodName = methodRecord.locales[locale]?.name ?? t(locale, "method");
           widths={[240, 360, 480]}
           class="bio-photo bio-photo--inset"
         />
-        <FloatingCosmetic kind="perfume" tint="blush" depth={0.6} yaw={0.4} desktopOnly class="bio-cosmetic" />
+        <FloatingCosmetic kind="oil" tint="champagne" layer="mid" depth={0.6} yaw={0.4} spin={0.8} priority={1} desktopOnly class="bio-cosmetic" />
       </div>
     </div>
 
@@ -221,9 +221,12 @@ const methodName = methodRecord.locales[locale]?.name ?? t(locale, "method");
     align-items: start;
   }
 
+  /* The collage overhangs its own frame on both sides, so its width must leave room for the
+     overhang inside the page gutter — in RTL the inset hangs off the RIGHT, towards the edge
+     the scrollbar lives on, and an overhang wider than the margin used to be clipped away. */
   .bio-gallery {
     position: relative;
-    inline-size: min(78vw, 26rem);
+    inline-size: min(70vw, 26rem);
     justify-self: center;
     margin-block-end: var(--space-6);
   }
@@ -236,8 +239,15 @@ const methodName = methodRecord.locales[locale]?.name ?? t(locale, "method");
     position: absolute;
     inline-size: 46%;
     inset-block-end: -14%;
-    inset-inline-start: -16%;
+    inset-inline-start: -9%;
     border: 6px solid var(--palette-ivory);
+    box-shadow: var(--shadow-soft);
+  }
+
+  @media (min-width: 1024px) {
+    .bio-photo--inset {
+      inset-inline-start: -16%;
+    }
   }
 
   .bio-cosmetic {

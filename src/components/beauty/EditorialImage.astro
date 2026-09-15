@@ -13,6 +13,14 @@
  *   oval     a soft egg
  *   soft     a rounded editorial rectangle
  *   circle   a small round inset
+ *   lens     (Phase 12) a shallow lens crop — a wide band with a gently bowed top and bottom
+ *   none     (Phase 12) a square-cut full-bleed frame. Not every photograph belongs in a card;
+ *            the strongest ones should be allowed to simply be the page.
+ *
+ * `tone` (Phase 12) sets the warm wash laid over the photograph. `warm` is the default that keeps
+ * every frame inside the blush palette; `deep` is for a band that carries type over the image and
+ * therefore needs its lower half darkened enough to stay legible; `none` leaves the photograph
+ * alone, for the small insets where a wash would only muddy it.
  *
  * `parallax` adds a CSS scroll-driven drift inside the mask (no JavaScript, disabled under
  * reduced motion). The photograph is never distorted: it moves within a crop that already has
@@ -25,7 +33,8 @@ import { photography, type PhotographKey } from "../../lib/photography";
 interface Props {
   photo: PhotographKey;
   locale: Locale;
-  mask?: "arch" | "pebble" | "oval" | "soft" | "circle";
+  mask?: "arch" | "pebble" | "oval" | "soft" | "circle" | "lens" | "none";
+  tone?: "warm" | "deep" | "none";
   /** CSS aspect-ratio of the mask, e.g. "4 / 5". */
   ratio?: string;
   /** The `sizes` attribute — how wide the image renders at each breakpoint. */
@@ -40,6 +49,7 @@ const {
   photo,
   locale,
   mask = "soft",
+  tone = "warm",
   ratio = "4 / 5",
   sizes = "(min-width: 1024px) 40vw, 90vw",
   widths = [360, 560, 760, 960],
@@ -55,7 +65,13 @@ const image = photography[photo];
 
 <figure
   {...rest}
-  class:list={["editorial-image", `editorial-image--${mask}`, parallax && "parallax-media", className]}
+  class:list={[
+    "editorial-image",
+    `editorial-image--${mask}`,
+    `editorial-image--tone-${tone}`,
+    parallax && "parallax-media",
+    className,
+  ]}
   style={`--image-ratio: ${ratio}; --image-focus: ${image.focus};`}
 >
   <Picture
@@ -94,7 +110,7 @@ const image = photography[photo];
   .editorial-image :global(img) {
     object-fit: cover;
     object-position: var(--image-focus);
-    transition: transform 1.4s var(--motion-easing-silk);
+    transition: transform var(--motion-duration-cinematic) var(--motion-easing-silk);
   }
 
   /* A warm, very light wash so every photograph sits inside the blush palette. */
@@ -105,6 +121,17 @@ const image = photography[photo];
     pointer-events: none;
     background: linear-gradient(180deg, rgb(246 231 227 / 0%) 55%, rgb(122 35 66 / 14%) 100%);
     mix-blend-mode: multiply;
+  }
+
+  /* A band that carries type: the wash reaches further up and lands deeper, so a headline over
+     the lower half keeps its contrast at every crop. */
+  .editorial-image--tone-deep::after {
+    background: linear-gradient(180deg, rgb(46 17 25 / 8%) 0%, rgb(46 17 25 / 22%) 45%, rgb(46 17 25 / 62%) 100%);
+    mix-blend-mode: normal;
+  }
+
+  .editorial-image--tone-none::after {
+    content: none;
   }
 
   /* Each mask is set as BOTH a radius and a clip-path. The radius alone is not enough: Chrome
@@ -128,6 +155,19 @@ const image = photography[photo];
   .editorial-image--soft {
     border-radius: var(--radius-card);
     clip-path: inset(0 round var(--radius-card));
+  }
+
+  /* A wide band with a gently bowed top and bottom — a lens, not a rectangle. */
+  .editorial-image--lens {
+    border-radius: var(--radius-lens);
+    clip-path: inset(0 round var(--radius-lens));
+  }
+
+  /* Square-cut: the photograph IS the surface. The clip stays even with no radius, because a
+     scroll-animated <img> is composited on its own layer and overflow alone does not hold it. */
+  .editorial-image--none {
+    border-radius: 0;
+    clip-path: inset(0);
   }
 
   .editorial-image--circle {

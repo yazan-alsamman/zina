@@ -625,12 +625,12 @@ html[lang="ar"] .link-quiet {
 @media (prefers-reduced-motion: no-preference) {
   .enter {
     animation: reveal-rise var(--motion-duration-reveal) var(--motion-easing-silk) both;
-    animation-delay: calc(var(--enter-step, 0) * 120ms + 80ms);
+    animation-delay: calc(var(--enter-step, 0) * var(--motion-stagger-sequence) + var(--motion-duration-instant));
   }
 
   .enter-fade {
-    animation: reveal-fade 1400ms var(--motion-easing-silk) both;
-    animation-delay: calc(var(--enter-step, 0) * 120ms + 80ms);
+    animation: reveal-fade var(--motion-duration-cinematic) var(--motion-easing-silk) both;
+    animation-delay: calc(var(--enter-step, 0) * var(--motion-stagger-sequence) + var(--motion-duration-instant));
   }
 }
 
@@ -667,6 +667,285 @@ html[lang="ar"] .link-quiet {
   white-space: nowrap;
 }
 
+
+/* ====================================================================
+   PHASE 12 — THE SURFACE
+   ====================================================================
+   Three things separate an expensive page from a competent one, and none of them is an effect:
+   the page has a SURFACE (grain, light, a direction the light comes from), it has EDITORIAL
+   FURNITURE (section marks, vertical labels, a lede, a pull quote), and its controls answer the
+   pointer in a way you feel rather than notice. Everything below is one of those three.
+   ==================================================================== */
+
+/*
+ * PAPER GRAIN. A 160px tile of monochrome fractal noise, multiplied over the whole document at a
+ * few per cent. It is what stops large flat blush grounds from reading as flat digital colour —
+ * the same reason a printed lookbook is varnished rather than left bare.
+ *
+ * Generated in the stylesheet, not downloaded: no request, no asset, no third party. It sits
+ * ABOVE the 3D canvas deliberately, so rendered products share the page's surface instead of
+ * floating on top of it, and below the header and menu, which must stay crisp.
+ *
+ * Suppressed below 768px (invisible at that size, and the paint budget is better spent on the
+ * photographs) and in forced-colors mode.
+ */
+@media (min-width: 768px) {
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-grain);
+    pointer-events: none;
+    opacity: 0.4;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.09'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 160px 160px;
+  }
+}
+
+/*
+ * LIGHT. One direction for the whole site: a large softbox high and to the right, a champagne
+ * bounce low and to the left. Photography, the 3D products (see scene.ts) and these CSS pools all
+ * agree on it, which is why they read as one photographed space rather than three layers.
+ */
+.organic--leak {
+  background: var(--gradient-light-leak);
+  filter: blur(28px);
+  border-radius: 50%;
+  opacity: 0.55;
+}
+
+.organic--pool {
+  background: var(--gradient-champagne-glow);
+  filter: blur(34px);
+  border-radius: 50%;
+  opacity: 0.7;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .organic--breathe {
+    animation: organic-breathe var(--motion-drift-duration) var(--motion-easing-attend) infinite alternate;
+  }
+}
+
+@keyframes organic-breathe {
+  from {
+    transform: scale(1);
+    opacity: 0.45;
+  }
+  to {
+    transform: scale(1.12);
+    opacity: 0.7;
+  }
+}
+
+/* ==================================================================== editorial furniture */
+
+/*
+ * THE SECTION MARK. An outlined numeral set larger than any headline on the page, sitting behind
+ * or beside the section it counts. It is decoration with a job: it tells you where you are in a
+ * long scroll without adding a word of copy. Always aria-hidden — the heading carries the meaning.
+ */
+.section-mark {
+  position: absolute;
+  z-index: 0;
+  font-family: var(--type-family-display);
+  font-size: var(--type-display-mega);
+  line-height: 0.8;
+  letter-spacing: var(--type-tracking-mega);
+  color: transparent;
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--palette-deep-rose) 20%, transparent);
+  user-select: none;
+  pointer-events: none;
+}
+
+.section-mark--solid {
+  -webkit-text-stroke: 0;
+  color: color-mix(in srgb, var(--palette-petal) 45%, transparent);
+}
+
+.tone-wine .section-mark {
+  -webkit-text-stroke-color: color-mix(in srgb, #f3b8c6 26%, transparent);
+}
+
+/*
+ * THE VERTICAL LABEL — a tracked caption set on its side down the edge of a composition, the way
+ * a spine is set. Latin only: Arabic is not set vertically, and tracking would sever it, so in
+ * Arabic the same element lies flat and keeps its normal type.
+ */
+.vertical-label {
+  writing-mode: vertical-rl;
+  font-family: var(--type-family-ui);
+  font-size: var(--type-label-sm);
+  font-weight: var(--type-weight-medium);
+  letter-spacing: var(--type-tracking-label);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+html[lang="ar"] .vertical-label {
+  writing-mode: horizontal-tb;
+  text-transform: none;
+  font-weight: var(--type-weight-regular);
+  font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
+}
+
+/* THE LEDE — an opening paragraph set larger and deliberately short-lined. */
+.lede {
+  max-inline-size: var(--type-measure-lede);
+  font-family: var(--type-family-display);
+  font-size: calc(var(--type-display-sm) * var(--type-arabic-size-factor));
+  line-height: calc(1.32 * var(--type-arabic-leading-factor));
+  color: var(--color-text-secondary);
+}
+
+/* THE PULL QUOTE — a sentence lifted out of the reading column and set in the italic accent. */
+.pull-quote {
+  margin-block: var(--space-6);
+  padding-inline-start: var(--space-4);
+  border-inline-start: 1px solid var(--color-accent-clay);
+  font-family: var(--type-family-accent);
+  font-size: calc(var(--type-display-sm) * var(--type-arabic-size-factor));
+  line-height: calc(1.28 * var(--type-arabic-leading-factor));
+  color: var(--color-text-primary);
+  max-inline-size: 28ch;
+}
+
+/*
+ * THE DRAWN RULE — a hairline that arrives rather than appearing. Where scroll timelines are
+ * unsupported it is simply a full-width hairline, which is what it is for.
+ */
+.rule-draw {
+  block-size: 1px;
+  inline-size: 100%;
+  border: 0;
+  background: linear-gradient(90deg, var(--palette-dusty-rose), var(--palette-powder));
+  transform-origin: inline-start;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .rule-draw {
+      animation: rule-draw linear both;
+      animation-timeline: view();
+      animation-range: entry 10% entry 80%;
+    }
+  }
+}
+
+@keyframes rule-draw {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/*
+ * THE SEAM — where one tonal ground meets the next. A hard edge between two warm grounds reads as
+ * a mistake; this fades the upper ground into the lower one across a few rem, so a section
+ * boundary is a change of LIGHT rather than a cut. Placed as the first child of the lower section.
+ */
+.seam {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  block-size: var(--space-8);
+  pointer-events: none;
+  background: linear-gradient(180deg, var(--palette-ivory) 0%, rgb(251 246 242 / 0%) 100%);
+}
+
+.seam--blush {
+  background: linear-gradient(180deg, var(--palette-blush) 0%, rgb(246 231 227 / 0%) 100%);
+}
+
+.seam--champagne {
+  background: linear-gradient(180deg, var(--palette-champagne) 0%, rgb(243 233 222 / 0%) 100%);
+}
+
+/* ==================================================================== micro-interaction */
+
+/*
+ * A SHEEN. One pale band crossing a control as the pointer settles on it — the highlight sliding
+ * across a lacquered cap, the same gesture the 3D products make. It is the only thing on the site
+ * that moves for no reason other than pleasure, so there is exactly one of it.
+ */
+.btn::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: -60%;
+  inline-size: 40%;
+  z-index: -1;
+  background: var(--gradient-sheen);
+  transform: translateX(0);
+  opacity: 0;
+  transition:
+    transform var(--motion-duration-cinematic) var(--motion-easing-silk),
+    opacity var(--motion-duration-standard) var(--motion-easing-attend);
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .btn:hover::after {
+    opacity: 1;
+    transform: translateX(400%);
+  }
+}
+
+/* A control answers a press. Small enough that you feel it rather than watch it. */
+.btn:active {
+  transform: scale(var(--motion-scale-press));
+}
+
+/* ==================================================================== reveals */
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* A composition whose parts arrive in reading order. `--reveal-step` is set per child. */
+    .reveal-step {
+      animation: reveal-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry calc(45% + var(--reveal-step, 0) * 12%);
+    }
+
+    /* A photograph uncovering itself from the reading edge — a masked image transition. */
+    .reveal-wipe {
+      animation: reveal-wipe linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 30%;
+    }
+
+    /* A band that grows to its full width as it arrives. Used once per page at most. */
+    .reveal-widen {
+      animation: reveal-widen linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 25%;
+    }
+  }
+}
+
+@keyframes reveal-wipe {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes reveal-widen {
+  from {
+    transform: scale(0.94);
+    opacity: 0.5;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 /* ==================================================================== forced colors */
 
 @media (forced-colors: active) {
@@ -681,8 +960,14 @@ html[lang="ar"] .link-quiet {
   }
 
   .organic,
-  .cosmetic-canvas {
+  .cosmetic-canvas,
+  .section-mark,
+  .seam {
     display: none;
+  }
+
+  body::after {
+    content: none;
   }
 
   .btn {
@@ -706,7 +991,13 @@ html[lang="ar"] .link-quiet {
 
   .organic,
   .cosmetic,
-  .cosmetic-canvas {
+  .cosmetic-canvas,
+  .section-mark,
+  .seam {
     display: none !important;
+  }
+
+  body::after {
+    content: none;
   }
 }

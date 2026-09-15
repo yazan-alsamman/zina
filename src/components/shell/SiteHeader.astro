@@ -141,9 +141,12 @@ const currentState = (href: string): "page" | "true" | undefined =>
   .wordmark {
     position: relative;
     z-index: calc(var(--z-overlay) + 1);
-    font-family: var(--type-family-display);
-    font-size: calc(1.3rem * var(--type-arabic-size-factor));
-    letter-spacing: var(--type-tracking-wordmark);
+    /* At 360px the tracked Latin wordmark and the menu trigger together are wider than the
+       header, and the trigger was being pushed past the edge. The wordmark is the element that
+       gives way: it is allowed to shrink, and its tracking closes up, down to a floor where it
+       is still recognisably the same mark. */
+    font-size: calc(clamp(1.05rem, 0.72rem + 1.1vw, 1.3rem) * var(--type-arabic-size-factor));
+    letter-spacing: clamp(0.16em, 0.02em + 1.4vw, var(--type-tracking-wordmark));
     text-transform: uppercase;
     color: var(--color-text-primary);
     text-decoration: none;
@@ -163,12 +166,12 @@ const currentState = (href: string): "page" | "true" | undefined =>
     z-index: calc(var(--z-overlay) + 1);
     display: inline-flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: clamp(0.45rem, 0.1rem + 1.4vw, 0.75rem);
     flex: none;
     white-space: nowrap;
     min-block-size: 44px;
     min-inline-size: 44px;
-    padding-inline: 1rem 0.9rem;
+    padding-inline: clamp(0.7rem, 0.2rem + 2vw, 1rem) clamp(0.65rem, 0.2rem + 1.8vw, 0.9rem);
     font-family: var(--type-family-ui);
     font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
     font-weight: var(--type-weight-medium);
@@ -306,8 +309,8 @@ const currentState = (href: string): "page" | "true" | undefined =>
 
   @media (prefers-reduced-motion: no-preference) {
     .menu-toggle:checked ~ .primary-nav .nav-list li {
-      animation: reveal-rise 700ms var(--motion-easing-silk) both;
-      animation-delay: calc(var(--i) * 60ms + 120ms);
+      animation: reveal-rise var(--motion-duration-editorial) var(--motion-easing-silk) both;
+      animation-delay: calc(var(--i) * var(--motion-stagger-compact) + var(--motion-stagger-sequence));
     }
   }
 
@@ -381,9 +384,12 @@ const currentState = (href: string): "page" | "true" | undefined =>
       overflow: visible;
     }
 
+    /* At exactly 1024 the row has no slack: five links, a pill and the switcher. The gaps are
+       what give way first, closing to 0.9rem, so the language switcher is never pushed past the
+       edge on a 1024-wide tablet in landscape. */
     .nav-list {
       flex-direction: row;
-      gap: clamp(1.25rem, 2.2vw, 2.5rem);
+      gap: clamp(0.9rem, 0.1rem + 1.6vw, 2.5rem);
       margin-inline: auto;
     }
 
@@ -444,12 +450,12 @@ const currentState = (href: string): "page" | "true" | undefined =>
 
     .nav-actions {
       flex-wrap: nowrap;
-      gap: var(--space-4);
+      gap: clamp(var(--space-2), 0.2rem + 1.4vw, var(--space-4));
     }
 
     .cta {
       min-block-size: 42px;
-      padding: 0.6rem 1.35rem;
+      padding: 0.6rem clamp(0.9rem, 0.2rem + 1.1vw, 1.35rem);
       border-color: var(--color-text-primary);
       color: var(--color-text-primary);
     }

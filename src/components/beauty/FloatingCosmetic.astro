@@ -6,6 +6,24 @@
  * (src/scripts/cosmetics/scene.ts) finds every `[data-cosmetic]` and draws the product into that
  * rectangle, so position, size and responsive behaviour are ordinary CSS set by the caller.
  *
+ * ============================================================================
+ * PHASE 12 — THE SLOT BECAME A DIRECTION, NOT JUST A PLACE
+ * ============================================================================
+ * A slot now declares where it sits in DEPTH, how it behaves as the page scrolls past it, and how
+ * badly it wants to be in frame when the scene's visibility budget has to choose:
+ *
+ *   layer      back | mid | fore — the cinematic depth level. Background products are small,
+ *              slow and quiet; there should normally be exactly one `fore` per screen.
+ *   spin       radians of yaw travelled across the slot's scroll range. The product arrives at
+ *              one angle and leaves at another.
+ *   approach   how much the camera closes in as the slot reaches the middle of the viewport.
+ *   priority   art-direction weight in the budget. A hero product outranks decoration.
+ *   path       a TRAVEL RAIL. Give the slot a tall rectangle and a path, and the product is drawn
+ *              into a small box that moves along that path as the section scrolls — a product
+ *              crossing the page, behind and around the editorial content. Used sparingly.
+ *   size       the travelling box's width, as a fraction of the rail's width.
+ *   light      "wine" on the dark ground, so the rim light does the separating work.
+ *
  * Without WebGL, with Save-Data on, or before the scene has loaded, the slot shows only a soft
  * blush glow — decorative, never an empty box, never a broken-image state. Every slot is
  * aria-hidden: the products are atmosphere, not content, and nothing on the page depends on them.
@@ -18,14 +36,30 @@ import type { CosmeticKind, CosmeticTint } from "../../scripts/cosmetics/models"
 interface Props {
   kind: CosmeticKind;
   tint?: CosmeticTint;
+  /** Cinematic depth. `fore` should be rare — one per screen at most. */
+  layer?: "back" | "mid" | "fore";
   /** 0 (far, subtle parallax) to 1 (near, stronger parallax and cursor response). */
   depth?: number;
   /** Resting yaw in radians — which way the label faces. */
   yaw?: number;
   /** Resting roll in radians. */
   tilt?: number;
+  /** Radians of yaw travelled across the slot's scroll range. */
+  spin?: number;
+  /** 0–1: how much the camera closes in at the middle of the range. */
+  approach?: number;
+  /** Weight in the scene's visibility budget. Positive = keep me in frame. */
+  priority?: number;
+  /** Travel rail: `"0,0 0.7,0.5 0.15,1"` in rail-normalised coordinates. */
+  path?: string;
+  /** With `path`: the travelling box's width as a fraction of the rail width. */
+  size?: number;
+  /** Sits on the wine ground — the rim light carries the separation. */
+  light?: "page" | "wine";
   /** Hidden below 768px, where the composition carries fewer products. */
   desktopOnly?: boolean;
+  /** Hidden below 1024px — for the third and fourth products in a dense composition. */
+  wideOnly?: boolean;
   class?: string;
   style?: string;
 }
@@ -33,10 +67,18 @@ interface Props {
 const {
   kind,
   tint = "blush",
+  layer = "mid",
   depth = 0.5,
   yaw = -0.45,
   tilt = 0,
+  spin = 0.5,
+  approach = 0.35,
+  priority = 0,
+  path,
+  size = 1,
+  light = "page",
   desktopOnly = false,
+  wideOnly = false,
   class: className,
   style,
   ...rest
@@ -47,12 +89,26 @@ const {
 
 <div
   {...rest}
-  class:list={["cosmetic", desktopOnly && "cosmetic--desktop", className]}
+  class:list={[
+    "cosmetic",
+    `cosmetic--${layer}`,
+    path && "cosmetic--rail",
+    desktopOnly && "cosmetic--desktop",
+    wideOnly && "cosmetic--wide",
+    className,
+  ]}
   data-cosmetic={kind}
   data-tint={tint}
+  data-layer={layer}
   data-depth={depth}
   data-yaw={yaw}
   data-tilt={tilt}
+  data-spin={spin}
+  data-approach={approach}
+  data-priority={priority}
+  data-path={path}
+  data-size={path ? size : undefined}
+  data-light={light === "wine" ? "wine" : undefined}
   style={style}
   aria-hidden="true"
 >
@@ -68,6 +124,17 @@ const {
     aspect-ratio: 1;
   }
 
+  /* A rail is a tall corridor the product travels down; it has no aspect ratio of its own. */
+  :global(:where(.cosmetic--rail)) {
+    aspect-ratio: auto;
+  }
+
+  /*
+   * THE FALLBACK. This glow is what a reader sees with WebGL unavailable, Save-Data on, or
+   * before the scene chunk arrives — so it is designed, not a placeholder: a soft lit form with
+   * a warm contact shadow beneath it, sized and weighted by the slot's own depth layer. The
+   * composition keeps its balance whether or not the 3D layer ever loads.
+   */
   .cosmetic-glow {
     position: absolute;
     inset: 8%;
@@ -75,10 +142,40 @@ const {
     /* A gradient only — a blur filter here was clipped to a hard-edged layer box. */
     background: var(--gradient-glow);
     opacity: 0.75;
+    transition: opacity var(--motion-duration-cinematic) var(--motion-easing-silk);
+  }
+
+  .cosmetic--back .cosmetic-glow {
+    inset: 18%;
+    opacity: 0.45;
+  }
+
+  .cosmetic--fore .cosmetic-glow {
+    inset: 4%;
+    opacity: 0.85;
+  }
+
+  .cosmetic--rail .cosmetic-glow {
+    /* On a rail the glow marks the path's midpoint rather than filling the corridor. */
+    inset: 42% 30%;
+    aspect-ratio: 1;
+    block-size: auto;
+  }
+
+  /* Once the real product is rendering, the fallback recedes to a soft light pool beneath it
+     instead of disappearing — glass needs something warm behind it to read against. */
+  :global(html.cosmetics-live) .cosmetic-glow {
+    opacity: 0.28;
   }
 
   @media (max-width: 767px) {
     .cosmetic--desktop {
+      display: none;
+    }
+  }
+
+  @media (max-width: 1023px) {
+    .cosmetic--wide {
       display: none;
     }
   }

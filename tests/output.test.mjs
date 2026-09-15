@@ -9,6 +9,7 @@
 
 import { test, describe, before } from "node:test";
 import assert from "node:assert/strict";
+import { shippedCss } from "./helpers/css.mjs";
 import { assertOnlyCosmeticsLoader, assertChunksCollectNothing } from "./helpers/client-js.mjs";
 import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
@@ -381,10 +382,9 @@ describe("no prohibited dependencies or techniques", () => {
     // Phase 11 introduced soft geometry (pills, cards, arches). What must not happen is a one-off
     // pixel radius invented in a component: every radius resolves to a token, 0, or a percentage
     // shape (circles and the cream-swirl pebble).
-    const css = readdirSync(join(dist, "_astro"))
-      .filter((f) => f.endsWith(".css"))
-      .map((f) => readFileSync(join(dist, "_astro", f), "utf8"))
-      .join("\n");
+    // Phase 12: external stylesheets AND the inline <style> blocks Astro puts in each page's
+    // head, which is where component CSS actually lives. See tests/helpers/css.mjs.
+    const css = shippedCss(dist, pages);
     const radii = [...css.matchAll(/border-radius:\s*([^;}]+)/g)].map((m) => m[1].trim());
     for (const radius of radii) {
       for (const part of radius.split(/[\s/]+/).filter(Boolean)) {
@@ -397,10 +397,9 @@ describe("no prohibited dependencies or techniques", () => {
   });
 
   test("shadows are tokens or warm wine-tinted light — never neutral grey or black elevation", () => {
-    const css = readdirSync(join(dist, "_astro"))
-      .filter((f) => f.endsWith(".css"))
-      .map((f) => readFileSync(join(dist, "_astro", f), "utf8"))
-      .join("\n");
+    // Phase 12: external stylesheets AND the inline <style> blocks Astro puts in each page's
+    // head, which is where component CSS actually lives. See tests/helpers/css.mjs.
+    const css = shippedCss(dist, pages);
     const shadows = [...css.matchAll(/box-shadow:\s*([^;}]+)/g)].map((m) => m[1].trim());
     for (const shadow of shadows) {
       if (/^(none|var\(--shadow-[a-z]+\))$/.test(shadow)) continue;

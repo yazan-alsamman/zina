@@ -1,5 +1,9 @@
 /**
- * DESIGN TOKENS — Phase 11 "Blush Atelier" identity (docs/PHASE_11_VISUAL_REDESIGN.md).
+ * DESIGN TOKENS — "Blush Atelier" identity.
+ *   Phase 11 established it (docs/PHASE_11_VISUAL_REDESIGN.md).
+ *   Phase 12 deepened it (docs/PHASE_12_EXPERIENCE.md): a four-tier motion scale, a four-step
+ *   warm shadow ladder, breakpoint tokens shared with the 3D scene, editorial type tokens and the
+ *   product-scale ladder the cosmetic slots are sized from.
  *
  * Phase 11 replaced the Phase 2 warm-ink palette with a luxury beauty identity: layered ivory,
  * blush, powder, champagne and nude grounds; near-black plum text; deep rose and burgundy
@@ -37,6 +41,8 @@
   --palette-burgundy: #7a2342;
   --palette-wine: #2e1119;
   --palette-plum: #74405f;
+  /* Phase 12 — one further step at the light end, for the sheen that crosses a control. */
+  --palette-porcelain: #fdf9f6;
 
   /* ---------------------------------------------------------------- colour: ground */
   --color-ground-base: var(--palette-ivory); /* the page — warm ivory, NOT white */
@@ -100,6 +106,12 @@
   --gradient-wine:
     radial-gradient(70% 90% at 85% 10%, rgb(156 53 86 / 45%) 0%, rgb(156 53 86 / 0%) 70%),
     linear-gradient(180deg, #3a1522 0%, var(--palette-wine) 100%);
+  /* Phase 12. A light leak is the champagne bounce spilling into frame; the sheen is the single
+     pale band that crosses a control on hover, matching the highlight the 3D caps carry. */
+  --gradient-light-leak:
+    radial-gradient(closest-side, rgb(243 233 222 / 72%) 0%, rgb(235 201 200 / 28%) 55%, rgb(235 201 200 / 0%) 100%);
+  --gradient-sheen:
+    linear-gradient(100deg, rgb(253 249 246 / 0%) 0%, rgb(253 249 246 / 42%) 50%, rgb(253 249 246 / 0%) 100%);
   --gradient-rose-metal: linear-gradient(135deg, #e9c3b4 0%, #c79a86 45%, #f3dccf 60%, #b88471 100%);
 
   /* ---------------------------------------------------------------- typography: family
@@ -131,10 +143,14 @@
   --type-tracking-display: -0.015em; /* Latin only */
   --type-tracking-wordmark: 0.32em; /* Latin only */
   --type-tracking-record: 0.02em; /* Latin only */
+  --type-tracking-mega: -0.04em; /* Latin only — display numerals close up at extreme sizes */
 
   /* ---------------------------------------------------------------- typography: scale
    * Fluid between 375 and 1440. rem-based preferred values keep browser text scaling working
    * (WCAG 1.4.4). Floors: body never below 16px, nothing below 12px. */
+  /* The editorial register: a numeral or a single word set larger than any headline, used as a
+     section marker rather than as reading matter. Never carries information on its own. */
+  --type-display-mega: clamp(4.5rem, 1rem + 15vw, 16rem);
   --type-display-hero: clamp(3rem, 1.6rem + 6vw, 7.25rem); /* 48 → 116 */
   --type-display-xl: clamp(2.5rem, 1.5rem + 4.3vw, 5.5rem); /* 40 → 88 */
   --type-display-lg: clamp(2.25rem, 1.45rem + 3.2vw, 4.25rem); /* 36 → 68 */
@@ -163,6 +179,7 @@
   /* measure */
   --type-measure-editorial: 66ch; /* a MAXIMUM, not a fixed width */
   --type-measure-narrow: 48ch;
+  --type-measure-lede: 38ch; /* an opening paragraph, deliberately short-lined */
 
   /* ---------------------------------------------------------------- spacing — 8px baseline */
   --space-0-5: 0.25rem; /* 4 */
@@ -182,6 +199,24 @@
   --space-section: var(--space-8);
   --space-subsection: var(--space-6);
   --space-related-above: var(--space-9);
+
+  /* ---------------------------------------------------------------- breakpoints
+   * These are NUMBERS, not media queries — a custom property cannot be used in an @media
+   * condition. They exist so the one place that genuinely needs the values at runtime, the 3D
+   * scene's visibility budget (src/scripts/cosmetics/scene.ts), reads the SAME numbers the
+   * stylesheet below is written against instead of hard-coding its own copy. */
+  --bp-md: 768;
+  --bp-lg: 1024;
+  --bp-xl: 1600;
+  --bp-xxl: 1920;
+
+  /* ---------------------------------------------------------------- 3D product scale
+   * A slot is sized as a percentage of its positioning context, so these are the rungs a
+   * composition picks from rather than free numbers typed into each page. */
+  --cosmetic-xs: 22%;
+  --cosmetic-sm: 30%;
+  --cosmetic-md: 42%;
+  --cosmetic-lg: 56%;
 
   /* ---------------------------------------------------------------- layout */
   /* One edge for the whole site: header, heroes, sections and footer align at every width. */
@@ -204,6 +239,7 @@
   --radius-card: 28px; /* review cards, panels */
   --radius-arch: 999px 999px 32px 32px; /* the signature portrait mask */
   --radius-pebble: 58% 42% 46% 54% / 48% 56% 44% 52%; /* organic, cream-swirl masks */
+  --radius-lens: 999px 999px 999px 999px / 22% 22% 22% 22%; /* a shallow lens crop for bands */
 
   /* ---------------------------------------------------------------- borders */
   --border-width-hairline: 1px;
@@ -217,17 +253,36 @@
   /* ---------------------------------------------------------------- shadow
    * Low, warm and diffuse — a product-photography shadow, tinted with wine rather than grey. */
   --shadow-none: none;
+  /* Four steps, all wine-tinted. `subtle` is a contact shadow, `hero` a full studio fall-off.
+     There is deliberately no neutral grey anywhere in this ladder — a grey shadow under a blush
+     photograph is the single fastest way to make a warm palette look cheap. */
+  --shadow-subtle: 0 10px 22px -16px rgb(94 31 51 / 22%);
   --shadow-soft: 0 24px 48px -28px rgb(94 31 51 / 28%);
   --shadow-float: 0 40px 80px -40px rgb(94 31 51 / 38%), 0 12px 24px -16px rgb(94 31 51 / 18%);
+  --shadow-hero:
+    0 72px 120px -56px rgb(94 31 51 / 42%),
+    0 28px 56px -32px rgb(94 31 51 / 26%),
+    0 4px 12px -8px rgb(122 35 66 / 16%);
   --shadow-control: 0 10px 24px -14px rgb(122 35 66 / 55%);
 
   /* ---------------------------------------------------------------- motion
    * Luxury is slow. Entrances are long and decelerating; nothing bounces or overshoots. */
+  /* FOUR TIERS, by what the motion is FOR — not by how long it happens to be.
+   *   micro     150–250ms  a control acknowledging a pointer
+   *   standard  300–500ms  a state change you are meant to follow
+   *   editorial 600–1000ms an element taking its place in a composition
+   *   cinematic 1000–1800ms a scene changing
+   * The Phase 11 names are kept as the canonical spelling of the first three tiers so no
+   * component had to be rewritten; `editorial` and `cinematic` are the new upper register. */
   --motion-duration-instant: 100ms;
+  --motion-duration-micro: 200ms;
   --motion-duration-quick: 180ms;
   --motion-duration-base: 320ms;
+  --motion-duration-standard: 420ms;
   --motion-duration-settle: 600ms;
+  --motion-duration-editorial: 900ms;
   --motion-duration-reveal: 1100ms;
+  --motion-duration-cinematic: 1600ms;
   --motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
   --motion-easing-exit: cubic-bezier(0.4, 0, 1, 1);
   --motion-easing-attend: cubic-bezier(0.4, 0, 0.2, 1);
@@ -237,12 +292,15 @@
   --motion-distance-settle: 28px;
   --motion-distance-subtle: 10px;
   --motion-scale-image: 1.04;
+  --motion-scale-press: 0.985;
   --motion-marquee-duration: 48s;
+  --motion-drift-duration: 22s;
 
   /* ---------------------------------------------------------------- z-index — named layers only */
   --z-base: 0;
   --z-raised: 10;
   --z-cosmetics: 40; /* the shared 3D canvas — above photography, below the header */
+  --z-grain: 45; /* the paper veil — over the products too, so they share the page's surface */
   --z-header: 100;
   --z-overlay: 200;
   --z-dialog: 300;
@@ -276,14 +334,19 @@
 @media (prefers-reduced-motion: reduce) {
   :root {
     --motion-duration-quick: 0ms;
+    --motion-duration-micro: 0ms;
     --motion-duration-base: 0ms;
+    --motion-duration-standard: 0ms;
     --motion-duration-settle: 0ms;
+    --motion-duration-editorial: 0ms;
     --motion-duration-reveal: 0ms;
+    --motion-duration-cinematic: 0ms;
     --motion-stagger-sequence: 0ms;
     --motion-stagger-compact: 0ms;
     --motion-distance-settle: 0px;
     --motion-distance-subtle: 0px;
     --motion-scale-image: 1;
+    --motion-scale-press: 1;
   }
 }
 
@@ -304,5 +367,33 @@
     --layout-margin: 3.5rem; /* 56 */
     --space-section: var(--space-12);
     --space-related-above: var(--space-12);
+  }
+}
+
+/* 1366×768 is the most common real laptop viewport in this audience, and it is SHORT rather than
+   narrow. Vertical rhythm tightens here while horizontal rhythm keeps growing, so the hero and
+   its call to action still fit above the fold. */
+@media (min-width: 1280px) and (max-height: 820px) {
+  :root {
+    --space-section: var(--space-10);
+    --layout-header-height: 76px;
+  }
+}
+
+/* Large desktops get MORE MARGIN, not more content: the composition widens its silence rather
+   than stretching its columns. --layout-max-content is a ceiling the grid never exceeds. */
+@media (min-width: 1600px) {
+  :root {
+    --layout-margin: 4.5rem; /* 72 */
+    --space-section: var(--space-14);
+    --space-related-above: var(--space-12);
+  }
+}
+
+@media (min-width: 1920px) {
+  :root {
+    --layout-margin: 6rem; /* 96 */
+    --layout-max-content: 1560px;
+    --layout-max-wide: 1560px;
   }
 }

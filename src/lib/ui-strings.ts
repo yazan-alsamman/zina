@@ -300,6 +300,18 @@ const en = {
   collaborateEyebrow: "Work with Zina",
   menuHeading: "Menu",
   scrollCue: "Scroll",
+
+  /* Phase 12 — interface vocabulary only. Every one of these labels a section of the page; none
+     describes the testing, and none asserts anything the records do not already say. */
+  expertiseEyebrow: "The testing table",
+  expertiseHeading: "What I test",
+  journeyLabel: "In the frame",
+  recentEyebrow: "Latest from the table",
+  closingEyebrow: "In her words",
+  chapterLabel: "Chapter",
+  /* Names the gap where evidence photography will go. A statement about the PAGE, not a claim
+     about a product — and more honest than an unlabelled tonal rectangle. */
+  plateReserved: "Photograph to follow",
 } satisfies Strings;
 
 const ar = {
@@ -565,6 +577,15 @@ const ar = {
   collaborateEyebrow: "تعاوني مع زينا",
   menuHeading: "القائمة",
   scrollCue: "مرّري",
+
+  /* Phase 12 — composed for this phase; NEEDS NATIVE REVIEW like the headings above (Q3-2). */
+  expertiseEyebrow: "طاولة التجربة",
+  expertiseHeading: "ما الذي أختبره",
+  journeyLabel: "في الإطار",
+  recentEyebrow: "أحدث ما على الطاولة",
+  closingEyebrow: "بكلماتها",
+  chapterLabel: "فصل",
+  plateReserved: "الصورة قيد الإعداد",
 } satisfies Record<keyof typeof en, string>;
 
 const dictionaries = { en, ar } as const;

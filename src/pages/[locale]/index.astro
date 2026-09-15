@@ -13,15 +13,32 @@
  * Visual hierarchy, in order: Zina · her voice · her testing · her reviews · the products.
  * The 3D products are atmosphere around her, never the subject.
  *
- * SECTIONS
- *   1 opening      tagline as the h1, portrait under an arch, floating products, record count
- *   2 marquee      the categories actually present in this locale's records
- *   3 story        the featured record told as PRODUCT → TESTED → EXPERIENCE → RESULT → VERDICT
- *                  (still exactly one conditions block and one observation on this page)
- *   4 ritual       the Method's six stages, with the boundary statement travelling with them
- *   5 recent       three review cards
- *   6 meet         Zina: the short bio and what the work involves, linked to About
- *   7 closing      the philosophy statement on the wine ground
+ * ============================================================================
+ * PHASE 12 — THE PAGE AS A SEQUENCE OF SCENES
+ * ============================================================================
+ * Phase 11 built seven strong sections, and every one of them was LOUD: photography plus products
+ * plus a headline, seven times. Phase 12 keeps all seven and changes their rhythm, because a page
+ * that never rests has no peaks. The sequence now alternates:
+ *
+ *   VISUAL  opening   portrait, four products, one of them the anchor
+ *   texture marquee   the categories, moving
+ *   QUIET   discovery WHAT she tests — type and rules only. No photograph, no product.
+ *   VISUAL  story     the proof, with ONE product travelling the length of the section
+ *   VISUAL  ritual    the six stages, with a single background product
+ *   QUIET   band      a full-bleed beauty frame carrying the section's own heading. No product.
+ *   VISUAL  recent    three review cards
+ *   QUIET   meet      the collage — two photographs of her, and no packaging at all
+ *   QUIET   closing   her sentence, on the wine ground
+ *
+ * The discovery section is new and is not new COPY: `expertise[].label` and `.detail` were already
+ * in the person record and were the one substantial thing the homepage never showed. It answers
+ * the question the page previously skipped between "here she is" and "here is a review".
+ *
+ * Visual hierarchy, unchanged and non-negotiable: Zina · her voice · her testing · her reviews ·
+ * the products. The 3D is atmosphere around her, never the subject, and the marquee, the
+ * discovery ledger and the "meet Zina" collage carry no packaging at all — the collage lost its
+ * nail polish in Phase 12 precisely because the section is two photographs of HER, and a product
+ * beside them was competing for the one thing that section is about.
  *
  * Every link goes to an implemented route. No section is a teaser for something that does not exist.
  */
@@ -90,7 +107,8 @@ const taglineHead = splitAt > 0 ? tagline.slice(0, splitAt + 1) : tagline;
 const taglineTail = splitAt > 0 ? tagline.slice(splitAt + 1).trim() : "";
 
 const name = personRecord.name[locale === "ar" ? "arabic" : "latin"];
-const expertise = (personLocale.expertise ?? []).slice(0, 5);
+/* All of them, not a preview: the discovery section is now where they live, with their details. */
+const expertise = personLocale.expertise ?? [];
 
 const selfPath = path.home(locale);
 const meta = templatedMeta(personLocale.professionalTitle, personLocale.bios.short, {
@@ -117,10 +135,15 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
 >
   {/* ================================================================ 1 · opening */}
   <section class="opening opening--portrait" aria-labelledby="hero-title">
+    {/* The studio light: a softbox high and right, a champagne bounce low and left, and one
+        leak crossing the frame. The same direction the 3D products are lit from. */}
     <div class="opening-atmosphere" aria-hidden="true">
       <span class="organic organic--glow opening-glow"></span>
       <span class="organic organic--champagne opening-glow-2"></span>
+      <span class="organic organic--leak organic--breathe opening-leak"></span>
     </div>
+
+    <p class="vertical-label opening-spine" aria-hidden="true">{t(locale, "chapterLabel")} 01</p>
 
     <div class="container container--wide opening-inner">
       <div class="statement-block">
@@ -168,11 +191,25 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
           </span>
         </p>
 
-        <FloatingCosmetic kind="serum" tint="rose" depth={0.9} yaw={-0.6} tilt={0.12} class="hero-cosmetic hero-cosmetic--serum" />
-        <FloatingCosmetic kind="jar" tint="blush" depth={1} yaw={-0.3} class="hero-cosmetic hero-cosmetic--jar" />
-        <FloatingCosmetic kind="lipstick" tint="rose" depth={0.6} yaw={0.4} tilt={-0.25} class="hero-cosmetic hero-cosmetic--lipstick" />
-        <FloatingCosmetic kind="perfume" tint="blush" depth={0.35} yaw={0.55} desktopOnly class="hero-cosmetic hero-cosmetic--perfume" />
-        <FloatingCosmetic kind="compact" tint="blush" depth={0.7} yaw={0.2} desktopOnly class="hero-cosmetic hero-cosmetic--compact" />
+        {/* ONE ANCHOR, THEN SUPPORT. The serum is the only `fore` product on this screen: it is
+            nearest, answers the cursor most, turns furthest as the page moves, and outranks the
+            others when the scene's budget has to choose. The jar and lipstick are midground; the
+            perfume and the powder jar are background atmosphere and only appear on wide screens.
+            On a phone the budget is two, and priority decides which two — never a scramble. */}
+        <FloatingCosmetic
+          kind="serum"
+          tint="rose"
+          layer="fore"
+          depth={0.9}
+          yaw={-0.6}
+          tilt={0.12}
+          spin={0.9}
+          approach={0.7}
+          priority={2.4}
+          class="hero-cosmetic hero-cosmetic--serum"
+        />
+        <FloatingCosmetic kind="jar" tint="blush" layer="mid" depth={0.8} yaw={-0.3} spin={0.5} priority={0.9} class="hero-cosmetic hero-cosmetic--jar" />
+        <FloatingCosmetic kind="lipcase" tint="rose" layer="mid" depth={0.6} yaw={0.4} tilt={-0.25} spin={0.6} priority={0.3} class="hero-cosmetic hero-cosmetic--lipstick" />
       </div>
     </div>
 
@@ -200,12 +237,64 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
     )
   }
 
+  {/* ================================================================ 3 · discovery — QUIET
+      Type and rules. No photograph, no product, no gradient trick. The page has just been loud
+      and is about to be loud again; this is the breath between them, and it is also the beat the
+      Phase 11 homepage skipped — what, specifically, she tests. */}
+  {
+    expertise.length > 0 && (
+      <section class="discovery" aria-labelledby="discovery-heading">
+        <div class="container container--wide discovery-inner">
+          <div class="discovery-head">
+            <p class="eyebrow reveal">{t(locale, "expertiseEyebrow")}</p>
+            <h2 class="discovery-title reveal" id="discovery-heading">{t(locale, "expertiseHeading")}</h2>
+            <span class="section-mark discovery-mark" aria-hidden="true">02</span>
+          </div>
+
+          <ol class="discovery-list plain">
+            {expertise.map((item, index) => (
+              <li class="discovery-item reveal-step" style={`--reveal-step: ${index}`}>
+                <span class="discovery-number record" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+                <h3 class="discovery-label">{item.label}</h3>
+                {item.detail && <p class="discovery-detail">{item.detail}</p>}
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+    )
+  }
+
   {/* ================================================================ 3 · the story (the proof) */}
   {
     featured && featuredContent && (
       <section class="featured story" aria-labelledby="featured-heading">
+        <span class="seam seam--blush" aria-hidden="true" />
         <span class="organic organic--glow story-glow" aria-hidden="true" />
         <div class="container container--wide story-inner">
+          <span class="section-mark story-mark" aria-hidden="true">03</span>
+
+          {/* THE PRODUCT JOURNEY. This slot is not a box, it is a RAIL: a tall invisible corridor
+              down the visual column of the section. The scene draws the product into a small box
+              that travels the path below as you scroll — far out at the top, swinging in across
+              the photograph, back out, and settling low beside the verdict — turning through most
+              of a half-turn on the way. One product does this on this page. Doing it to all of
+              them would be a screensaver. Desktop and tablet only: on a phone the column is the
+              content, and a travelling object would cross it. */}
+          <FloatingCosmetic
+            kind={featuredCosmetic.kind}
+            tint={featuredCosmetic.tint}
+            layer="fore"
+            depth={0.95}
+            yaw={-0.5}
+            spin={2.4}
+            approach={0.85}
+            priority={2.6}
+            path="0.82,0 0.06,0.32 0.66,0.62 0.12,1"
+            size={0.4}
+            desktopOnly
+            class="story-journey"
+          />
           <div class="story-visual">
             <div class="story-visual-sticky">
               <EditorialImage
@@ -217,11 +306,15 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
                 sizes="(min-width: 1024px) 36vw, 88vw"
                 class="story-image reveal-fade"
               />
+              {/* The phone composition: no rail, one quiet product tucked against the frame. */}
               <FloatingCosmetic
                 kind={featuredCosmetic.kind}
                 tint={featuredCosmetic.tint}
+                layer="mid"
                 depth={0.9}
                 yaw={-0.5}
+                spin={0.6}
+                priority={1.2}
                 class="story-cosmetic"
               />
               <p class="story-chip">
@@ -332,6 +425,7 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
   {/* ================================================================ 4 · the ritual (method) */}
   <section class="method-well" aria-labelledby="method-heading">
     <div class="container container--wide method-inner">
+      <span class="section-mark section-mark--solid method-mark" aria-hidden="true">04</span>
       <div class="method-visual reveal-fade">
         <EditorialImage
           photo="studioMonochrome"
@@ -343,7 +437,9 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
           class="method-image"
         />
         <span class="organic organic--ring method-ring" aria-hidden="true"></span>
-        <FloatingCosmetic kind="compact" tint="blush" depth={0.7} yaw={0.1} class="method-cosmetic" />
+        {/* The ritual section is about the stages, not the packaging: ONE background object,
+            quiet, low priority, so the numbered list is what the eye lands on. */}
+        <FloatingCosmetic kind="brush" tint="wine" layer="back" depth={0.5} yaw={0.1} spin={0.4} priority={-0.2} class="method-cosmetic" />
       </div>
 
       <div class="method-copy">
@@ -375,12 +471,34 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
   {
     recent.length > 0 && (
       <section class="recent" aria-labelledby="recent-heading">
+        {/* THE BAND — the one full-bleed photograph on the page, and the only place the heading
+            is set over an image rather than beside one. It is the beauty frame precisely because
+            this is where the page turns to the reviews: the subject of the work is what a formula
+            does on skin, and this is the only photograph in the set where that is legible. No 3D
+            product appears over it; the photograph does not need help. */}
+        <div class="recent-band">
+          <EditorialImage
+            photo="beautyCloseup"
+            locale={locale}
+            mask="none"
+            tone="deep"
+            ratio="4 / 5"
+            parallax={true}
+            sizes="100vw"
+            widths={[640, 960, 1280, 1800, 2400]}
+            class="recent-band-image"
+          />
+          <div class="container container--wide recent-band-copy">
+            <p class="eyebrow reveal">{t(locale, "recentEyebrow")}</p>
+            <h2 class="recent-title reveal" id="recent-heading">{t(locale, "recentReviews")}</h2>
+          </div>
+          <p class="vertical-label recent-spine" aria-hidden="true">
+            {t(locale, "chapterLabel")} 05
+          </p>
+        </div>
+
         <div class="container container--wide">
           <div class="recent-head">
-            <div>
-              <p class="eyebrow reveal">{t(locale, "reviews")}</p>
-              <h2 class="section-title reveal" id="recent-heading">{t(locale, "recentReviews")}</h2>
-            </div>
             <p class="all-link reveal">
               <a class="link-quiet" href={path.reviewsIndex(locale)}>
                 {t(locale, "viewAllReviews")}
@@ -422,21 +540,12 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
               widths={[240, 360, 480]}
               class="meet-image meet-image--inset reveal"
             />
-            <FloatingCosmetic kind="lipstick" tint="wine" depth={0.8} yaw={-0.2} tilt={0.3} class="meet-cosmetic" />
           </div>
 
           <div class="meet-copy">
             <p class="eyebrow reveal">{t(locale, "meetZina")}</p>
             <h2 class="section-title reveal" id="meet-heading">{name}</h2>
             <p class="meet-bio reveal">{personLocale.bios.short}</p>
-
-            {expertise.length > 0 && (
-              <ul class="expertise plain reveal">
-                {expertise.map((item) => (
-                  <li>{item.label}</li>
-                ))}
-              </ul>
-            )}
 
             <div class="meet-actions reveal">
               <BeautyButton href={path.about(locale)}>{t(locale, "discoverApproach")}</BeautyButton>
@@ -455,10 +564,34 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
     personLocale.philosophy?.statement && (
       <section class="closing tone-wine" aria-label={t(locale, "aboutPhilosophy")}>
         <span class="organic organic--glow closing-glow" aria-hidden="true" />
-        <FloatingCosmetic kind="perfume" tint="rose" depth={0.6} yaw={-0.5} class="closing-cosmetic closing-cosmetic--a" />
-        <FloatingCosmetic kind="serum" tint="blush" depth={0.3} yaw={0.6} tilt={-0.15} desktopOnly class="closing-cosmetic closing-cosmetic--b" />
+        {/* On the wine ground the rim light does the separating work (`light="wine"`), or glass
+            simply disappears into the dark. */}
+        <FloatingCosmetic
+          kind="perfume"
+          tint="rose"
+          layer="fore"
+          depth={0.6}
+          yaw={-0.5}
+          spin={1.1}
+          approach={0.6}
+          priority={2}
+          light="wine"
+          class="closing-cosmetic closing-cosmetic--a"
+        />
+        <FloatingCosmetic
+          kind="balm"
+          tint="rose"
+          layer="back"
+          depth={0.3}
+          yaw={0.6}
+          tilt={-0.15}
+          spin={0.4}
+          light="wine"
+          wideOnly
+          class="closing-cosmetic closing-cosmetic--b"
+        />
         <div class="container closing-inner">
-          <p class="eyebrow reveal">{t(locale, "aboutPhilosophy")}</p>
+          <p class="eyebrow reveal">{t(locale, "closingEyebrow")}</p>
           <blockquote class="closing-quote reveal">
             <p>{personLocale.philosophy.statement}</p>
           </blockquote>
@@ -624,10 +757,11 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
     inset-inline-end: -16%;
   }
 
+  /* The one HERO-weight shadow on the site: the portrait is the subject of the page. */
   .portrait-image {
     position: relative;
     z-index: 1;
-    box-shadow: var(--shadow-float);
+    box-shadow: var(--shadow-hero);
   }
 
   /* Glass caption card overlapping the portrait's lower edge. */
@@ -635,7 +769,7 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
     position: absolute;
     z-index: 3;
     inset-block-end: 7%;
-    inset-inline-end: -6%;
+    inset-inline-end: -2%;
     display: flex;
     align-items: center;
     gap: var(--space-2);
@@ -668,34 +802,27 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
     color: var(--color-text-muted);
   }
 
+  /* THE STILL LIFE. Four objects, arranged as one group rather than sprinkled around a ring:
+     the anchor high on the reading side, the jar weighting the base, a small capsule opposite,
+     and one background object further out. Every inset is inside the section's clip, so nothing
+     is ever cut in half by an edge — a clipped product is the single clearest tell that a 3D
+     layer was dropped onto a page rather than composed into it. */
   .hero-cosmetic--serum {
-    inline-size: 32%;
-    inset-block-start: 10%;
-    inset-inline-start: -18%;
+    inline-size: var(--cosmetic-sm);
+    inset-block-start: 8%;
+    inset-inline-start: -13%;
   }
 
   .hero-cosmetic--jar {
-    inline-size: 42%;
-    inset-block-end: -9%;
-    inset-inline-start: -16%;
+    inline-size: var(--cosmetic-md);
+    inset-block-end: -4%;
+    inset-inline-start: -11%;
   }
 
   .hero-cosmetic--lipstick {
-    inline-size: 28%;
-    inset-block-start: -8%;
-    inset-inline-end: -8%;
-  }
-
-  .hero-cosmetic--perfume {
-    inline-size: 32%;
-    inset-block-start: 30%;
-    inset-inline-end: -26%;
-  }
-
-  .hero-cosmetic--compact {
-    inline-size: 30%;
-    inset-block-end: 20%;
-    inset-inline-start: -34%;
+    inline-size: var(--cosmetic-xs);
+    inset-block-start: 2%;
+    inset-inline-end: 2%;
   }
 
   .scroll-cue {
@@ -842,9 +969,9 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
   }
 
   .story-cosmetic {
-    inline-size: 44%;
-    inset-block-end: -10%;
-    inset-inline-end: -12%;
+    inline-size: var(--cosmetic-md);
+    inset-block-end: -8%;
+    inset-inline-end: -8%;
   }
 
   .story-chip {
@@ -1094,7 +1221,7 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
   }
 
   .method-cosmetic {
-    inline-size: 52%;
+    inline-size: var(--cosmetic-lg);
     inset-block-end: -12%;
     inset-inline-end: -26%;
   }
@@ -1158,18 +1285,6 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
 
   /* ================================================================ 5 · recent */
 
-  .recent {
-    padding-block: var(--space-10);
-  }
-
-  .recent-head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: end;
-    justify-content: space-between;
-    gap: var(--space-3);
-  }
-
   .all-link .count {
     margin-inline-start: var(--space-1);
     color: var(--color-text-muted);
@@ -1225,35 +1340,12 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
     box-shadow: var(--shadow-float);
   }
 
-  .meet-cosmetic {
-    inline-size: 34%;
-    inset-block-start: 12%;
-    inset-inline-end: -24%;
-  }
-
   .meet-bio {
     margin-block-start: var(--space-3);
     max-inline-size: 48ch;
     font-size: calc(var(--type-body-lg) * var(--type-arabic-size-factor));
     line-height: calc(var(--type-leading-body-lg) * var(--type-arabic-leading-factor));
     color: var(--color-text-secondary);
-  }
-
-  .expertise {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-1);
-    margin-block-start: var(--space-4);
-  }
-
-  .expertise li {
-    padding: 0.5rem 1rem;
-    border-radius: var(--radius-control);
-    border: 1px solid rgb(122 35 66 / 22%);
-    font-family: var(--type-family-ui);
-    font-size: calc(var(--type-ui-sm) * var(--type-arabic-size-factor));
-    color: var(--color-text-secondary);
-    background: rgb(255 250 247 / 60%);
   }
 
   .meet-actions {
@@ -1314,9 +1406,180 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
   }
 
   .closing-cosmetic--b {
-    inline-size: clamp(7rem, 12vw, 11rem);
-    inset-block-start: 12%;
-    inset-inline-end: 7%;
+    inline-size: clamp(6rem, 10vw, 9rem);
+    inset-block-start: 18%;
+    inset-inline-end: 9%;
+  }
+
+
+  /* ================================================================ PHASE 12 · hero light */
+
+  .opening-leak {
+    inline-size: 34rem;
+    block-size: 18rem;
+    inset-block-start: 26%;
+    inset-inline-start: -8rem;
+    rotate: -14deg;
+  }
+
+  /* The spine label runs down the outer edge of the opening, the way a masthead is set on a
+     magazine's fore-edge. Latin only — `.vertical-label` lays itself flat in Arabic. */
+  .opening-spine {
+    display: none;
+  }
+
+  /* ================================================================ 3 · discovery (QUIET) */
+
+  .discovery {
+    position: relative;
+    overflow: clip;
+    padding-block: var(--space-10);
+    background: var(--color-ground-base);
+  }
+
+  .discovery-head {
+    position: relative;
+  }
+
+  .discovery-title {
+    margin-block-start: var(--space-2);
+    font-size: calc(var(--type-display-xl) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-display-xl) * var(--type-arabic-leading-factor));
+    max-inline-size: 12ch;
+  }
+
+  /* Low in the left column, under the heading — a chapter number, not a collision. */
+  .discovery-mark {
+    position: static;
+    display: block;
+    margin-block-start: var(--space-4);
+    line-height: 0.78;
+  }
+
+  .discovery-list {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    margin-block-start: var(--space-7);
+    border-block-start: var(--border-rule-hairline);
+  }
+
+  /* A ledger row, not a card: a number, a name, a line of detail, a hairline. Nothing is boxed,
+     nothing is shadowed, nothing is rounded. That restraint is the point of the section. */
+  .discovery-item {
+    display: grid;
+    grid-template-columns: 2.75rem minmax(0, 1fr);
+    gap: var(--space-1) var(--space-3);
+    padding-block: var(--space-3);
+    border-block-end: var(--border-rule-hairline);
+  }
+
+  .discovery-number {
+    grid-row: 1 / span 2;
+    font-size: var(--type-record-sm);
+    color: var(--color-accent-clay);
+    padding-block-start: 0.45rem;
+  }
+
+  .discovery-label {
+    font-family: var(--type-family-display);
+    font-size: calc(clamp(1.5rem, 1.2rem + 1.3vw, 2.4rem) * var(--type-arabic-size-factor));
+    line-height: 1.15;
+    font-weight: var(--type-weight-regular);
+    color: var(--color-text-primary);
+  }
+
+  .discovery-detail {
+    max-inline-size: 54ch;
+    font-size: calc(var(--type-body-sm) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-body-sm) * var(--type-arabic-leading-factor));
+    color: var(--color-text-secondary);
+  }
+
+  /* ================================================================ 3 · story journey */
+
+  .story-mark {
+    inset-block-start: -0.1em;
+    inset-inline-end: 2%;
+  }
+
+  /* THE RAIL. A corridor, not a box: it spans the height of the story and sits over the visual
+     column, so the travelling product crosses the photograph and the empty margin beside it and
+     never the prose. `inline-size` is what sets the travelling object's size (a fraction of it). */
+  /* The corridor runs down the OUTER side of the visual column: at its widest swing the product
+     grazes the photograph's edge, and at its furthest it is out in the page margin. It never
+     reaches the middle of the frame, because the middle of the frame is Zina. */
+  .story-journey {
+    display: none;
+    inset-block: var(--space-6);
+    inset-inline-start: -7%;
+    inline-size: 30%;
+    z-index: 3;
+  }
+
+  /* ================================================================ 4 · method */
+
+  .method-mark {
+    inset-block-start: -0.22em;
+    inset-inline-start: 0;
+    opacity: 0.55;
+  }
+
+  /* ================================================================ 5 · the band */
+
+  .recent {
+    padding-block: 0 var(--space-10);
+  }
+
+  .recent-band {
+    position: relative;
+    isolation: isolate;
+    margin-block-end: var(--space-8);
+  }
+
+  .recent-band-image {
+    inline-size: 100%;
+  }
+
+  /* The heading sits INSIDE the photograph's lower third, over the deep wash. On the narrowest
+     screens the frame is tall and the type sits low; as the screen widens the crop flattens and
+     the type moves onto the left third, away from her face. */
+  .recent-band-copy {
+    position: absolute;
+    inset-block-end: var(--space-5);
+    inset-inline: 0;
+    z-index: 1;
+    color: #fbf1ee;
+  }
+
+  .recent-band-copy .eyebrow {
+    color: #f3b8c6;
+  }
+
+  .recent-title {
+    margin-block-start: var(--space-2);
+    font-family: var(--type-family-display);
+    font-size: calc(var(--type-display-xl) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-display-xl) * var(--type-arabic-leading-factor));
+    font-weight: var(--type-weight-regular);
+    color: #fbf1ee;
+    max-inline-size: 13ch;
+  }
+
+  .recent-spine {
+    display: none;
+  }
+
+  .recent-head {
+    display: flex;
+    justify-content: flex-end;
+    margin-block-end: var(--space-4);
+  }
+
+  /* ================================================================ 7 · closing */
+
+  .closing-quote {
+    letter-spacing: var(--type-tracking-display);
   }
 
   /* ================================================================ 768+ */
@@ -1329,14 +1592,56 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
     .step {
       grid-template-columns: 4rem minmax(0, 1fr);
     }
+
+    /* TABLET IS NOT A LARGE PHONE. The ledger opens into three columns — number, name, detail —
+       which is the composition it was designed for; the phone version is the compressed one. */
+    .discovery-item {
+      grid-template-columns: 3.5rem minmax(0, 0.9fr) minmax(0, 1.2fr);
+      align-items: baseline;
+      gap: var(--space-4);
+      padding-block: var(--space-4);
+    }
+
+    .discovery-number {
+      grid-row: auto;
+      padding-block-start: 0.55rem;
+    }
+
+    /* The band flattens as the screen widens: a portrait crop on a phone, a cinema crop here. */
+    .recent-band-image {
+      aspect-ratio: 16 / 10;
+    }
+
+    .recent-title {
+      max-inline-size: 11ch;
+    }
+
+    /* The travelling product appears at tablet width, where there is margin for it to cross —
+       and the fixed phone slot stands down, so the section never shows two of the same object. */
+    .story-journey {
+      display: block;
+    }
+
+    .story-cosmetic {
+      display: none;
+    }
   }
 
   /* ================================================================ 1024+ */
 
   @media (min-width: 1024px) {
+    /*
+     * The opening fills the first screen, but only up to a point. On a 1440-tall display
+     * `100svh` alone left roughly a third of the section empty BELOW the composition, because
+     * the grid was top-aligned inside a section far taller than its content — the hero read as
+     * pushed up rather than placed. Capping the height and centring the grid inside it keeps the
+     * same first-screen presence at 900px and stops the dead band appearing at 1440.
+     */
     .opening {
+      display: grid;
+      align-content: center;
       padding-block: var(--space-6) var(--space-12);
-      min-block-size: calc(100svh - var(--layout-header-height));
+      min-block-size: min(calc(100svh - var(--layout-header-height)), 54rem);
     }
 
     .opening-inner {
@@ -1418,11 +1723,151 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
     .meet-collage {
       margin-block-end: 0;
     }
+
+    /* The discovery section becomes a two-column editorial spread: the heading holds the left
+       column and stays put while the ledger runs beside it. */
+    .discovery-inner {
+      display: grid;
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+      gap: var(--space-10);
+      align-items: start;
+    }
+
+    .discovery-head {
+      position: sticky;
+      inset-block-start: calc(var(--layout-header-height) + var(--space-6));
+    }
+
+    .discovery-list {
+      margin-block-start: 0;
+    }
+
+    .discovery-item {
+      grid-template-columns: 4rem minmax(0, 0.85fr) minmax(0, 1.15fr);
+    }
+
+    .recent-band-image {
+      aspect-ratio: 21 / 9;
+    }
+
+    /* Away from her face: at this width the type takes the outer third of the frame. */
+    .recent-title {
+      max-inline-size: 9ch;
+      font-size: calc(var(--type-display-hero) * var(--type-arabic-size-factor));
+    }
+
+    .recent-band-copy {
+      inset-block-end: var(--space-7);
+    }
+
+    .recent-spine,
+    .opening-spine {
+      display: block;
+    }
+
+    .opening-spine {
+      position: absolute;
+      inset-block-start: var(--space-8);
+      inset-inline-start: 1.25rem;
+      z-index: 2;
+      opacity: 0.6;
+    }
+
+    .recent-spine {
+      position: absolute;
+      inset-block-start: var(--space-6);
+      inset-inline-end: var(--space-4);
+      z-index: 1;
+      color: #cfaab1;
+    }
   }
+
+  /* ================================================================ 1366 × 768
+     A short laptop, not a narrow one. The hero must fit: the portrait loses height rather than
+     the headline losing size, and the scroll cue stays reachable. */
+  @media (min-width: 1280px) and (max-height: 820px) {
+    .opening {
+      min-block-size: 0;
+      padding-block: var(--space-4) var(--space-8);
+    }
+
+    .portrait {
+      max-inline-size: 26rem;
+    }
+
+    .statement-head {
+      font-size: calc(var(--type-display-xl) * var(--type-arabic-size-factor));
+    }
+
+    .hero-intro {
+      margin-block-start: var(--space-3);
+    }
+
+    .attribution {
+      margin-block-start: var(--space-4);
+    }
+
+    .scroll-cue {
+      inset-block-end: var(--space-2);
+    }
+
+    .scroll-cue::after {
+      block-size: 1.75rem;
+    }
+  }
+
+  /* ================================================================ 1440+ */
 
   @media (min-width: 1440px) {
     .portrait {
       max-inline-size: 34rem;
+    }
+  }
+
+  /* ================================================================ 1600+
+     A large screen gets more SILENCE, not more content. The grid is already capped by
+     --layout-max-content; what grows here is the margin around it and the scale of the two
+     things that carry the page — the portrait and the display type. */
+  @media (min-width: 1600px) {
+    .opening-inner {
+      gap: var(--space-10);
+    }
+
+    .portrait {
+      max-inline-size: 38rem;
+      margin-inline-end: 2%;
+    }
+
+    .story-inner {
+      gap: var(--space-14);
+    }
+
+    .discovery-inner {
+      gap: var(--space-12);
+    }
+
+    .discovery-item {
+      padding-block: var(--space-5);
+    }
+
+    .recent-band-image {
+      aspect-ratio: 2.6 / 1;
+    }
+  }
+
+  @media (min-width: 1920px) {
+    .portrait {
+      max-inline-size: 42rem;
+    }
+
+    .recent-band-image {
+      aspect-ratio: 3 / 1;
+    }
+
+    /* At this width a three-across card row leaves too much air under each card; the entries
+       keep their three columns and grow instead. */
+    .entries {
+      gap: var(--space-5);
     }
   }
 </style>

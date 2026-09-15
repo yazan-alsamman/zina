@@ -110,7 +110,8 @@ const verdict = (content as { verdict?: { wouldRepurchase?: string } }).verdict;
     border-radius: var(--radius-card);
     background: var(--color-ground-card);
     border: 1px solid color-mix(in srgb, var(--color-line-hairline) 90%, transparent);
-    box-shadow: var(--shadow-soft);
+    /* A card at rest is a contact shadow, so the lift on hover is something you can see. */
+    box-shadow: var(--shadow-subtle);
     overflow: hidden;
     transition:
       transform var(--motion-duration-settle) var(--motion-easing-silk),
@@ -173,7 +174,7 @@ const verdict = (content as { verdict?: { wouldRepurchase?: string } }).verdict;
   }
 
   .entry-cosmetic {
-    inline-size: 56%;
+    inline-size: var(--cosmetic-lg);
     inset-inline-start: 22%;
     inset-block-start: 4%;
   }

@@ -1,5 +1,10 @@
 /**
- * COSMETIC MODELS — original, procedurally built packaging for the Phase 11 3D system.
+ * COSMETIC MODELS — original, procedurally built packaging for the Phase 11/12 3D system.
+ *
+ * Phase 12 grew the catalogue from nine packages to twenty-four. Every addition is a genuinely
+ * DIFFERENT SILHOUETTE, not a recolour: an ampoule is not a vial, a swan-neck pump is not a
+ * foundation cap, a domed highlighter is not an open compact. Proportions come from the real
+ * category (a 2 ml ampoule, a 150 ml cleanser, a 15 mm nail-polish neck); the forms are ours.
  *
  * Each model is modelled from real-world PROPORTIONS of its category (a 30 ml dropper bottle, a
  * 50 ml cream jar, a bullet lipstick) but every silhouette, finish and label here is original.
@@ -34,19 +39,28 @@ import {
   Vector3,
 } from "three";
 import {
+  bristle,
+  brushedMetal,
+  ceramic,
+  flocked,
   glass,
   gloss,
   labelTexture,
+  lacquer,
   liquid,
+  loosePowder,
+  matte,
   metal,
   mirror,
   palette,
   pearl,
   pressedPowder,
   satin,
+  satinGlass,
 } from "./materials";
 
 export type CosmeticKind =
+  /* Phase 11 */
   | "serum"
   | "jar"
   | "lipstick"
@@ -55,7 +69,23 @@ export type CosmeticKind =
   | "foundation"
   | "mascara"
   | "gloss"
-  | "tube";
+  | "tube"
+  /* Phase 12 */
+  | "ampoule"
+  | "vial"
+  | "mist"
+  | "pump"
+  | "toner"
+  | "oil"
+  | "palette"
+  | "brush"
+  | "sponge"
+  | "polish"
+  | "balm"
+  | "highlighter"
+  | "cleanser"
+  | "powder"
+  | "lipcase";
 
 export type CosmeticTint = "blush" | "rose" | "nude" | "champagne" | "wine";
 
@@ -173,8 +203,8 @@ function serum(tint: CosmeticTint): Group {
   ];
   group.add(glassShell(lathe(body), "#fff6f4"));
 
-  const fill = [v(0, 0.16), v(0.88, 0.16), v(0.92, 0.24), v(0.92, 1.72), v(0, 1.72)];
-  group.add(mesh(lathe(fill), liquid(c.liquid, 0.92), 2));
+  const fill = [v(0, 0.2), v(0.8, 0.2), v(0.84, 0.3), v(0.84, 1.62), v(0, 1.62)];
+  group.add(mesh(lathe(fill), liquid(c.liquid, 0.84), 2));
 
   const pipette = new CylinderGeometry(0.075, 0.05, 2.6, 24);
   pipette.translate(0, 1.72, 0);
@@ -288,7 +318,9 @@ function perfume(tint: CosmeticTint): Group {
   const group = new Group();
 
   group.add(glassShell(slab(2.2, 2.3, 1.1, 0.34, 0.16), "#ffe9ec"));
-  group.add(mesh(slab(1.86, 1.55, 0.78, 0.2, 0.08), liquid(c.liquid, 0.92), 2));
+  // The fill stops well inside the shell on every axis: a bottle is read from its glass walls
+  // and its shoulder highlight, and a fill that reaches the walls erases both.
+  group.add(mesh(slab(1.62, 1.3, 0.6, 0.2, 0.08), liquid(c.liquid, 0.86), 2));
 
   group.add(mesh(lathe(roundedCylinderProfile(0.34, 2.62, 3.0, 0.04)), metal(palette.champagne, 0.18)));
   const stopper = new SphereGeometry(0.72, 64, 48);
@@ -347,7 +379,7 @@ function foundation(tint: CosmeticTint): Group {
   const group = new Group();
 
   group.add(glassShell(slab(1.7, 2.5, 0.95, 0.26, 0.12), "#fbefe9", true));
-  group.add(mesh(slab(1.46, 1.85, 0.72, 0.18, 0.06), liquid(c.liquid, 0.95), 2));
+  group.add(mesh(slab(1.3, 1.62, 0.56, 0.18, 0.06), liquid(c.liquid, 0.9), 2));
 
   group.add(mesh(lathe(roundedCylinderProfile(0.36, 2.74, 3.02, 0.03)), metal(palette.champagne, 0.2)));
   group.add(mesh(lathe(roundedCylinderProfile(0.46, 3.02, 4.15, 0.12)), gloss(palette.wine, 0.18)));
@@ -442,6 +474,367 @@ function tube(tint: CosmeticTint): Group {
   return group;
 }
 
+
+/* ------------------------------------------------------------------ Phase 12 models
+ *
+ * Each of the following is a distinct silhouette. Where two categories share a family (a vial and
+ * an ampoule are both small glass), they differ the way the real objects differ: the ampoule is
+ * sealed and drawn to a snapped point, the vial is squat and screw-capped.
+ */
+
+/** 2 ml sealed ampoule: bulbous base, long drawn neck, snapped tip, one rose-gold index ring. */
+function ampoule(tint: CosmeticTint): Group {
+  const c = tintColors[tint];
+  const group = new Group();
+
+  const body = smooth(
+    [v(0, 0), v(0.34, 0.02), v(0.42, 0.28), v(0.42, 1.25), v(0.3, 1.55), v(0.14, 1.9), v(0.12, 2.5), v(0.16, 2.72), v(0.1, 2.9), v(0, 2.94)],
+    46
+  );
+  group.add(glassShell(lathe(body), "#fbf1ee"));
+
+  const fill = [v(0, 0.08), v(0.34, 0.1), v(0.36, 0.3), v(0.36, 1.2), v(0.2, 1.62), v(0, 1.72)];
+  group.add(mesh(lathe(smooth(fill, 24)), liquid(c.liquid, 0.9), 2));
+
+  // The break ring an ampoule is snapped at — the one detail that makes the category legible.
+  const ring = new TorusGeometry(0.125, 0.018, 10, 48);
+  ring.rotateX(Math.PI / 2);
+  ring.translate(0, 2.42, 0);
+  group.add(mesh(ring, metal(palette.roseGold, 0.2)));
+  return group;
+}
+
+/** 5 ml sample vial: squat clear glass, wide shoulder, low champagne screw cap. */
+function vial(tint: CosmeticTint): Group {
+  const c = tintColors[tint];
+  const group = new Group();
+
+  const body = [v(0, 0), v(0.52, 0), v(0.56, 0.06), v(0.56, 0.92), v(0.5, 1.02), v(0.34, 1.08), v(0.34, 1.24), v(0, 1.24)];
+  group.add(glassShell(lathe(body), "#fff4f1"));
+  group.add(mesh(lathe([v(0, 0.1), v(0.48, 0.1), v(0.48, 0.74), v(0, 0.74)]), liquid(c.liquid, 0.9), 2));
+  group.add(mesh(lathe(roundedCylinderProfile(0.4, 1.2, 1.64, 0.05)), metal(palette.champagne, 0.22)));
+  return group;
+}
+
+/** 100 ml facial mist: tall slim satin-glass column, stepped collar, flat-top fine-mist actuator. */
+function mist(tint: CosmeticTint): Group {
+  const c = tintColors[tint];
+  const group = new Group();
+
+  const body = roundedCylinderProfile(0.62, 0, 3.3, 0.1);
+  const shell = satinGlass("#f7ece8");
+  group.add(mesh(lathe(body), shell.back, 1), mesh(lathe(body), shell.front, 3));
+  group.add(mesh(lathe(roundedCylinderProfile(0.5, 0.12, 2.3, 0.06)), liquid(c.liquid, 0.55), 2));
+
+  const dip = new CylinderGeometry(0.035, 0.035, 3.1, 12);
+  dip.translate(0, 1.5, 0);
+  group.add(mesh(dip, gloss("#f3e2dc", 0.4), 2));
+
+  group.add(mesh(lathe(roundedCylinderProfile(0.46, 3.3, 3.62, 0.04)), brushedMetal(palette.champagne)));
+  group.add(mesh(lathe(roundedCylinderProfile(0.3, 3.62, 4.26, 0.05)), metal(palette.champagne, 0.16)));
+  // The actuator crown and its side nozzle.
+  const crown = new CylinderGeometry(0.34, 0.3, 0.16, 48);
+  crown.translate(0, 4.34, 0);
+  group.add(mesh(crown, gloss(palette.wine, 0.2)));
+  const nozzle = new CylinderGeometry(0.05, 0.05, 0.2, 16);
+  nozzle.rotateZ(Math.PI / 2);
+  nozzle.translate(0.32, 4.3, 0);
+  group.add(mesh(nozzle, metal(palette.roseGold, 0.2)));
+
+  const label = labelTexture([{ text: "BRUME", size: 50, tracking: 1 }, { text: "100 ml", size: 24, font: "ui" }], { color: c.ink });
+  group.add(band(0.626, 1.5, 0.78, 1.7, label));
+  return group;
+}
+
+/** 200 ml skincare pump: glazed ceramic column, brushed collar, swan-neck lotion pump. */
+function pump(tint: CosmeticTint): Group {
+  const c = tintColors[tint];
+  const group = new Group();
+
+  const body = [v(0, 0), v(0.92, 0), v(0.98, 0.08), v(0.98, 2.5), v(0.9, 2.72), v(0.62, 2.86), v(0.6, 3.0), v(0, 3.0)];
+  group.add(mesh(lathe(smooth(body, 40)), ceramic(tint === "wine" ? palette.burgundy : palette.porcelain)));
+  group.add(mesh(lathe(roundedCylinderProfile(0.62, 3.0, 3.3, 0.05)), brushedMetal(palette.champagne)));
+
+  const stem = new CylinderGeometry(0.19, 0.19, 0.95, 28);
+  stem.translate(0, 3.74, 0);
+  group.add(mesh(stem, metal(palette.roseGold, 0.18)));
+
+  // The swan neck: a quarter turn of tube ending in a downward spout.
+  const neck: Vector3[] = [];
+  for (let i = 0; i <= 24; i++) {
+    const t = i / 24;
+    const a = t * Math.PI * 0.62;
+    neck.push(new Vector3(Math.sin(a) * 0.62, 4.2 + Math.cos(a) * 0.18 - 0.18 + t * 0.12, 0));
+  }
+  neck.push(new Vector3(0.68, 3.98, 0));
+  group.add(mesh(new TubeGeometry(new CatmullRomCurve3(neck), 60, 0.16, 18, false), metal(palette.roseGold, 0.2)));
+
+  const label = labelTexture([{ text: "LAIT", size: 56, tracking: 1 }, { text: "200 ml", size: 26, font: "ui" }], { color: c.ink });
+  group.add(band(0.985, 1.3, 0.85, 1.5, label));
+  return group;
+}
+
+/**
+ * 200 ml toner: a broad, square-shouldered frosted bottle under a wide flat ceramic disc.
+ *
+ * Deliberately squatter and wider than `pump`: the two were built at the same slenderness and
+ * read as one bottle in two finishes, which is the failure mode the catalogue exists to avoid.
+ */
+function toner(tint: CosmeticTint): Group {
+  const c = tintColors[tint];
+  const group = new Group();
+
+  group.add(glassShell(slab(1.95, 2.45, 1.95, 0.18, 0.09), "#f6efe9", true));
+  group.add(mesh(slab(1.56, 1.6, 1.56, 0.12, 0.05), liquid(c.liquid, 0.62), 2));
+  group.add(mesh(lathe(roundedCylinderProfile(0.6, 2.52, 2.68, 0.04)), brushedMetal(palette.champagne)));
+  group.add(mesh(lathe(roundedCylinderProfile(1.06, 2.68, 3.12, 0.1)), ceramic(palette.clay)));
+
+  const label = labelTexture([{ text: "TONIQUE", size: 44, tracking: 1 }, { text: "200 ml", size: 24, font: "ui" }], { color: c.ink });
+  group.add(plate(1.3, 0.66, 0.99, 1.3, label));
+  return group;
+}
+
+/** 30 ml face oil: a squat wide glass disc under a long slender wand cap. */
+function faceOil(tint: CosmeticTint): Group {
+  const c = tintColors[tint];
+  const group = new Group();
+
+  const body = smooth([v(0, 0), v(0.9, 0.04), v(1.0, 0.35), v(0.98, 0.9), v(0.72, 1.18), v(0.34, 1.3), v(0.32, 1.5), v(0, 1.5)], 44);
+  group.add(glassShell(lathe(body), "#fdf2ec"));
+  group.add(mesh(lathe(smooth([v(0, 0.08), v(0.86, 0.12), v(0.92, 0.4), v(0.88, 0.86), v(0.6, 1.06), v(0, 1.1)], 28)), liquid(c.liquid, 0.94), 2));
+  group.add(mesh(lathe(roundedCylinderProfile(0.36, 1.5, 1.72, 0.03)), metal(palette.roseGold, 0.18)));
+  group.add(mesh(lathe(roundedCylinderProfile(0.24, 1.72, 3.5, 0.06)), lacquer(palette.wine)));
+
+  const label = labelTexture([{ text: "HUILE", size: 54, tracking: 1 }, { text: "30 ml", size: 24, font: "ui" }], { color: c.ink });
+  group.add(band(1.003, 0.6, 0.5, 1.6, label));
+  return group;
+}
+
+/** Eyeshadow palette, open: a flat rectangular case, six pressed pans, a mirrored lid tilted back. */
+function eyePalette(tint: CosmeticTint): Group {
+  const group = new Group();
+  const shellColor = tint === "wine" ? palette.burgundy : tint === "champagne" ? palette.champagne : "#d8a0a4";
+
+  const base = new ExtrudeGeometry(roundedRect(3.2, 2.2, 0.16), {
+    depth: 0.34,
+    bevelEnabled: true,
+    bevelThickness: 0.05,
+    bevelSize: 0.05,
+    bevelSegments: 4,
+    curveSegments: 10,
+  });
+  base.rotateX(-Math.PI / 2);
+  base.translate(0, 0.39, 0);
+  group.add(mesh(base, matte(shellColor)));
+
+  const pans = ["#e9b9ae", "#d79aa0", "#c0798b", "#efd7c4", "#cfa583", "#8f4a5e"];
+  pans.forEach((color, index) => {
+    const pan = new ExtrudeGeometry(roundedRect(0.86, 0.82, 0.06), { depth: 0.06, bevelEnabled: false, curveSegments: 8 });
+    pan.rotateX(-Math.PI / 2);
+    pan.translate(-1.02 + (index % 3) * 1.02, 0.42, -0.52 + Math.floor(index / 3) * 1.04);
+    group.add(mesh(pan, pressedPowder(color)));
+  });
+
+  // The lid pivots at the back edge; its geometry sits forward of the hinge so it closes flush.
+  const lid = new Group();
+  const lidShell = new ExtrudeGeometry(roundedRect(3.2, 2.2, 0.16), { depth: 0.16, bevelEnabled: false, curveSegments: 10 });
+  lidShell.rotateX(-Math.PI / 2);
+  lidShell.translate(0, 0, 1.1);
+  lid.add(mesh(lidShell, matte(shellColor)));
+  const pane = new ExtrudeGeometry(roundedRect(2.92, 1.94, 0.1), { depth: 0.02, bevelEnabled: false, curveSegments: 8 });
+  pane.rotateX(-Math.PI / 2);
+  pane.translate(0, -0.01, 1.1);
+  lid.add(mesh(pane, mirror()));
+  lid.position.set(0, 0.4, -1.1);
+  lid.rotation.x = -2.0;
+  group.add(lid);
+
+  const hinge = new CylinderGeometry(0.06, 0.06, 2.9, 20);
+  hinge.rotateZ(Math.PI / 2);
+  hinge.translate(0, 0.4, -1.1);
+  group.add(mesh(hinge, brushedMetal(palette.champagne)));
+  return group;
+}
+
+/** Makeup brush: a long lacquered handle, a brushed ferrule with a crimp, a tapered bristle dome. */
+function brush(tint: CosmeticTint): Group {
+  const group = new Group();
+  const handle = tint === "champagne" ? palette.champagne : tint === "nude" ? "#8a5a4a" : palette.wine;
+
+  const shaft = smooth([v(0, 0), v(0.1, 0.04), v(0.16, 0.5), v(0.185, 1.9), v(0.17, 3.0), v(0.15, 3.4), v(0, 3.42)], 36);
+  group.add(mesh(lathe(shaft), lacquer(handle)));
+
+  group.add(mesh(lathe(roundedCylinderProfile(0.2, 3.4, 4.35, 0.03)), brushedMetal(palette.roseGold)));
+  const crimp = new TorusGeometry(0.201, 0.016, 8, 48);
+  crimp.rotateX(Math.PI / 2);
+  crimp.translate(0, 3.62, 0);
+  group.add(mesh(crimp, brushedMetal(palette.roseGold)));
+
+  // The head: a flattened dome tapering to a soft point, the way a powder brush sits.
+  const head = smooth([v(0, 4.3), v(0.22, 4.34), v(0.3, 4.7), v(0.29, 5.25), v(0.2, 5.6), v(0.08, 5.74), v(0, 5.76)], 36);
+  const headGeometry = lathe(head);
+  headGeometry.scale(1.35, 1, 0.7);
+  group.add(mesh(headGeometry, bristle("#efd9d2")));
+  return group;
+}
+
+/** Beauty sponge: a teardrop egg with one flat cut face, in flocked foam. */
+function sponge(tint: CosmeticTint): Group {
+  const c = tintColors[tint];
+  const group = new Group();
+
+  const profile = smooth([v(0, 0), v(0.62, 0.06), v(0.82, 0.5), v(0.84, 1.0), v(0.66, 1.5), v(0.36, 1.86), v(0.12, 2.0), v(0, 2.02)], 44);
+  const geometry = lathe(profile);
+  // The flat cut: every vertex past the cut plane is pushed back onto it.
+  const position = geometry.attributes.position!;
+  for (let i = 0; i < position.count; i++) {
+    if (position.getZ(i) > 0.42) position.setZ(i, 0.42);
+  }
+  geometry.computeVertexNormals();
+  group.add(mesh(geometry, flocked(c.body)));
+  return group;
+}
+
+/** Nail polish: a faceted square glass body under a tall slim cap, with lacquer pooled inside. */
+function polish(tint: CosmeticTint): Group {
+  const c = tintColors[tint];
+  const group = new Group();
+
+  const body = new CylinderGeometry(0.62, 0.72, 1.45, 4, 1);
+  body.rotateY(Math.PI / 4);
+  body.translate(0, 0.725, 0);
+  const shell = glass("#fff2f0");
+  group.add(mesh(body, shell.back, 1), mesh(body, shell.front, 3));
+
+  const fill = new CylinderGeometry(0.5, 0.6, 0.98, 4, 1);
+  fill.rotateY(Math.PI / 4);
+  fill.translate(0, 0.52, 0);
+  group.add(mesh(fill, liquid(c.liquid, 0.97), 2));
+
+  group.add(mesh(lathe(roundedCylinderProfile(0.3, 1.45, 1.66, 0.03)), metal(palette.champagne, 0.2)));
+  group.add(mesh(lathe(roundedCylinderProfile(0.26, 1.66, 3.3, 0.05)), gloss(tint === "wine" ? palette.wine : c.ink, 0.14)));
+  return group;
+}
+
+/** Balm pot: a small squat glazed-ceramic jar, closed, with a domed lid and a fine seam. */
+function balm(tint: CosmeticTint): Group {
+  const group = new Group();
+  const shell = tint === "wine" ? palette.burgundy : tint === "rose" ? palette.rose : palette.porcelain;
+
+  group.add(mesh(lathe(roundedCylinderProfile(1.05, 0, 0.72, 0.16)), ceramic(shell)));
+  const seam = new TorusGeometry(1.052, 0.014, 8, 72);
+  seam.rotateX(Math.PI / 2);
+  seam.translate(0, 0.72, 0);
+  group.add(mesh(seam, brushedMetal(palette.champagne)));
+
+  const dome = smooth([v(0, 1.26), v(0.42, 1.24), v(0.78, 1.12), v(1.0, 0.9), v(1.06, 0.78), v(1.06, 0.72), v(0, 0.72)], 40);
+  group.add(mesh(lathe(dome), ceramic(shell)));
+
+  const knob = new SphereGeometry(0.13, 32, 24);
+  knob.translate(0, 1.3, 0);
+  group.add(mesh(knob, metal(palette.roseGold, 0.18)));
+  return group;
+}
+
+/** Highlighter compact, CLOSED: a domed lacquered disc with concentric engraved rims. */
+function highlighter(tint: CosmeticTint): Group {
+  const group = new Group();
+  const shell = tint === "wine" ? palette.burgundy : tint === "champagne" ? palette.champagne : "#dda1a6";
+
+  group.add(mesh(lathe(roundedCylinderProfile(1.5, 0, 0.3, 0.1)), gloss(shell, 0.18)));
+
+  const dome = smooth([v(0, 0.98), v(0.55, 0.94), v(1.05, 0.78), v(1.4, 0.52), v(1.5, 0.36), v(1.5, 0.3), v(0, 0.3)], 44);
+  group.add(mesh(lathe(dome), gloss(shell, 0.14)));
+
+  for (let i = 0; i < 3; i++) {
+    const radius = 0.42 + i * 0.32;
+    const ring = new TorusGeometry(radius, 0.012, 8, 96);
+    ring.rotateX(Math.PI / 2);
+    // Each ring sits on the dome, which falls away towards the rim.
+    ring.translate(0, 0.96 - Math.pow(radius / 1.5, 2) * 0.62, 0);
+    group.add(mesh(ring, metal(palette.roseGold, 0.2)));
+  }
+  return group;
+}
+
+/** 150 ml cleanser: a tall soft-touch matte bottle with a shoulder taper and a disc-top cap. */
+function cleanser(tint: CosmeticTint): Group {
+  const c = tintColors[tint];
+  const group = new Group();
+
+  const body = smooth([v(0, 0), v(0.78, 0.02), v(0.86, 0.22), v(0.86, 2.6), v(0.74, 3.0), v(0.48, 3.22), v(0.46, 3.36), v(0, 3.36)], 44);
+  group.add(mesh(lathe(body), matte(tint === "wine" ? palette.burgundy : c.body)));
+  group.add(mesh(lathe(roundedCylinderProfile(0.54, 3.36, 3.92, 0.1)), gloss(palette.wine, 0.2)));
+
+  // The disc top: a shallow inset lid with a thumb notch.
+  const disc = new CylinderGeometry(0.44, 0.44, 0.1, 48);
+  disc.translate(0, 3.9, 0);
+  group.add(mesh(disc, gloss(palette.wine, 0.14)));
+  const notch = new SphereGeometry(0.14, 24, 16);
+  notch.scale(1, 0.4, 1);
+  notch.translate(0.24, 3.94, 0);
+  group.add(mesh(notch, metal(palette.champagne, 0.24)));
+
+  const label = labelTexture([{ text: "NETTOYANT", size: 40, tracking: 1 }, { text: "150 ml", size: 24, font: "ui" }], { color: c.ink });
+  group.add(band(0.865, 1.5, 0.85, 1.6, label));
+  return group;
+}
+
+/** Loose-powder jar: a wide low satin-glass bowl, a perforated sifter, a veil of suspended pigment. */
+function loosePowderJar(tint: CosmeticTint): Group {
+  const group = new Group();
+  const powderColor = tint === "nude" ? "#e9c3a9" : tint === "champagne" ? "#f0dcc0" : "#f2cfcd";
+
+  const body = [v(0, 0), v(1.3, 0), v(1.38, 0.1), v(1.38, 0.92), v(1.3, 1.02), v(1.16, 1.04), v(1.16, 1.18), v(0, 1.18)];
+  const shell = satinGlass("#faf0ec");
+  group.add(mesh(lathe(body), shell.back, 1), mesh(lathe(body), shell.front, 3));
+
+  const veil = lathe([v(0, 0.1), v(1.2, 0.1), v(1.22, 0.62), v(0, 0.66)]);
+  group.add(mesh(veil, loosePowder(powderColor), 2));
+
+  const sifter = new CylinderGeometry(1.15, 1.15, 0.05, 72);
+  sifter.translate(0, 1.0, 0);
+  group.add(mesh(sifter, ceramic("#fbf3ef")));
+  for (let ring = 1; ring <= 2; ring++) {
+    const holes = ring * 8;
+    for (let i = 0; i < holes; i++) {
+      const angle = (i / holes) * Math.PI * 2;
+      const radius = ring * 0.38;
+      const hole = new CylinderGeometry(0.045, 0.045, 0.055, 10);
+      hole.translate(Math.cos(angle) * radius, 1.002, Math.sin(angle) * radius);
+      group.add(mesh(hole, gloss("#c9a7a2", 0.5)));
+    }
+  }
+
+  // The lid, lifted and tilted — the jar reads as in use, matching the open cream jar.
+  const lid = new Group();
+  lid.add(mesh(lathe(roundedCylinderProfile(1.44, 0, 0.5, 0.12)), brushedMetal(palette.champagne)));
+  lid.position.set(-0.5, 2.1, -0.7);
+  lid.rotation.set(0.7, 0, -0.32);
+  group.add(lid);
+  return group;
+}
+
+/** Closed lipstick case: a seamless two-part capsule with a fine index ring. A quiet silhouette. */
+function lipcase(tint: CosmeticTint): Group {
+  const group = new Group();
+  const shell = tint === "champagne" ? palette.champagne : palette.roseGold;
+
+  group.add(mesh(lathe(roundedCylinderProfile(0.46, 0, 1.5, 0.08)), metal(shell, 0.2)));
+  const seam = new TorusGeometry(0.462, 0.012, 8, 64);
+  seam.rotateX(Math.PI / 2);
+  seam.translate(0, 1.5, 0);
+  group.add(mesh(seam, metal(palette.wine, 0.3)));
+  group.add(mesh(lathe(roundedCylinderProfile(0.46, 1.5, 3.3, 0.1)), metal(shell, 0.2)));
+
+  // One engraved band near the crown — the only ornament.
+  const engrave = new TorusGeometry(0.455, 0.01, 8, 64);
+  engrave.rotateX(Math.PI / 2);
+  engrave.translate(0, 3.0, 0);
+  group.add(mesh(engrave, gloss(tint === "wine" ? palette.wine : palette.burgundy, 0.2)));
+  return group;
+}
+
 const builders: Record<CosmeticKind, (tint: CosmeticTint) => Group> = {
   serum,
   jar,
@@ -452,6 +845,43 @@ const builders: Record<CosmeticKind, (tint: CosmeticTint) => Group> = {
   mascara,
   gloss: lipGloss,
   tube,
+  ampoule,
+  vial,
+  mist,
+  pump,
+  toner,
+  oil: faceOil,
+  palette: eyePalette,
+  brush,
+  sponge,
+  polish,
+  balm,
+  highlighter,
+  cleanser,
+  powder: loosePowderJar,
+  lipcase,
+};
+
+/**
+ * FRAMING — how tightly the camera sits on each package.
+ *
+ * `normalise()` fits every model to the same unit bounding SPHERE, so at the scene's neutral
+ * camera distance EVERY product exactly fills its slot with a small margin. A factor here pushes
+ * the camera BACK, giving a package more air around it — which the wide open forms want, because
+ * an open palette filling its box edge to edge reads as cropped rather than as staged.
+ *
+ * Factors below 1 are deliberately absent and are clamped away in scene.ts. Pulling the camera
+ * inside the neutral distance slices tall packages off at their own scissor rectangle; depth is
+ * expressed by moving the OTHER layers back instead.
+ */
+export const COSMETIC_FRAMING: Partial<Record<CosmeticKind, number>> = {
+  palette: 1.16,
+  compact: 1.12,
+  highlighter: 1.08,
+  jar: 1.1,
+  powder: 1.14,
+  balm: 1.06,
+  sponge: 1.05,
 };
 
 /** Centre on the bounding box and scale to a unit bounding sphere. */

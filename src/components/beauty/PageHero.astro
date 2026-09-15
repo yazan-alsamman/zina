@@ -8,6 +8,11 @@
  * portrait of Zina, and up to two floating products beside it.
  *
  * Without a photograph the copy takes the full width — a typographic opening, not a gap.
+ *
+ * PHASE 12. The two products are now explicitly staged rather than equal: the first is midground
+ * and outranks the page's other slots in the scene's visibility budget, the second is background
+ * atmosphere that only appears where there is room for it. A `mark` may be passed to set a
+ * chapter numeral behind the heading, matching the homepage's section marks.
  */
 import type { Locale } from "../../../content/schema/types";
 import type { PhotographKey } from "../../lib/photography";
@@ -21,15 +26,18 @@ interface Props {
   tone?: "blush" | "champagne" | "powder";
   cosmetics?: { kind: CosmeticKind; tint?: CosmeticTint }[];
   compact?: boolean;
+  /** A short editorial mark set behind the opening — a numeral or a one-word category. */
+  mark?: string;
 }
 
-const { locale, photo, tone = "blush", cosmetics = [], compact = false } = Astro.props;
+const { locale, photo, tone = "blush", cosmetics = [], compact = false, mark } = Astro.props;
 const [first, second] = cosmetics;
 ---
 
 <div class:list={["page-hero", `page-hero--${tone}`, photo && "page-hero--portrait", compact && "page-hero--compact"]}>
   <span class="organic organic--glow page-hero-glow" aria-hidden="true"></span>
   <span class="organic organic--champagne page-hero-glow-2" aria-hidden="true"></span>
+  {mark && <span class="section-mark page-hero-mark" aria-hidden="true">{mark}</span>}
 
   <div class="container page-hero-inner">
     <div class="page-hero-copy enter">
@@ -51,9 +59,30 @@ const [first, second] = cosmetics;
             widths={[320, 480, 640, 820]}
             class="page-hero-image"
           />
-          {first && <FloatingCosmetic kind={first.kind} tint={first.tint} depth={0.8} class="page-hero-cosmetic page-hero-cosmetic--a" />}
+          {first && (
+            <FloatingCosmetic
+              kind={first.kind}
+              tint={first.tint}
+              layer="mid"
+              depth={0.8}
+              spin={0.7}
+              approach={0.5}
+              priority={1.4}
+              class="page-hero-cosmetic page-hero-cosmetic--a"
+            />
+          )}
           {second && (
-            <FloatingCosmetic kind={second.kind} tint={second.tint} depth={0.4} yaw={0.5} desktopOnly class="page-hero-cosmetic page-hero-cosmetic--b" />
+            <FloatingCosmetic
+              kind={second.kind}
+              tint={second.tint}
+              layer="back"
+              depth={0.4}
+              yaw={0.5}
+              spin={0.3}
+              priority={-0.3}
+              wideOnly
+              class="page-hero-cosmetic page-hero-cosmetic--b"
+            />
           )}
         </div>
       )
@@ -61,7 +90,17 @@ const [first, second] = cosmetics;
 
     {
       !photo && first && (
-        <FloatingCosmetic kind={first.kind} tint={first.tint} depth={0.6} desktopOnly class="page-hero-cosmetic page-hero-cosmetic--solo" />
+        <FloatingCosmetic
+          kind={first.kind}
+          tint={first.tint}
+          layer="mid"
+          depth={0.6}
+          spin={0.7}
+          approach={0.5}
+          priority={1}
+          desktopOnly
+          class="page-hero-cosmetic page-hero-cosmetic--solo"
+        />
       )
     }
   </div>
@@ -147,15 +186,21 @@ const [first, second] = cosmetics;
   }
 
   .page-hero-cosmetic--a {
-    inline-size: 42%;
-    inset-block-end: -8%;
-    inset-inline-start: -22%;
+    inline-size: var(--cosmetic-md);
+    inset-block-end: -6%;
+    inset-inline-start: -16%;
   }
 
   .page-hero-cosmetic--b {
-    inline-size: 28%;
-    inset-block-start: -2%;
-    inset-inline-end: -6%;
+    inline-size: var(--cosmetic-xs);
+    inset-block-start: 4%;
+    inset-inline-end: 1%;
+  }
+
+  .page-hero-mark {
+    inset-block-start: -0.1em;
+    inset-inline-end: 1%;
+    opacity: 0.8;
   }
 
   .page-hero-cosmetic--solo {

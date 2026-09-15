@@ -117,7 +117,7 @@ const bio = person().locales[locale]?.bios?.editorialByline ?? "";
   schemas={schemas}
   switcherHref={path.method(locale === "en" ? "ar" : "en")}
 >
-  <PageHero locale={locale} photo="studioSeated" tone="powder" cosmetics={[{ kind: "foundation", tint: "nude" }, { kind: "serum", tint: "blush" }]}>
+  <PageHero locale={locale} mark="02" photo="studioSeated" tone="powder" cosmetics={[{ kind: "pump", tint: "blush" }, { kind: "sponge", tint: "rose" }]}>
     <Breadcrumbs locale={locale} crumbs={crumbs} />
 
     <h1 class="display-lg title">{content.name}</h1>
@@ -422,7 +422,11 @@ const bio = person().locales[locale]?.bios?.editorialByline ?? "";
     margin-block-start: var(--space-2);
   }
 
+  /* A list of destinations, so each one is a 26px target rather than a line of prose. */
   .review-links a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 26px;
     font-size: calc(var(--type-body-sm) * var(--type-arabic-size-factor));
   }
 
