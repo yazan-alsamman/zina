@@ -21,8 +21,8 @@ import {
   BoxGeometry,
   CatmullRomCurve3,
   CylinderGeometry,
-  DoubleSide,
   ExtrudeGeometry,
+  FrontSide,
   Group,
   LatheGeometry,
   Mesh,
@@ -166,19 +166,27 @@ function slab(width: number, height: number, depth: number, radius: number, beve
   return geometry;
 }
 
-/** A wrap-around printed band on a cylindrical body, facing the camera. */
+/**
+ * A wrap-around printed band on a cylindrical body, facing the camera.
+ *
+ * FRONT FACES ONLY. This was DoubleSide, which meant that once a package turned past ninety
+ * degrees the label was drawn again from behind — and a label seen from behind is MIRRORED TYPE.
+ * On the film page, where one product turns slowly through half a rotation in close-up, "SÉRUM"
+ * spent part of the shot reading backwards. Printing is opaque: from the back of a bottle you see
+ * the bottle, not the label reversed.
+ */
 function band(radius: number, y: number, height: number, arc: number, texture: ReturnType<typeof labelTexture>): Mesh {
   const geometry = new CylinderGeometry(radius, radius, height, 64, 1, true, -arc / 2, arc);
   geometry.translate(0, y, 0);
-  const material = new MeshBasicMaterial({ map: texture, transparent: true, depthWrite: false, side: DoubleSide });
+  const material = new MeshBasicMaterial({ map: texture, transparent: true, depthWrite: false, side: FrontSide });
   return mesh(geometry, material, 4);
 }
 
-/** A flat printed label for slab-shaped bottles. */
+/** A flat printed label for slab-shaped bottles. Front faces only, for the same reason as `band`. */
 function plate(width: number, height: number, z: number, y: number, texture: ReturnType<typeof labelTexture>): Mesh {
   const geometry = new BoxGeometry(width, height, 0.001);
   geometry.translate(0, y, z);
-  const material = new MeshBasicMaterial({ map: texture, transparent: true, depthWrite: false });
+  const material = new MeshBasicMaterial({ map: texture, transparent: true, depthWrite: false, side: FrontSide });
   return mesh(geometry, material, 4);
 }
 
@@ -262,8 +270,12 @@ function jar(tint: CosmeticTint): Group {
   ring.rotateX(Math.PI / 2);
   ring.translate(0, 0.18, 0);
   lid.add(mesh(ring, metal(palette.roseGold, 0.18)));
-  lid.position.set(0.55, 2.55, -0.9);
-  lid.rotation.set(-0.75, 0, 0.35);
+  /* PHASE 13: the lid used to sit high and far back (0.55, 2.55, -0.9), which at the sizes the
+     site actually renders read as a separate disc hovering above an unrelated pot. Brought in
+     and down so its silhouette OVERLAPS the jar — that overlap is the only thing that says
+     "this lid belongs to this jar" once the object is 150px wide. */
+  lid.position.set(0.78, 1.92, -0.5);
+  lid.rotation.set(-0.62, 0, 0.42);
   group.add(lid);
 
   const label = labelTexture(
@@ -363,7 +375,13 @@ function compact(tint: CosmeticTint): Group {
   glassDisc.translate(0, -0.005, 1.6);
   lid.add(mesh(glassDisc, mirror()));
   lid.position.set(0, 0.42, -1.6);
-  lid.rotation.x = -1.95;
+  /* Was -1.95 rad — so far back that base and lid read as two unrelated discs with a gap, and the
+     hinge was invisible. Past upright rather than short of it, like a laptop screen: the lid still
+     leans back, but its lower edge stays against the base so the two read as one hinged object.
+     (Short of upright, at -1.32, the whole thing became a tall rounded mass that the silhouette
+     test could no longer tell apart from the beauty sponge — which is a fair description of how it
+     looked.) */
+  lid.rotation.x = -1.78;
   group.add(lid);
 
   const hinge = new CylinderGeometry(0.08, 0.08, 0.8, 24);
@@ -585,7 +603,10 @@ function toner(tint: CosmeticTint): Group {
   const group = new Group();
 
   group.add(glassShell(slab(1.95, 2.45, 1.95, 0.18, 0.09), "#f6efe9", true));
-  group.add(mesh(slab(1.56, 1.6, 1.56, 0.12, 0.05), liquid(c.liquid, 0.62), 2));
+  /* The fill leaves a clear margin on every side and is barely opaque. On a near-cubic bottle a
+     fill that reaches the walls stops reading as liquid and starts reading as a solid block
+     someone put in a box — the widest bottle in the set is where that goes wrong first. */
+  group.add(mesh(slab(1.4, 1.42, 1.4, 0.2, 0.05), liquid(c.liquid, 0.42), 2));
   group.add(mesh(lathe(roundedCylinderProfile(0.6, 2.52, 2.68, 0.04)), brushedMetal(palette.champagne)));
   group.add(mesh(lathe(roundedCylinderProfile(1.06, 2.68, 3.12, 0.1)), ceramic(palette.clay)));
 
@@ -602,8 +623,10 @@ function faceOil(tint: CosmeticTint): Group {
   const body = smooth([v(0, 0), v(0.9, 0.04), v(1.0, 0.35), v(0.98, 0.9), v(0.72, 1.18), v(0.34, 1.3), v(0.32, 1.5), v(0, 1.5)], 44);
   group.add(glassShell(lathe(body), "#fdf2ec"));
   group.add(mesh(lathe(smooth([v(0, 0.08), v(0.86, 0.12), v(0.92, 0.4), v(0.88, 0.86), v(0.6, 1.06), v(0, 1.1)], 28)), liquid(c.liquid, 0.94), 2));
-  group.add(mesh(lathe(roundedCylinderProfile(0.36, 1.5, 1.72, 0.03)), metal(palette.roseGold, 0.18)));
-  group.add(mesh(lathe(roundedCylinderProfile(0.24, 1.72, 3.5, 0.06)), lacquer(palette.wine)));
+  // PHASE 13: the cap was 1.78 tall on a 0.24 radius over a 1.5-tall body — a matchstick in a
+  // macaron. Shorter and broader reads as the wand cap of a face-oil bottle.
+  group.add(mesh(lathe(roundedCylinderProfile(0.38, 1.5, 1.7, 0.03)), metal(palette.roseGold, 0.18)));
+  group.add(mesh(lathe(roundedCylinderProfile(0.32, 1.7, 2.92, 0.08)), lacquer(palette.wine)));
 
   const label = labelTexture([{ text: "HUILE", size: 54, tracking: 1 }, { text: "30 ml", size: 24, font: "ui" }], { color: c.ink });
   group.add(band(1.003, 0.6, 0.5, 1.6, label));
@@ -700,16 +723,15 @@ function polish(tint: CosmeticTint): Group {
   const c = tintColors[tint];
   const group = new Group();
 
-  const body = new CylinderGeometry(0.62, 0.72, 1.45, 4, 1);
-  body.rotateY(Math.PI / 4);
-  body.translate(0, 0.725, 0);
-  const shell = glass("#fff2f0");
-  group.add(mesh(body, shell.back, 1), mesh(body, shell.front, 3));
-
-  const fill = new CylinderGeometry(0.5, 0.6, 0.98, 4, 1);
-  fill.rotateY(Math.PI / 4);
-  fill.translate(0, 0.52, 0);
-  group.add(mesh(fill, liquid(c.liquid, 0.97), 2));
+  /*
+   * PHASE 13. This was a four-radial-segment CylinderGeometry — a square prism whose flat facets
+   * and hard normals rendered as crumpled foil rather than as faceted glass, and whose walls were
+   * so thin the bottle read as opaque. It is now the same bevelled slab the perfume and foundation
+   * bottles use, kept square in plan (a small corner radius) so the faceted character survives
+   * while the bevels give the glass an edge to catch the light on.
+   */
+  group.add(glassShell(slab(1.3, 1.45, 1.3, 0.12, 0.09), "#fff2f0"));
+  group.add(mesh(slab(1.0, 0.92, 1.0, 0.09, 0.05), liquid(c.liquid, 0.95), 2));
 
   group.add(mesh(lathe(roundedCylinderProfile(0.3, 1.45, 1.66, 0.03)), metal(palette.champagne, 0.2)));
   group.add(mesh(lathe(roundedCylinderProfile(0.26, 1.66, 3.3, 0.05)), gloss(tint === "wine" ? palette.wine : c.ink, 0.14)));
@@ -741,17 +763,23 @@ function highlighter(tint: CosmeticTint): Group {
   const group = new Group();
   const shell = tint === "wine" ? palette.burgundy : tint === "champagne" ? palette.champagne : "#dda1a6";
 
-  group.add(mesh(lathe(roundedCylinderProfile(1.5, 0, 0.3, 0.1)), gloss(shell, 0.18)));
+  /*
+   * PHASE 13. The shell was 0.3 deep under a 0.68-tall dome on a 1.5 radius — so flat that it
+   * rendered as a bun, and three proud rings across that flatness read as stripes rather than as
+   * engraving. The case is now deeper and the dome taller (a closed compact is a puck, not a
+   * disc), and there are two finer rings sitting nearer the crown where an engraved mark goes.
+   */
+  group.add(mesh(lathe(roundedCylinderProfile(1.15, 0, 0.66, 0.12)), gloss(shell, 0.18)));
 
-  const dome = smooth([v(0, 0.98), v(0.55, 0.94), v(1.05, 0.78), v(1.4, 0.52), v(1.5, 0.36), v(1.5, 0.3), v(0, 0.3)], 44);
+  const dome = smooth([v(0, 1.56), v(0.42, 1.5), v(0.8, 1.3), v(1.06, 1.0), v(1.15, 0.76), v(1.15, 0.66), v(0, 0.66)], 44);
   group.add(mesh(lathe(dome), gloss(shell, 0.14)));
 
-  for (let i = 0; i < 3; i++) {
-    const radius = 0.42 + i * 0.32;
-    const ring = new TorusGeometry(radius, 0.012, 8, 96);
+  for (let i = 0; i < 2; i++) {
+    const radius = 0.3 + i * 0.26;
+    const ring = new TorusGeometry(radius, 0.008, 8, 96);
     ring.rotateX(Math.PI / 2);
-    // Each ring sits on the dome, which falls away towards the rim.
-    ring.translate(0, 0.96 - Math.pow(radius / 1.5, 2) * 0.62, 0);
+    // Each ring sits on the dome's surface, which falls away towards the rim.
+    ring.translate(0, 1.54 - Math.pow(radius / 1.15, 2) * 0.78, 0);
     group.add(mesh(ring, metal(palette.roseGold, 0.2)));
   }
   return group;
@@ -809,8 +837,8 @@ function loosePowderJar(tint: CosmeticTint): Group {
   // The lid, lifted and tilted — the jar reads as in use, matching the open cream jar.
   const lid = new Group();
   lid.add(mesh(lathe(roundedCylinderProfile(1.44, 0, 0.5, 0.12)), brushedMetal(palette.champagne)));
-  lid.position.set(-0.5, 2.1, -0.7);
-  lid.rotation.set(0.7, 0, -0.32);
+  lid.position.set(-0.68, 1.5, -0.38);
+  lid.rotation.set(0.55, 0, -0.4);
   group.add(lid);
   return group;
 }

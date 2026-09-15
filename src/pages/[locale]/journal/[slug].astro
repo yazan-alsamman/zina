@@ -223,7 +223,7 @@ const id = { toc: "contents", references: "referenced-records", related: "relate
         showToc && (
           <nav class="toc" aria-labelledby={id.toc}>
             <h2 class="label" id={id.toc}>{t(locale, "contents")}</h2>
-            <ol class="toc-list">
+            <ol class="toc-list link-list">
               {headings.map((heading) => (
                 <li>
                   <a href={`#${heading.slug}`}>{heading.text}</a>

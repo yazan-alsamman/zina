@@ -28,6 +28,12 @@ export const path = {
   home: (locale: Locale) => localeHome(locale),
   about: (locale: Locale) => withSlashes([locale, "about"]),
   method: (locale: Locale) => withSlashes([locale, "method"]),
+  /**
+   * The film. A scroll-driven cinematic presentation of the same six-stage method the /method/
+   * page documents in prose — the experience, not a second copy of the record. The slug is
+   * English in both locales, like every other structural segment on this site.
+   */
+  film: (locale: Locale) => withSlashes([locale, "film"]),
   methodStage: (locale: Locale, stageKey: string) =>
     `${withSlashes([locale, "method"])}#${stageKey}`,
   reviewsIndex: (locale: Locale) => withSlashes([locale, "reviews"]),
@@ -113,6 +119,7 @@ export const IMPLEMENTED_ROUTES = new Set<string>([
   "reviewsByCategory",
   "reviewsByBrand",
   "method",
+  "film",
   "journalIndex",
   "journal",
   "journalByCategory",

@@ -260,7 +260,7 @@ const id = { records: "documented-records", related: "related-reading", terms: "
       (articles.length > 0 || projects.length > 0) && (
         <section class="related" aria-labelledby={id.related}>
           <h2 class="section-heading" id={id.related}>{t(locale, "brandRelatedHeading")}</h2>
-          <ul class="related-list plain">
+          <ul class="related-list plain link-list">
             {articles.map((article) => (
               <li>
                 <a href={path.journal(locale, article.locales[locale]!.slug!)}>

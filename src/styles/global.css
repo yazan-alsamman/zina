@@ -383,6 +383,32 @@ html[lang="ar"] .btn {
   transform: translateY(-1px);
 }
 
+/*
+ * LINK LIST — a list whose items ARE destinations: a table of contents, a set of related
+ * articles, the onward links on a 404.
+ *
+ * ============================================================================
+ * PHASE 13 — WHY THIS IS A PRIMITIVE AND NOT FOUR COPIES OF A RULE
+ * ============================================================================
+ * A bare <a> in an <li> is as tall as its line box — 20 to 23px. WCAG 2.5.8 asks for 24x24 CSS
+ * pixels, and an inline link in a sentence is exempt, but a LIST OF DESTINATIONS is not a
+ * sentence: it is a menu, and on a phone it is a menu you hit with a thumb.
+ *
+ * Phase 12 fixed this on the footer, the breadcrumbs, the language switcher and the method page
+ * by writing the same three declarations into four component stylesheets. The Phase 13 sweep,
+ * which covered more routes, promptly found four MORE places with the identical defect — the
+ * journal table of contents, work and brand related links, and the 404's onward list. Copying the
+ * rule a fifth to eighth time would have guaranteed a ninth. It is one class now.
+ *
+ * The height is padding, so the baseline the list sits on does not move.
+ */
+.link-list a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 26px;
+  padding-block: 0.15rem;
+}
+
 /* A quiet text link with a drawn underline — for tertiary onward links. */
 .link-quiet {
   display: inline-flex;

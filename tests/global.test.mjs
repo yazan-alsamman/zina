@@ -346,11 +346,45 @@ describe("accessibility invariants", () => {
     }
   });
 
-  test("every nav landmark is uniquely named", () => {
+  test("every nav landmark is uniquely named, by label or by labelledby", () => {
+    /*
+     * PHASE 13. This test used to look for `aria-label` only, in two ways that both happened to
+     * be wrong in the same direction:
+     *
+     *   - the "unnamed" check was `/<nav(?![^>]*aria-label)/`, and "aria-label" is a PREFIX of
+     *     "aria-labelledby" — so a nav named by `aria-labelledby` passed by accident rather than
+     *     because the test understood it, and so would `aria-labelfoo`.
+     *   - the uniqueness check collected `aria-label` values only, so a nav named by
+     *     `aria-labelledby` was invisible to it: two navs could share a computed name and the
+     *     test would say nothing.
+     *
+     * Both mechanisms are now recognised explicitly, and `aria-labelledby` is RESOLVED to the
+     * text of the element it points at, so uniqueness is checked against the name a screen reader
+     * actually announces. The journal article's table of contents is named this way.
+     */
+    const textOfId = (html, id) => {
+      const opening = new RegExp(`<([a-z0-9]+)[^>]*\bid="${id}"[^>]*>`, "i").exec(html);
+      if (!opening) return null;
+      const rest = html.slice(opening.index + opening[0].length);
+      const close = rest.indexOf(`</${opening[1]}`);
+      return close === -1 ? null : rest.slice(0, close).replace(/<[^>]+>/g, "").trim();
+    };
+
     for (const page of pages) {
-      const names = [...page.html.matchAll(/<nav[^>]*aria-label="([^"]+)"/g)].map((m) => m[1]);
-      const unnamed = (page.html.match(/<nav(?![^>]*aria-label)/g) ?? []).length;
-      assert.equal(unnamed, 0, `${page.route} has an unnamed nav landmark`);
+      const names = [];
+      for (const tag of page.html.match(/<nav[^>]*>/g) ?? []) {
+        const label = /\saria-label="([^"]+)"/.exec(tag)?.[1];
+        const labelledby = /\saria-labelledby="([^"]+)"/.exec(tag)?.[1];
+        assert.ok(label || labelledby, `${page.route} has an unnamed nav landmark: ${tag}`);
+        if (labelledby) {
+          const resolved = textOfId(page.html, labelledby);
+          assert.ok(resolved, `${page.route}: nav aria-labelledby="${labelledby}" points at nothing`);
+          assert.ok(resolved.length > 0, `${page.route}: nav aria-labelledby="${labelledby}" resolves to empty text`);
+          names.push(resolved);
+        } else {
+          names.push(label);
+        }
+      }
       assert.equal(new Set(names).size, names.length, `${page.route} has duplicate nav names: ${names}`);
     }
   });

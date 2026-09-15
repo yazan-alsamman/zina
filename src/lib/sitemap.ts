@@ -279,6 +279,11 @@ export function discoverableUrls(indexableBuild: boolean = IS_INDEXABLE_BUILD): 
     ...staticFamily("home", path.home, indexableBuild),
     ...staticFamily("about", path.about, indexableBuild, (l) => person().locales[l]?.seo?.noindex),
     ...staticFamily("method", path.method, indexableBuild, (l) => method().locales[l]?.seo?.noindex),
+    /* The film. Its own surface, its own canonical and its own hreflang pair — a presentation of
+       the method rather than a duplicate of it, so it belongs in the index in its own right.
+       site.json declares no priority for it, and routeMeta simply omits what is not declared
+       rather than inventing a number. */
+    ...staticFamily("film", path.film, indexableBuild),
     ...staticFamily("reviews.index", path.reviewsIndex, indexableBuild),
     ...staticFamily("brands.index", path.brandsIndex, indexableBuild),
     ...staticFamily("work.index", path.workIndex, indexableBuild),

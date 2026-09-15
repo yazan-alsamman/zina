@@ -7,7 +7,14 @@
  * locale but not this one.
  *
  * TONE: no apology, no illustration, no humour, no large "404". State the fact and offer the
- * nearest real thing.
+ * nearest real thing. That refusal is unchanged.
+ *
+ * PHASE 13: it now opens on the same PageHero every other inner page opens on. The tone rules
+ * above are about what the page SAYS; this is about the ground it says it on. Before this, the
+ * 404 was the only page on the site that rendered on flat ivory with no tonal light — every
+ * other surface has an art-directed opening, and an error page that visibly drops out of the
+ * design system tells a visitor the site is broken rather than that a link is. No illustration
+ * was added, no "404" was set large, and the copy is untouched.
  *
  * IT DOES NOT OFFER THE OTHER LOCALE'S VERSION of a missing page (decision D3-7). That would
  * reintroduce the "the real site is English, Arabic is a subset" framing the multilingual
@@ -22,6 +29,7 @@ import { absoluteUrl, localeHome, path } from "../../lib/routing";
 import { templatedMeta } from "../../lib/seo";
 import { t } from "../../lib/ui-strings";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHero from "../../components/beauty/PageHero.astro";
 
 export const getStaticPaths = (() =>
   LOCALES.map((locale) => ({ params: { locale } }))) satisfies GetStaticPaths;
@@ -38,15 +46,17 @@ const meta = templatedMeta(t(locale, "notFoundTitle"), t(locale, "notFoundBody")
 ---
 
 <BaseLayout locale={locale} meta={meta} switcherHref={localeHome(locale === "en" ? "ar" : "en")}>
-  <div class="container not-found">
+  <PageHero locale={locale} compact tone="champagne" cosmetics={[{ kind: "vial", tint: "champagne" }]}>
     <h1 class="display-md">{t(locale, "notFoundTitle")}</h1>
     <p class="body">{t(locale, "notFoundBody")}</p>
+  </PageHero>
 
+  <div class="container not-found">
     {
       recent.length > 0 && (
         <section class="recent">
           <h2 class="label">{t(locale, "recentReviews")}</h2>
-          <ul class="plain items">
+          <ul class="plain items link-list">
             {recent.map((review) => (
               <li>
                 <a href={path.review(locale, review.locales[locale]!.slug!)}>
@@ -66,18 +76,26 @@ const meta = templatedMeta(t(locale, "notFoundTitle"), t(locale, "notFoundBody")
 </BaseLayout>
 
 <style>
+  /* The measure constrains the CONTENT, not the container: `.container` centres whatever it is
+     given, so a max-width here pushed the whole block into the middle of the page while the hero
+     copy above it started at the page edge — two different left margins on one screen. */
   .not-found {
-    padding-block: var(--space-10);
+    padding-block: var(--space-8) var(--space-10);
+  }
+
+  .recent,
+  .all {
     max-width: var(--type-measure-editorial);
   }
 
   .body {
-    margin-block-start: var(--space-2);
+    margin-block-start: var(--space-3);
+    max-inline-size: var(--type-measure-narrow);
     color: var(--color-text-secondary);
   }
 
   .recent {
-    margin-block-start: var(--space-8);
+    margin-block-start: 0;
     padding-block-start: var(--space-3);
     border-block-start: var(--border-rule-hairline);
   }

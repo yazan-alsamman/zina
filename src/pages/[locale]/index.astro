@@ -111,7 +111,16 @@ const name = personRecord.name[locale === "ar" ? "arabic" : "latin"];
 const expertise = personLocale.expertise ?? [];
 
 const selfPath = path.home(locale);
-const meta = templatedMeta(personLocale.professionalTitle, personLocale.bios.short, {
+/*
+ * THE META DESCRIPTION IS `homepageIntro`, NOT `bios.short`.
+ *
+ * `bios.short` is 199 characters in English and 165 in Arabic. A search result shows roughly 155
+ * before it truncates, so the homepage — the most important page on the site — was publishing a
+ * sentence that got cut mid-clause. `homepageIntro` (103 / 72) is the same voice, is the sentence
+ * already set under the hero headline, and fits whole. The longer bio still carries the Person
+ * schema's `description`, where there is no length to fit.
+ */
+const meta = templatedMeta(personLocale.professionalTitle, personLocale.bios.homepageIntro, {
   canonical: absoluteUrl(selfPath),
   robots: robotsContent(IS_INDEXABLE_BUILD),
   locale,
@@ -292,7 +301,7 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
             priority={2.6}
             path="0.82,0 0.06,0.32 0.66,0.62 0.12,1"
             size={0.4}
-            desktopOnly
+            wideOnly
             class="story-journey"
           />
           <div class="story-visual">
@@ -460,9 +469,13 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
         {/* The boundary travels with the method, everywhere it appears. */}
         <p class="boundary-line reveal">{methodLocale.boundaryStatement}</p>
 
-        <p class="method-cta reveal">
+        <div class="method-cta reveal">
           <BeautyButton href={path.method(locale)} variant="outline">{methodLocale.tagline}</BeautyButton>
-        </p>
+          {/* The film presents these same six stages. It is offered here, next to them, rather
+              than in the navigation: it is an experience to be entered deliberately, not a
+              destination to be browsed past. */}
+          <BeautyButton href={path.film(locale)} variant="quiet">{t(locale, "filmEnter")}</BeautyButton>
+        </div>
       </div>
     </div>
   </section>
@@ -974,6 +987,14 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
     inset-inline-end: -8%;
   }
 
+  /*
+   * PHASE 13. This caption used to sit at the image's TOP-LEFT — which is exactly the corridor the
+   * travelling product runs down from tablet width up, and the choreography audit measured the
+   * product covering up to 68% of it mid-scroll. Decoration yields to content: from 768 the
+   * caption moves to the image's lower-right, where nothing else lives (the fixed phone-only
+   * product slot is hidden at that width), and the corridor is left clear. Below 768 there is no
+   * rail, so the caption keeps its original position.
+   */
   .story-chip {
     position: absolute;
     z-index: 3;
@@ -1275,6 +1296,10 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
   }
 
   .method-cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3) var(--space-4);
     margin-block-start: var(--space-4);
   }
 
@@ -1512,7 +1537,10 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
   .story-journey {
     display: none;
     inset-block: var(--space-6);
-    inset-inline-start: -7%;
+    /* -3%, not -7%: at its furthest out the product should sit IN the page margin, not half off
+       the screen. A product cropped by the viewport edge reads as an accident rather than as a
+       composition, which is the one thing the whole choreography system exists to avoid. */
+    inset-inline-start: -3%;
     inline-size: 30%;
     z-index: 3;
   }
@@ -1616,15 +1644,6 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
       max-inline-size: 11ch;
     }
 
-    /* The travelling product appears at tablet width, where there is margin for it to cross —
-       and the fixed phone slot stands down, so the section never shows two of the same object. */
-    .story-journey {
-      display: block;
-    }
-
-    .story-cosmetic {
-      display: none;
-    }
   }
 
   /* ================================================================ 1024+ */
@@ -1693,6 +1712,31 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
     .story-visual-sticky {
       position: sticky;
       inset-block-start: calc(var(--layout-header-height) + var(--space-6));
+    }
+
+    /*
+     * THE TRAVELLING PRODUCT LIVES HERE, NOT AT 768.
+     *
+     * Phase 12 switched the rail on at tablet width, but the story section only becomes TWO
+     * COLUMNS at 1024 — between 768 and 1023 it is a single stack, so a rail positioned over "the
+     * visual column" was in fact running down the prose, and the choreography audit caught it
+     * covering a heading. A corridor needs a column of its own to be a corridor. Below 1024 the
+     * phone composition applies instead: one fixed product tucked against the frame.
+     */
+    .story-journey {
+      display: block;
+    }
+
+    .story-cosmetic {
+      display: none;
+    }
+
+    /* Out of the corridor the travelling product runs down. */
+    .story-chip {
+      inset-block-start: auto;
+      inset-block-end: 6%;
+      inset-inline-start: auto;
+      inset-inline-end: -5%;
     }
 
     .method-well {

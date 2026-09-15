@@ -339,10 +339,22 @@ describe("checklist 20-22 — canonical/hreflang consistency, dead links, full r
     assert.equal(dead, 0);
   });
 
-  test("22. item counts match: 85 routes, sitemap/RSS mechanism still produces the known corpus totals", () => {
-    assert.equal(pages.length, 85);
+  test("22. item counts match: 87 routes, sitemap/RSS mechanism still produces the known corpus totals", () => {
+    /*
+     * A CORPUS TRIPWIRE, not a fact about the design. It exists so that a content or routing edit
+     * which silently adds or drops pages has to be acknowledged here rather than slipping through.
+     *
+     * It fired as designed when /{locale}/film/ was added: 85 -> 87 pages and 56 -> 58 sitemap
+     * URLs, which is exactly two locales of one new route family, and the numbers were re-derived
+     * rather than relaxed. The assertion is unchanged in kind and in strictness.
+     */
+    assert.equal(pages.length, 87);
     const forced = discoverableUrls(true);
-    assert.equal(forced.length, 56, "sitemap URL count changed — domain/content edits altered the corpus shape");
+    assert.equal(forced.length, 58, "sitemap URL count changed — domain/content edits altered the corpus shape");
+    assert.ok(
+      forced.some((url) => url.loc.endsWith("/en/film/")) && forced.some((url) => url.loc.endsWith("/ar/film/")),
+      "the film is missing from the sitemap in one or both locales"
+    );
     assert.equal(journalFeed("en", true).items.length, 5);
     assert.equal(journalFeed("ar", true).items.length, 5);
   });

@@ -1,0 +1,329 @@
+---
+/**
+ * THE FILM STAGE — a storyboard that a renderer can lift into a film.
+ *
+ * ============================================================================
+ * THE DOM IS THE PAGE, NOT A FALLBACK
+ * ============================================================================
+ * What this component emits is a complete editorial piece: seven full-height frames, five of
+ * Zina's photographs, one line of type each. With no JavaScript, no WebGL, Save-Data on or
+ * reduced motion requested, that is what a reader gets, and it is finished work — not a
+ * placeholder, not an apology, not an empty box where a canvas should have been.
+ *
+ * When the conditions allow, `src/scripts/cinema/stage.ts` reads this same markup and renders it
+ * as a scroll-driven film: the photographs become lit planes in one 3D scene, and the captions —
+ * THE SAME DOM NODES — move to a fixed overlay and cross-dissolve. Nothing is duplicated, so
+ * there is exactly one copy of every sentence for a search engine and a screen reader, and the
+ * film costs no image request the storyboard has not already made.
+ *
+ * ============================================================================
+ * THE CONTRACT WITH THE RENDERER
+ * ============================================================================
+ *   [data-cinema]          the track. Its scroll length is the film's running time.
+ *   [data-cinema-stage]    the sticky viewport the canvas is appended into.
+ *   [data-cinema-scene]    one per beat, in order. Its .film-copy becomes a caption.
+ *   [data-cinema-frame]    the photographs, in order. Their index is what timeline.ts addresses.
+ *
+ * The product is named on the track rather than hard-coded in the renderer, so the film can be
+ * re-cast from the page.
+ */
+import type { Locale } from "../../../content/schema/types";
+import type { PhotographKey } from "../../lib/photography";
+import type { CosmeticKind, CosmeticTint } from "../../scripts/cosmetics/models";
+import EditorialImage from "../beauty/EditorialImage.astro";
+
+export interface Beat {
+  /** Matches the `key` in src/scripts/cinema/timeline.ts, for readability at both ends. */
+  key: string;
+  /** The small tracked line above the caption — a real stage of the method, or a chapter mark. */
+  label: string;
+  /** One line. The film's typography is deliberately almost nothing. */
+  line: string;
+  /** Present only on the beats that introduce a new photograph. */
+  photo?: PhotographKey;
+  /** Emphasis: the title card and the closing frame are set larger than the rest. */
+  scale?: "normal" | "large";
+  /** The title card carries the page's h1 — the film's own typography IS the document outline. */
+  heading?: boolean;
+}
+
+interface Props {
+  locale: Locale;
+  beats: Beat[];
+  product: CosmeticKind;
+  tint: CosmeticTint;
+  /** Announced to assistive technology in place of the decorative canvas. */
+  label: string;
+}
+
+const { locale, beats, product, tint, label } = Astro.props;
+
+/** The first photograph is the page's LCP; every other one loads lazily and is opted in by the
+    renderer only once the film is actually starting. */
+let seen = 0;
+---
+
+<div
+  class="film"
+  data-cinema
+  data-cinema-product={product}
+  data-cinema-tint={tint}
+  aria-label={label}
+>
+  {/* The canvas is appended here. Zero-height until the film is live, so the storyboard's own
+      layout is untouched when it is not. */}
+  <div class="film-stage" data-cinema-stage aria-hidden="true"></div>
+
+  <div class="film-reel">
+    {
+      beats.map((beat) => {
+        const frame = beat.photo ? seen++ : -1;
+        return (
+          <section class="film-scene" data-cinema-scene data-beat={beat.key} aria-label={beat.label}>
+            {beat.photo && (
+              <div class="film-frame" data-cinema-frame data-frame={frame}>
+                <EditorialImage
+                  photo={beat.photo}
+                  locale={locale}
+                  mask="none"
+                  tone="none"
+                  ratio="3 / 4"
+                  priority={frame === 0}
+                  sizes="100vw"
+                  widths={[640, 960, 1280, 1600, 2000]}
+                  class="film-photo"
+                />
+              </div>
+            )}
+
+            <div class:list={["film-copy", beat.scale === "large" && "film-copy--large"]}>
+              <p class="film-label">{beat.label}</p>
+              {beat.heading ? <h1 class="film-line">{beat.line}</h1> : <p class="film-line">{beat.line}</p>}
+            </div>
+          </section>
+        );
+      })
+    }
+  </div>
+</div>
+
+<style>
+  /* ================================================================ the track */
+
+  .film {
+    position: relative;
+    background: var(--palette-wine);
+  }
+
+  /*
+   * The stage sticks for the whole length of the track, and the reel is pulled up over it, so the
+   * canvas sits behind the storyboard rather than beside it. Height is zero until the film is
+   * live: without a canvas in it, the stage must not occupy a screen of nothing.
+   */
+  .film-stage {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 0;
+    block-size: 0;
+    overflow: hidden;
+  }
+
+  .film-stage :global(canvas) {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+
+  /* ================================================================ the storyboard */
+
+  .film-scene {
+    position: relative;
+    display: grid;
+    align-items: end;
+    min-block-size: 100svh;
+    overflow: clip;
+  }
+
+  .film-frame {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .film-frame :global(.film-photo) {
+    inline-size: 100%;
+    block-size: 100%;
+    aspect-ratio: auto;
+  }
+
+  /* The photograph sits in the dark rather than on it: a long gradient from the wine ground into
+     the frame on all four sides, so no storyboard image ever shows a hard edge either. */
+  .film-frame::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgb(46 17 25 / 82%) 0%, rgb(46 17 25 / 0%) 34%, rgb(46 17 25 / 0%) 52%, rgb(46 17 25 / 92%) 100%),
+      linear-gradient(90deg, rgb(46 17 25 / 70%) 0%, rgb(46 17 25 / 0%) 28%, rgb(46 17 25 / 0%) 72%, rgb(46 17 25 / 70%) 100%);
+  }
+
+  .film-copy {
+    position: relative;
+    z-index: 1;
+    padding: var(--space-8) var(--layout-margin) var(--space-10);
+    max-inline-size: 34rem;
+  }
+
+  .film-label {
+    font-family: var(--type-family-ui);
+    font-size: var(--type-label-sm);
+    font-weight: var(--type-weight-medium);
+    letter-spacing: var(--type-tracking-label);
+    text-transform: uppercase;
+    color: #f3b8c6;
+  }
+
+  :global(html[lang="ar"]) .film-label {
+    text-transform: none;
+    font-weight: var(--type-weight-regular);
+    font-size: calc(var(--type-label-sm) * var(--type-arabic-size-factor));
+  }
+
+  .film-line,
+  h1.film-line {
+    margin-block-start: var(--space-3);
+    font-weight: var(--type-weight-regular);
+    font-family: var(--type-family-display);
+    font-size: calc(var(--type-display-md) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-display-md) * var(--type-arabic-leading-factor));
+    letter-spacing: var(--type-tracking-display);
+    color: #fbf1ee;
+    text-wrap: balance;
+  }
+
+  .film-copy--large .film-line {
+    font-size: calc(var(--type-display-lg) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-display-lg) * var(--type-arabic-leading-factor));
+  }
+
+  /* ================================================================ when the film is live
+   *
+   * The storyboard becomes the film's source material: its photographs are now textures on planes
+   * in the canvas, so the <img> elements themselves must go — but only VISUALLY. They stay in the
+   * document, in the accessibility tree, with their alt text, which is why the film needs no
+   * duplicate markup to remain readable by a screen reader.
+   */
+
+  :global(html.cinema-live) .film-stage {
+    block-size: 100svh;
+  }
+
+  /*
+   * THE TITLE SCRIM. A long, very soft gradient along the bottom of the frame, exactly as a film
+   * carries under its lower thirds.
+   *
+   * It is not decoration: the caption is centred at the bottom and the camera moves, so at some
+   * point in the take SOMETHING bright will pass behind the type — a lit cap, a cheekbone, the
+   * dawn. Without a scrim the only ways to guarantee legibility are to move the type out of the
+   * composition or to stop the camera, and both cost more than this does.
+   */
+  :global(html.cinema-live) .film-stage::after {
+    content: "";
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: 0;
+    block-size: 46svh;
+    z-index: 1;
+    pointer-events: none;
+    /* The wine ground, at three opacities. Not a darker invented near-black: every gradient on
+       this site resolves to a colour that exists in tokens.css, and the suite enforces it. */
+    background: linear-gradient(180deg, rgb(46 17 25 / 0%) 0%, rgb(46 17 25 / 36%) 62%, rgb(46 17 25 / 66%) 100%);
+  }
+
+  :global(html.cinema-live) .film-reel {
+    /* Pull the reel back over the sticky stage. The reel still provides the scroll length; the
+       stage provides the picture. */
+    margin-block-start: -100svh;
+  }
+
+  :global(html.cinema-live) .film-frame {
+    opacity: 0;
+  }
+
+  :global(html.cinema-live) .film-scene {
+    align-items: center;
+    justify-items: center;
+    pointer-events: none;
+  }
+
+  /* The caption stops scrolling and becomes part of the frame. Opacity and drift are driven per
+     beat by the renderer, which is why there is no transition here — a CSS transition would fight
+     the scrub. */
+  /*
+   * A HALO, NOT A DROP SHADOW.
+   *
+   * The captions are real content — the title card is the page's h1 — and they sit over a moving
+   * photographic frame, so at some point in the take the type is over a lit cheek rather than over
+   * shadow. A wide, soft, wine-tinted halo lifts them off whatever is behind them without reading
+   * as a shadow, which is how film titling has always solved this. The colour is the identity's
+   * wine rather than black, for the same reason nothing else on this site casts a grey shadow.
+   */
+  :global(html.cinema-live) .film-line,
+  :global(html.cinema-live) .film-label {
+    text-shadow:
+      0 2px 30px rgb(46 17 25 / 66%),
+      0 1px 4px rgb(46 17 25 / 46%);
+  }
+
+  :global(html.cinema-live) .film-copy {
+    position: fixed;
+    inset-block-end: clamp(var(--space-8), 12vh, var(--space-14));
+    inset-inline-start: 50%;
+    translate: -50% 0;
+    z-index: 2;
+    opacity: 0;
+    text-align: center;
+    padding-block: 0;
+    max-inline-size: min(40rem, calc(100vw - var(--layout-margin) * 4));
+  }
+
+  /* ================================================================ wide screens */
+
+  @media (min-width: 768px) {
+    .film-copy {
+      padding-inline: var(--layout-margin);
+      max-inline-size: 40rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    /* Off-centre in the storyboard — a caption under a full-bleed frame reads better on the
+       reading edge than in the middle. Live, the renderer centres it in the composition. */
+    .film-copy {
+      max-inline-size: 44rem;
+      padding-block-end: var(--space-12);
+    }
+
+    :global(html.cinema-live) .film-line {
+      font-size: calc(var(--type-display-lg) * var(--type-arabic-size-factor));
+    }
+
+    :global(html.cinema-live) .film-copy--large .film-line {
+      font-size: calc(var(--type-display-xl) * var(--type-arabic-size-factor));
+    }
+  }
+
+  /* ================================================================ refusals */
+
+  @media (forced-colors: active) {
+    .film-frame::after {
+      display: none;
+    }
+  }
+
+  @media print {
+    .film-stage {
+      display: none;
+    }
+  }
+</style>

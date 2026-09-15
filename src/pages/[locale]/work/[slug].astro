@@ -148,7 +148,7 @@ const id = { terms: "engagement-terms", records: "related-records", reading: "re
       */}
       <section class="terms" aria-labelledby={id.terms}>
         <h2 class="label terms-label" id={id.terms}>{t(locale, "workTermsHeading")}</h2>
-        <dl class="terms-list">
+        <dl class="terms-list link-list">
           <div class="term">
             <dt class="label">{t(locale, "workClient")}</dt>
             <dd>
@@ -218,7 +218,7 @@ const id = { terms: "engagement-terms", records: "related-records", reading: "re
         relatedReviews.length > 0 && (
           <section class="related" aria-labelledby={id.records}>
             <h2 class="section-heading" id={id.records}>{t(locale, "workRelatedRecords")}</h2>
-            <ul class="related-list plain">
+            <ul class="related-list plain link-list">
               {relatedReviews.map((review) => (
                 <li>
                   <a href={path.review(locale, review.locales[locale]!.slug!)}>
@@ -235,7 +235,7 @@ const id = { terms: "engagement-terms", records: "related-records", reading: "re
         relatedArticles.length > 0 && (
           <section class="related" aria-labelledby={id.reading}>
             <h2 class="section-heading" id={id.reading}>{t(locale, "brandRelatedHeading")}</h2>
-            <ul class="related-list plain">
+            <ul class="related-list plain link-list">
               {relatedArticles.map((article) => (
                 <li>
                   <a href={path.journal(locale, article.locales[locale]!.slug!)}>

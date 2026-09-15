@@ -23,7 +23,7 @@ import { LOCALES, brandById } from "../../../../lib/content";
 import { brandDestination, brandFacet, brandFacets, facetIndexing } from "../../../../lib/facets";
 import { absoluteUrl, path, sectionBreadcrumb, otherLocale } from "../../../../lib/routing";
 import { breadcrumbSchema, jsonLd, templatedMeta } from "../../../../lib/seo";
-import { t } from "../../../../lib/ui-strings";
+import { t, tf } from "../../../../lib/ui-strings";
 import { formatCount, countedNoun } from "../../../../lib/format";
 import BaseLayout from "../../../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../../../components/shell/Breadcrumbs.astro";
@@ -51,7 +51,7 @@ const selfPath = path.reviewsByBrand(locale, facet.slug);
 const indexPath = path.reviewsIndex(locale);
 const indexing = facetIndexing(facet, selfPath, indexPath, "brand");
 
-const meta = templatedMeta(facet.name, t(locale, "brandIndexIntro"), {
+const meta = templatedMeta(facet.name, tf(locale, "brandMetaDescription", { name: facet.name }), {
   canonical: absoluteUrl(indexing.canonicalPath),
   robots: indexing.robots,
   locale,

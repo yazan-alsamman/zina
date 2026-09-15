@@ -92,13 +92,32 @@ describe("the current build is honestly empty — nothing is indexable while the
 describe("every gate opens correctly — proven against the REAL corpus, override forced true", () => {
   const forced = discoverableUrls(true);
 
-  test("the total matches the known corpus exactly: 56 URLs (29 en / 27 ar)", () => {
-    // 11 static route-types x 2 locales (22) + 10 review + 10 journal + 7 work + 7 brand.
+  test("the total matches the known corpus exactly: 58 URLs (30 en / 28 ar)", () => {
+    // 12 static route-types x 2 locales (24) + 10 review + 10 journal + 7 work + 7 brand.
     // Asymmetry: veloura-beauty (brand), one review, one journal article and one work record are
-    // English-only, so ar is short by 2 relative to a naive 28/28 split.
-    assert.equal(forced.length, 56);
-    assert.equal(forced.filter((u) => u.locale === "en").length, 29);
-    assert.equal(forced.filter((u) => u.locale === "ar").length, 27);
+    // English-only, so ar is short by 2 relative to a naive 29/29 split.
+    //
+    // 11 static types became 12 when /{locale}/film/ was added: it is a surface in its own right,
+    // with its own canonical and its own hreflang pair, not a duplicate of /method/. Both locales
+    // gained exactly one URL, which is what keeps the asymmetry above unchanged.
+    assert.equal(forced.length, 58);
+    assert.equal(forced.filter((u) => u.locale === "en").length, 30);
+    assert.equal(forced.filter((u) => u.locale === "ar").length, 28);
+  });
+
+  test("the film is present in both locales, and is a canonical of its own", () => {
+    const film = forced.filter((u) => u.loc.endsWith("/film/"));
+    assert.equal(film.length, 2, "the film should appear once per locale");
+    assert.deepEqual(
+      film.map((u) => u.locale).sort(),
+      ["ar", "en"],
+      "the film is missing from one locale"
+    );
+    // Its alternates must name both locales and an x-default, like every other static family.
+    for (const url of film) {
+      const hreflangs = url.alternates.map((a) => a.hreflang).sort();
+      assert.deepEqual(hreflangs, ["ar", "en", "x-default"], `${url.loc}: wrong hreflang set`);
+    }
   });
 
   test("the brand facet NEVER appears — permanently noindex, by construction", () => {

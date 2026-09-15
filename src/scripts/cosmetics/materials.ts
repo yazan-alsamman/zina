@@ -65,10 +65,21 @@ export function metal(color: string = palette.roseGold, roughness = 0.24): MeshP
   );
 }
 
-/** Mirror — the inside of a compact lid. */
+/**
+ * Mirror — the inside of a compact or palette lid.
+ *
+ * PHASE 13. This was a near-white perfect mirror (roughness 0.03, colour #fbf4f1), and a perfect
+ * mirror shows you the room: the studio environment is neutral, so every open compact and every
+ * eyeshadow palette on the site rendered a flat GREY rectangle — the one cold element in an
+ * entirely warm identity, and the first thing the eye caught on the contact sheet.
+ *
+ * A metal's albedo tints its reflection, so warming the colour warms everything it mirrors, and
+ * a little roughness turns a hard grey pane into the soft blush sheen a mirror actually has when
+ * it is lying in a warm still life.
+ */
 export function mirror(): MeshPhysicalMaterial {
   return cached("mirror", () =>
-    new MeshPhysicalMaterial({ color: "#fbf4f1", metalness: 1, roughness: 0.03, envMapIntensity: 1.4 })
+    new MeshPhysicalMaterial({ color: "#f0cfc6", metalness: 0.95, roughness: 0.11, envMapIntensity: 1.15 })
   );
 }
 

@@ -50,6 +50,7 @@ import { isolateValue } from "../../../lib/bidi";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
 import PageHero from "../../../components/beauty/PageHero.astro";
+import BeautyButton from "../../../components/beauty/BeautyButton.astro";
 
 export const getStaticPaths = (() =>
   LOCALES.map((locale) => ({ params: { locale } }))) satisfies GetStaticPaths;
@@ -122,6 +123,12 @@ const bio = person().locales[locale]?.bios?.editorialByline ?? "";
 
     <h1 class="display-lg title">{content.name}</h1>
     <p class="tagline">{content.tagline}</p>
+
+    {/* The film presents these same six stages as a scroll-driven sequence. Offered from the page
+        that documents them, because that is where a reader who wants to SEE them already is. */}
+    <p class="film-link">
+      <BeautyButton href={path.film(locale)} variant="quiet">{t(locale, "filmEnter")}</BeautyButton>
+    </p>
   </PageHero>
 
   <div class="container method">
@@ -242,6 +249,10 @@ const bio = person().locales[locale]?.bios?.editorialByline ?? "";
 </BaseLayout>
 
 <style>
+  .film-link {
+    margin-block-start: var(--space-4);
+  }
+
   .method {
     padding-block: var(--space-4) var(--space-10);
   }

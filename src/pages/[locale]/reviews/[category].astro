@@ -32,7 +32,7 @@ import {
   otherLocale,
 } from "../../../lib/routing";
 import { breadcrumbSchema, jsonLd, templatedMeta } from "../../../lib/seo";
-import { t } from "../../../lib/ui-strings";
+import { t, tf } from "../../../lib/ui-strings";
 import { formatCount, countedNoun } from "../../../lib/format";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../../components/shell/Breadcrumbs.astro";
@@ -73,7 +73,7 @@ const indexing = facetIndexing(facet, selfPath, indexPath, "category");
 const facetIsIndexable = indexing.robots.startsWith("index");
 const robots = robotsContent(IS_INDEXABLE_BUILD && facetIsIndexable);
 
-const meta = templatedMeta(facet.category, t(locale, "categoryIndexIntro"), {
+const meta = templatedMeta(facet.category, tf(locale, "categoryMetaDescription", { name: facet.category }), {
   canonical: absoluteUrl(indexing.canonicalPath),
   robots,
   locale,

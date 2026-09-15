@@ -123,6 +123,10 @@ const en = {
   navigationOnly: "This is a navigation view.",
   categoryIndexIntro: "Testing records in this category.",
   brandIndexIntro: "Testing records for this brand.",
+  /* Meta descriptions, which must differ per facet — see `tf`. The on-page intros above stay
+     as they are: on the page the heading right beside them already names the facet. */
+  categoryMetaDescription: "Testing records in the {name} category, each published with the conditions it was tested in.",
+  brandMetaDescription: "Testing records for {name}, each published with the conditions it was tested in.",
   noReviewsHere: "No reviews in this category yet.",
 
   /* method */
@@ -151,6 +155,7 @@ const en = {
   browseByFormat: "Browse by format",
   allArticles: "All articles",
   formatIndexIntro: "Articles in this editorial format.",
+  formatMetaDescription: "Articles in the {name} format, from Zina Almokri's journal.",
   readingTime: "min read",
   contents: "Contents",
   citedRecord: "Documented in",
@@ -312,6 +317,18 @@ const en = {
   /* Names the gap where evidence photography will go. A statement about the PAGE, not a claim
      about a product — and more honest than an unlabelled tonal rectangle. */
   plateReserved: "Photograph to follow",
+
+  /* The film. Interface vocabulary only: these words name the page and its parts. Not one of them
+     describes the testing, and not one asserts anything the records do not already say. */
+  filmEyebrow: "A film",
+  filmMetaTitle: "The method, as a film",
+  filmMetaDescription:
+    "A scroll-driven film of the six stages every product on this site is tested through, set to Zina Almokri's own photographs.",
+  filmStageLabel: "The film",
+  filmEnter: "Watch the film",
+  filmCodaEyebrow: "After the film",
+  filmCodaHeading: "The same six stages, written down",
+  filmReadMethod: "Read the method",
 } satisfies Strings;
 
 const ar = {
@@ -406,6 +423,8 @@ const ar = {
   navigationOnly: "هذه صفحة تصفح.",
   categoryIndexIntro: "سجلات الاختبار في هذه الفئة.",
   brandIndexIntro: "سجلات الاختبار لهذه العلامة.",
+  categoryMetaDescription: "سجلات الاختبار في فئة {name}، كل سجل منشور مع الظروف التي جرى اختباره فيها.",
+  brandMetaDescription: "سجلات الاختبار لعلامة {name}، كل سجل منشور مع الظروف التي جرى اختباره فيها.",
   noReviewsHere: "لا توجد مراجعات في هذه الفئة بعد.",
 
   /* method */
@@ -434,6 +453,7 @@ const ar = {
   browseByFormat: "تصفح حسب الشكل التحريري",
   allArticles: "كل المقالات",
   formatIndexIntro: "مقالات في هذا الشكل التحريري.",
+  formatMetaDescription: "مقالات بشكل {name} من مجلة زينا المقري.",
   readingTime: "دقيقة قراءة",
   contents: "المحتويات",
   citedRecord: "موثق في",
@@ -586,6 +606,17 @@ const ar = {
   closingEyebrow: "بكلماتها",
   chapterLabel: "فصل",
   plateReserved: "الصورة قيد الإعداد",
+
+  /* Composed for this phase; NEEDS NATIVE REVIEW like the headings above (Q3-2). */
+  filmEyebrow: "فيلم",
+  filmMetaTitle: "الطريقة، كفيلم",
+  filmMetaDescription:
+    "فيلم يتحرك مع التمرير عبر المراحل الست التي يُختبر بها كل منتج على هذا الموقع، على صور زينا المقري.",
+  filmStageLabel: "الفيلم",
+  filmEnter: "شاهدي الفيلم",
+  filmCodaEyebrow: "بعد الفيلم",
+  filmCodaHeading: "المراحل الست نفسها، مكتوبة",
+  filmReadMethod: "اقرئي الطريقة",
 } satisfies Record<keyof typeof en, string>;
 
 const dictionaries = { en, ar } as const;
@@ -595,6 +626,24 @@ export type UiKey = keyof typeof en;
 /** Typed string lookup. A missing key is a compile error, not a runtime blank. */
 export function t(locale: Locale, key: UiKey): string {
   return dictionaries[locale][key];
+}
+
+/**
+ * Typed lookup with substitution, for the handful of strings that must NAME the thing they
+ * describe: `tf(locale, "categoryMetaDescription", { name: "foundation" })`.
+ *
+ * Phase 13 added it for one reason. Every category facet page shipped the same meta description
+ * ("Testing records in this category."), as did every brand facet and every journal format —
+ * twenty-seven routes sharing six sentences. A search engine treats duplicate descriptions as a
+ * quality signal and rewrites them, so the site was writing its own snippets and then throwing
+ * them away. The substituted value is the facet's own name, which the page's TITLE and <h1>
+ * already carry; nothing new is asserted.
+ *
+ * Placeholders are `{name}`. An unknown placeholder is left alone rather than blanked, so a
+ * mistake is visible in the output instead of silently producing a hole.
+ */
+export function tf(locale: Locale, key: UiKey, vars: Record<string, string>): string {
+  return t(locale, key).replace(/\{(\w+)\}/g, (whole, token: string) => vars[token] ?? whole);
 }
 
 /** Bound lookup, so templates read `s("verdict")` rather than `t(locale, "verdict")`. */

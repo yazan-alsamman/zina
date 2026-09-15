@@ -1,0 +1,223 @@
+---
+/**
+ * THE FILM — /{locale}/film/
+ *
+ * ============================================================================
+ * WHAT THIS PAGE IS
+ * ============================================================================
+ * A scroll-driven cinematic presentation of Zina's six-stage testing method: seven frames, five
+ * of her photographs, one original 3D package, one continuous camera. Scroll is the transport.
+ *
+ * ============================================================================
+ * WHAT IT IS NOT, AND WHY THAT MATTERS
+ * ============================================================================
+ * It is NOT a product film. Every line of type on it is either Zina's own tagline or the name of
+ * a stage of her method — both real records in `content/`. It makes no claim about what any
+ * product does, because that belongs to individual reviews where the conditions are published
+ * alongside it. The 3D package is the site's own ORIGINAL generic packaging (see
+ * src/scripts/cosmetics/models.ts); it depicts no real product and is never captioned as one.
+ *
+ * The boundary statement travels with the method everywhere the method appears, so it appears
+ * here too — in the coda, where it can actually be read.
+ *
+ * ============================================================================
+ * THE PAGE WITHOUT THE FILM
+ * ============================================================================
+ * The DOM is a storyboard, and the storyboard is the page. With no JavaScript, no WebGL,
+ * Save-Data on, or reduced motion requested, a reader gets seven full-bleed frames of Zina's
+ * photography with the six stages set over them — finished editorial work, not a degraded state.
+ * The film is an enhancement laid over content that was already complete.
+ *
+ * Reduced motion refuses the film outright (src/scripts/cosmetics/boot.ts). A scroll-driven
+ * camera cannot be made still without ceasing to be the thing it is, and there is no honest
+ * "reduced" version of a dolly.
+ */
+import type { GetStaticPaths } from "astro";
+import type { Locale } from "../../../../content/schema/types";
+import { LOCALES, IS_INDEXABLE_BUILD, method, person } from "../../../lib/content";
+import { absoluteUrl, path, robotsContent } from "../../../lib/routing";
+import { jsonLd, personSchema, templatedMeta } from "../../../lib/seo";
+import { t } from "../../../lib/ui-strings";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import FilmStage, { type Beat } from "../../../components/cinema/FilmStage.astro";
+import BeautyButton from "../../../components/beauty/BeautyButton.astro";
+
+export const getStaticPaths = (() =>
+  LOCALES.map((locale) => ({ params: { locale } }))) satisfies GetStaticPaths;
+
+const { locale } = Astro.params as { locale: Locale };
+
+const personRecord = person();
+const personLocale = personRecord.locales[locale]!;
+const methodRecord = method();
+const methodLocale = methodRecord.locales[locale]!;
+
+/** The six stages, in the order the record declares — never re-ordered for the composition. */
+const stages = methodRecord.stageOrder
+  .map((key) => methodLocale.stages.find((stage) => stage.key === key))
+  .filter((stage): stage is NonNullable<typeof stage> => Boolean(stage));
+
+const ordinal = (index: number) => `${t(locale, "chapterLabel")} ${String(index + 1).padStart(2, "0")}`;
+
+/**
+ * THE SHOOTING ORDER.
+ *
+ * Seven beats, matching `SCENES` in src/scripts/cinema/timeline.ts one for one — the `key` on
+ * each side is the same word so the two files can be read together.
+ *
+ * Only five beats carry a photograph. The opening three share one frame, because the camera is
+ * moving through a single space in those beats rather than cutting between three.
+ *
+ * Every line is existing content: the title card is Zina's tagline, and the six lines after it
+ * are the six stage names.
+ */
+const beats: Beat[] = [
+  {
+    key: "awakening",
+    label: personLocale.professionalTitle,
+    line: personLocale.tagline,
+    photo: "portraitGlow",
+    scale: "large",
+    heading: true,
+  },
+  { key: "reveal", label: ordinal(0), line: stages[0]?.name ?? methodLocale.name },
+  { key: "product", label: ordinal(1), line: stages[1]?.name ?? methodLocale.name },
+  { key: "together", label: ordinal(2), line: stages[2]?.name ?? methodLocale.name, photo: "closeupComplexion" },
+  { key: "beauty", label: ordinal(3), line: stages[3]?.name ?? methodLocale.name, photo: "beautyCloseup" },
+  { key: "transformation", label: ordinal(4), line: stages[4]?.name ?? methodLocale.name, photo: "editorialRed" },
+  {
+    key: "final",
+    label: ordinal(5),
+    line: stages[5]?.name ?? methodLocale.name,
+    photo: "portraitRadiant",
+    scale: "large",
+  },
+];
+
+const selfPath = path.film(locale);
+const meta = templatedMeta(t(locale, "filmMetaTitle"), t(locale, "filmMetaDescription"), {
+  canonical: absoluteUrl(selfPath),
+  robots: robotsContent(IS_INDEXABLE_BUILD),
+  locale,
+});
+
+const alternates = [
+  ...LOCALES.map((l) => ({ hreflang: l, href: absoluteUrl(path.film(l)) })),
+  { hreflang: "x-default", href: absoluteUrl(path.film("en")) },
+];
+
+/* Person only. No VideoObject: there is no video file, no duration and no thumbnail to declare,
+   and marking a WebGL scene up as a video would be a fabricated entity. */
+const schemas = [jsonLd(personSchema(personRecord, locale))];
+---
+
+<BaseLayout
+  locale={locale}
+  meta={meta}
+  alternates={alternates}
+  schemas={schemas}
+  switcherHref={path.film(locale === "en" ? "ar" : "en")}
+>
+  <FilmStage
+    locale={locale}
+    beats={beats}
+    product="serum"
+    tint="rose"
+    label={t(locale, "filmStageLabel")}
+  />
+
+  {/*
+    THE CODA. Outside the film, on the page's own ground.
+
+    The film's typography is one line a frame, which is right for a film and useless for anything
+    that has to be read. So the two things that must be readable — her statement about what a
+    review is for, and the boundary that travels with the method everywhere it appears — live
+    here, at a size and on a ground that can carry them, with the way onward.
+  */}
+  <section class="coda" aria-labelledby="coda-heading">
+    <div class="container coda-inner">
+      <p class="eyebrow">{t(locale, "filmCodaEyebrow")}</p>
+      <h2 class="coda-heading" id="coda-heading">{t(locale, "filmCodaHeading")}</h2>
+
+      {
+        personLocale.philosophy?.statement && (
+          <blockquote class="coda-quote">
+            <p>{personLocale.philosophy.statement}</p>
+          </blockquote>
+        )
+      }
+
+      <p class="coda-boundary">{methodLocale.boundaryStatement}</p>
+
+      <div class="coda-actions">
+        <BeautyButton href={path.method(locale)}>{t(locale, "filmReadMethod")}</BeautyButton>
+        <BeautyButton href={path.reviewsIndex(locale)} variant="quiet">
+          {t(locale, "exploreReviews")}
+        </BeautyButton>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /*
+   * THE CODA CONTINUES THE MORNING, it does not start a new day.
+   *
+   * It used to open on the wine ground, which put a hard dark edge directly under the film's last
+   * frame — and the film's last frame is its brightest. The transformation the whole piece builds
+   * towards was undone by a colour change in the first pixel after it. It now begins in the blush
+   * the film ends in and settles into the page's own ivory.
+   */
+  .coda {
+    position: relative;
+    padding-block: var(--space-12) var(--space-10);
+    background: linear-gradient(180deg, var(--palette-blush) 0%, var(--palette-cream) 40%, var(--palette-ivory) 100%);
+  }
+
+  .coda-inner {
+    display: grid;
+    justify-items: start;
+    max-inline-size: var(--layout-max-text);
+  }
+
+  .coda .eyebrow {
+    color: var(--color-accent-clay);
+  }
+
+  .coda-heading {
+    margin-block-start: var(--space-3);
+    font-size: calc(var(--type-display-md) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-display-md) * var(--type-arabic-leading-factor));
+    color: var(--color-text-primary);
+    max-inline-size: 18ch;
+  }
+
+  .coda-quote {
+    margin-block-start: var(--space-6);
+    font-family: var(--type-family-accent);
+    font-size: calc(var(--type-display-sm) * var(--type-arabic-size-factor));
+    line-height: calc(1.32 * var(--type-arabic-leading-factor));
+    color: var(--color-text-primary);
+  }
+
+  .coda-boundary {
+    margin-block-start: var(--space-5);
+    font-size: calc(var(--type-body-sm) * var(--type-arabic-size-factor));
+    line-height: calc(var(--type-leading-body-sm) * var(--type-arabic-leading-factor));
+    color: var(--color-text-secondary);
+  }
+
+  .coda-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3) var(--space-4);
+    margin-block-start: var(--space-6);
+  }
+
+  @media (min-width: 1024px) {
+    .coda {
+      padding-block: var(--space-14) var(--space-12);
+    }
+  }
+</style>

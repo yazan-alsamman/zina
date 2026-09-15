@@ -12,6 +12,7 @@
     "build": "astro build",
     "build:fonts": "node scripts/build-fonts.mjs",
     "build:og": "node scripts/build-og-image.mjs",
+    "build:favicon": "node scripts/build-favicon.mjs",
     "preview": "astro preview",
     "check": "astro check",
     "test": "node --test \"tests/**/*.test.mjs\"",
