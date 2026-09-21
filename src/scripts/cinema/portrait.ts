@@ -66,6 +66,8 @@ const FRAGMENT = /* glsl */ `
   uniform float uTime;
   uniform float uFocus;        // depth-weighted softness: the far plane of the depth field
   uniform float uSoften;       // softness applied to the WHOLE plane, however near it is
+  uniform float uDissolve;     // how organic the reveal front is: 0 a clean ramp, 1 a torn edge
+  uniform float uVelocity;     // signed scroll speed, -1 to 1
 
   varying vec2 vUv;
 
@@ -101,12 +103,36 @@ const FRAGMENT = /* glsl */ `
 
   float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 
+  /* Value noise, and two octaves of it. Two, not five: this is shaping the EDGE of a dissolve,
+     not drawing a cloud, and the fine octaves of an fbm are invisible once the result has been
+     smoothstepped across a third of the depth range. Octaves you cannot see are octaves you are
+     paying for. */
+  float noise(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    vec2 u = f * f * (3.0 - 2.0 * f);
+    return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),
+               mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
+  }
+
+  float fbm2(vec2 p) {
+    return noise(p) * 0.65 + noise(p * 2.17) * 0.35;
+  }
+
   void main() {
     float depth = depthAt(vUv);
 
     /* Parallax. Nearer (brighter) parts of the image displace against the camera; the far ground
        barely moves. The 0.5 pivot keeps the mid-depth stationary so nothing swims. */
     vec2 uv = vUv + uParallax * (depth - 0.5) * uDepthScale;
+
+    /* A VERY SMALL SHEAR WITH SCROLL SPEED, weighted by depth.
+       A real camera whipped through a move drags its subject a little against its background, and
+       the eye reads that lag as weight. The amplitude is a third of a percent of the frame at full
+       speed, which is well under the threshold at which it could be named as an effect — and it is
+       driven by the transport's SMOOTHED, CLAMPED velocity (motion.ts), so there is no scroll
+       violent enough to turn it into a smear. */
+    uv.y -= uVelocity * (depth - 0.5) * 0.034;
 
     /* The lens. A three-tap smear along the parallax axis at the far end of the depth field —
        cheap, directional, and it reads as depth of field rather than as blur. */
@@ -136,8 +162,19 @@ const FRAGMENT = /* glsl */ `
        than it is already present. A narrow band at the front glows, so the edge of the reveal is
        a light travelling over her rather than a hard threshold. */
     float front = 1.0 - uReveal * 1.35;
-    float present = smoothstep(front, front + 0.34, depth);
-    float edge = exp(-pow((depth - front) * 9.0, 2.0)) * uReveal * (1.0 - uReveal) * 2.4;
+    /*
+     * THE FRONT IS TORN, NOT STRAIGHT.
+     *
+     * Ordering the dissolve purely by depth gives a front that sweeps as a smooth contour, and a
+     * smooth contour moving across a face reads as a wipe — a transition effect sitting on top of
+     * a photograph. Displacing the front by two octaves of value noise breaks it into something
+     * closer to how an emulsion actually comes up: in patches, unevenly, fastest where the light
+     * already was. The noise is in the PLANE's own uv, so it is fixed to the photograph and does
+     * not crawl when the camera moves.
+     */
+    float shaped = depth + (fbm2(vUv * 3.4) - 0.5) * uDissolve;
+    float present = smoothstep(front, front + 0.34, shaped);
+    float edge = exp(-pow((shaped - front) * 9.0, 2.0)) * uReveal * (1.0 - uReveal) * 2.4;
     rgb += edge * vec3(1.0, 0.92, 0.9) * 0.34;
 
     /* The plane stops being a plane.
@@ -166,6 +203,20 @@ const FRAGMENT = /* glsl */ `
 export interface PortraitPlane {
   mesh: Mesh;
   material: ShaderMaterial;
+  /**
+   * WHERE THE FACE IS, as a fraction from the top of the photograph.
+   *
+   * Every one of these photographs is a 3:4 portrait with the subject's head in the upper third.
+   * A plane scaled to COVER a wide cinema frame therefore shows its vertical MIDDLE — which is her
+   * collarbone. The film shipped with her eyes cropped off the top of the frame in every single
+   * beat, and in the closest one there was no face in shot at all, only a shoulder and a hand.
+   *
+   * The site already knows the answer: `photography.ts` carries a focal point per photograph and
+   * `EditorialImage.astro` publishes it as the `object-position` every cropped `<img>` on the site
+   * already honours. This reads that same value, so the film crops to the same point as the
+   * storyboard beneath it and there is exactly one place where a face's position is recorded.
+   */
+  readonly focusY: number;
   /** The loaded resource's aspect, which is not known until it arrives. */
   readonly aspect: number;
   /** False until the photograph is on the GPU. A plane that is not ready is never drawn. */
@@ -219,6 +270,8 @@ export function makePortrait(image: HTMLImageElement, geometry: PlaneGeometry): 
       uTime: { value: 0 },
       uFocus: { value: 0 },
       uSoften: { value: 0 },
+      uDissolve: { value: 0.42 },
+      uVelocity: { value: 0 },
     },
   });
 
@@ -245,6 +298,22 @@ export function makePortrait(image: HTMLImageElement, geometry: PlaneGeometry): 
   source.decoding = "async";
   source.src = image.currentSrc || image.src;
 
+  /*
+   * Read once, from the element the film is lifting. `object-position` resolves to a pair of
+   * percentages; the vertical one is the only part the film needs, because the horizontal staging
+   * of each beat is a deliberate composition in timeline.ts rather than a crop.
+   */
+  let focusY = 0.32;
+  try {
+    const parsed = getComputedStyle(image).objectPosition.split(/\s+/)[1];
+    if (parsed && parsed.endsWith("%")) {
+      const value = Number.parseFloat(parsed) / 100;
+      if (Number.isFinite(value)) focusY = Math.min(1, Math.max(0, value));
+    }
+  } catch {
+    /* A detached or unstyled element keeps the default, which is the middle of the upper third. */
+  }
+
   const mesh = new Mesh(geometry, material);
   mesh.scale.set(aspect, 1, 1);
   mesh.renderOrder = 1;
@@ -255,6 +324,9 @@ export function makePortrait(image: HTMLImageElement, geometry: PlaneGeometry): 
     material,
     get aspect() {
       return aspect;
+    },
+    get focusY() {
+      return focusY;
     },
     get ready() {
       return ready;

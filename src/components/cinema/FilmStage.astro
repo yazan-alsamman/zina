@@ -313,6 +313,34 @@ let seen = 0;
     }
   }
 
+  /* ================================================================ short viewports
+   *
+   * A LANDSCAPE PHONE IS NOT A SMALL DESKTOP; IT IS A SHORT ONE.
+   *
+   * The film's captions are `position: fixed` and anchored to the bottom of the frame, and the
+   * title card is six lines of display type. Every breakpoint on this site is a WIDTH, so a phone
+   * turned on its side — around 390 CSS pixels tall — was served the full desktop display size and
+   * the title card grew upward straight through the header and off the top of the screen. It was
+   * found at a 550px-tall viewport during the Phase 16 visual pass, where the first two lines were
+   * already clipped.
+   *
+   * The type scale steps down with the HEIGHT it actually has to fit into. Nothing else changes:
+   * the composition, the camera and the captions' own timing are untouched.
+   */
+
+  @media (max-height: 680px) {
+    :global(html.cinema-live) .film-copy {
+      inset-block-end: var(--space-6);
+      max-inline-size: min(34rem, calc(100vw - var(--layout-margin) * 3));
+    }
+
+    :global(html.cinema-live) .film-line,
+    :global(html.cinema-live) .film-copy--large .film-line {
+      font-size: calc(var(--type-display-sm) * var(--type-arabic-size-factor));
+      line-height: calc(var(--type-leading-display-sm) * var(--type-arabic-leading-factor));
+    }
+  }
+
   /* ================================================================ refusals */
 
   @media (forced-colors: active) {

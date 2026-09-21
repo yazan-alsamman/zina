@@ -203,7 +203,10 @@ Two corpus tripwires fired as designed and were re-derived, not relaxed: 85 → 
 
 ## 9. Limitations
 
-1. **Reduced motion does not get the film.** Deliberate, documented above.
+1. ~~**Reduced motion does not get the film.**~~ **Superseded by Phase 16**, which ships a reduced
+   cut — one locked-off camera, no parallax, no rotation, no drift — keeping every photograph,
+   caption, the lighting arc and the night-to-morning transformation. See docs/PHASE_16_CINEMA.md §7.
+   The reasoning recorded here was sound about the *camera* and wrong about the *film*.
 2. **Browser testing was Chromium-only.** Safari and Firefox were not available in this
    environment. The film uses no feature that needs a polyfill, but it has not been seen there.
 3. **The header stays.** An ivory bar over a dark film is not ideal for immersion, but the page

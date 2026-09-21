@@ -15,11 +15,17 @@
  *   - the page declares neither
  *   - WebGL is unavailable
  *   - the reader has asked the browser to save data
- *   - the reader has asked for reduced motion AND the layer is the film
  *
- * The film is the one layer that is refused outright under reduced motion. The ambient layer can
- * hold a still pose; a scroll-driven camera cannot be made still without ceasing to be the thing
- * it is, and the film page's storyboard is already a complete, readable page without it.
+ * REDUCED MOTION IS NO LONGER A REFUSAL. This module used to skip the film outright when a reader
+ * asked for reduced motion, on the reasoning that a scroll-driven camera cannot be made still
+ * without ceasing to be the thing it is. That was true of the camera and false of the film: the
+ * photographs, the captions, the lighting arc and the night-to-morning transformation are the
+ * story, and none of them implies self-motion. The film now ships a REDUCED CUT — one locked-off
+ * camera, no parallax, no rotation, no drift, no travel — and stage.ts both selects it at start-up
+ * and switches to it live if the preference changes. See the REDUCED block in stage.ts.
+ *
+ * Treating an accessibility preference as a request to remove vestibular motion, rather than as a
+ * switch that removes the work, is the difference between degrading gracefully and giving up.
  *
  * Nothing here reads, stores or transmits anything about the reader. Every slot is decorative
  * (aria-hidden) and every page is complete without it.
@@ -42,26 +48,62 @@ function boot(): void {
   if (!film && slots.length === 0) return;
   if ((navigator as NavigatorConnection).connection?.saveData) return;
   if (!supportsWebGL()) return;
-  if (film && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
   const load = () => {
     const fontsReady = document.fonts?.ready ?? Promise.resolve();
     if (film) {
       /*
-       * The film needs its photographs DECODED, not merely fetched: it builds its textures from
-       * the storyboard's own <img> elements, so a half-decoded image would upload as blank.
+       * The film needs its photographs LOADED before it can make textures from them.
        *
        * They ship `loading="lazy"` — the page must not download five full-bleed photographs to
        * reach first paint, and one eager image per page is an invariant the suite asserts. The
        * film opts them in HERE instead, which is after `load` and after idle: by this point the
        * page has painted, the reader is looking at the title card, and nothing is competing.
+       *
+       * ======================================================================
+       * WHY THIS DOES NOT USE image.decode(), WHICH IS THE OBVIOUS ANSWER
+       * ======================================================================
+       * It used to, and it silently killed the entire film.
+       *
+       * Observed in Chrome 14x on this page: all five photographs report `complete === true` and
+       * `naturalWidth === 1920` — they are fully loaded and painted — and `decode()` on every one
+       * of them returns a promise that NEVER SETTLES. Not resolves, not rejects. Pending forever.
+       * Because the boot awaited `Promise.all` of those promises, `startCinema` was never called,
+       * no canvas was ever created, and the page quietly stayed a storyboard. Nothing threw, so
+       * the `.catch` below never fired and the console was completely clean.
+       *
+       * The likely trigger is these being `<img>` inside `<picture>` with `srcset`/`sizes`, where
+       * the browser re-runs candidate selection when layout settles — the same moving target that
+       * portrait.ts documents and works around. The precise cause matters less than the rule:
+       *
+       *   THE FILM MUST NEVER BE GATED ON A PROMISE THAT CAN HANG.
+       *
+       * What the film actually needs is the PIXELS, and `complete && naturalWidth > 0` is exactly
+       * that condition, synchronously and without a promise. Anything not yet loaded is waited for
+       * through its own `load` event, and the whole wait is capped — so in the worst case the film
+       * starts a moment early with a photograph or two still arriving, which it is already built
+       * to handle: a portrait plane whose texture is not ready is simply not drawn (see
+       * `PortraitPlane.ready` in portrait.ts), and it joins the film the frame it lands.
        */
       const images = Array.from(film.querySelectorAll("img"));
       for (const image of images) image.loading = "eager";
-      const decoded = Promise.all(
-        images.map((image) => (image.decode ? image.decode().catch(() => undefined) : Promise.resolve()))
-      );
-      Promise.all([import("../cinema/stage"), fontsReady, decoded])
+
+      const loaded = (image: HTMLImageElement) =>
+        image.complete && image.naturalWidth > 0
+          ? Promise.resolve()
+          : new Promise<void>((resolve) => {
+              image.addEventListener("load", () => resolve(), { once: true });
+              /* An image that fails is not a reason to withhold the film from the four that did. */
+              image.addEventListener("error", () => resolve(), { once: true });
+            });
+
+      /* The cap is the guarantee. Whatever the photographs do, the film starts. */
+      const ready = Promise.race([
+        Promise.all(images.map(loaded)),
+        new Promise<void>((resolve) => setTimeout(resolve, 3000)),
+      ]);
+
+      Promise.all([import("../cinema/stage"), fontsReady, ready])
         .then(([module]) =>
           module.startCinema({
             stage: film.querySelector<HTMLElement>("[data-cinema-stage]")!,
