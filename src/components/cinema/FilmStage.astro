@@ -28,24 +28,11 @@
  * re-cast from the page.
  */
 import type { Locale } from "../../../content/schema/types";
-import type { PhotographKey } from "../../lib/photography";
+import type { Beat } from "../../lib/film";
 import type { CosmeticKind, CosmeticTint } from "../../scripts/cosmetics/models";
 import EditorialImage from "../beauty/EditorialImage.astro";
 
-export interface Beat {
-  /** Matches the `key` in src/scripts/cinema/timeline.ts, for readability at both ends. */
-  key: string;
-  /** The small tracked line above the caption — a real stage of the method, or a chapter mark. */
-  label: string;
-  /** One line. The film's typography is deliberately almost nothing. */
-  line: string;
-  /** Present only on the beats that introduce a new photograph. */
-  photo?: PhotographKey;
-  /** Emphasis: the title card and the closing frame are set larger than the rest. */
-  scale?: "normal" | "large";
-  /** The title card carries the page's h1 — the film's own typography IS the document outline. */
-  heading?: boolean;
-}
+export type { Beat };
 
 interface Props {
   locale: Locale;
@@ -54,9 +41,20 @@ interface Props {
   tint: CosmeticTint;
   /** Announced to assistive technology in place of the decorative canvas. */
   label: string;
+  /**
+   * WHETHER THIS FILM OWNS THE PAGE'S LCP.
+   *
+   * True on the dedicated film route and on the homepage, where the film is the first thing in the
+   * viewport and its opening frame is therefore the largest contentful paint.
+   *
+   * It exists because AT MOST ONE IMAGE PER PAGE MAY BE EAGER — an invariant the suite asserts
+   * (tests/phase12.test.mjs). When the film opens the homepage, the film's first frame takes that
+   * one slot and the homepage's own portrait, now seven viewports down, gives it up.
+   */
+  priority?: boolean;
 }
 
-const { locale, beats, product, tint, label } = Astro.props;
+const { locale, beats, product, tint, label, priority = true } = Astro.props;
 
 /** The first photograph is the page's LCP; every other one loads lazily and is opted in by the
     renderer only once the film is actually starting. */
@@ -88,7 +86,7 @@ let seen = 0;
                   mask="none"
                   tone="none"
                   ratio="3 / 4"
-                  priority={frame === 0}
+                  priority={priority && frame === 0}
                   sizes="100vw"
                   widths={[640, 960, 1280, 1600, 2000]}
                   class="film-photo"

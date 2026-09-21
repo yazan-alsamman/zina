@@ -58,6 +58,8 @@ import { jsonLd, personSchema, templatedMeta } from "../../lib/seo";
 import { t } from "../../lib/ui-strings";
 import { isolateIdentifier, isolateValue } from "../../lib/bidi";
 import { countedNoun, formatCount } from "../../lib/format";
+import { filmBeats, FILM_PRODUCT } from "../../lib/film";
+import FilmStage from "../../components/cinema/FilmStage.astro";
 import { cosmeticForCategory } from "../../lib/cosmetic-kinds";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ReviewEntry from "../../components/review/ReviewEntry.astro";
@@ -133,6 +135,18 @@ const alternates = [
 
 /** Person only — no Organization, no award, no credential, no unverified location. */
 const schemas = [jsonLd(personSchema(personRecord, locale))];
+
+/**
+ * THE CINEMATIC OPENING.
+ *
+ * The same seven beats the dedicated film route mounts, from the same builder — see src/lib/film.ts.
+ * There is one film and one renderer; this is a second MOUNT, never a second implementation.
+ *
+ * `heading: false` is the only difference between the two mounts. On `/{locale}/film/` the title
+ * card is the page's `h1` because nothing else on that page could be. Here the opening section
+ * below already carries it, and every page on this site has exactly one `h1`.
+ */
+const cinemaBeats = filmBeats(locale, { heading: false });
 ---
 
 <BaseLayout
@@ -142,6 +156,39 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
   schemas={schemas}
   switcherHref={path.home(locale === "en" ? "ar" : "en")}
 >
+  {/* ================================================================ 0 · the film
+   *
+   * THE FILM OPENS THE WEBSITE.
+   *
+   * The same component, the same beats and the same renderer as `/{locale}/film/`. It owns the
+   * first viewport and the seven that follow it; the page then continues, in ordinary document
+   * flow, into the homepage that was already here.
+   *
+   * It is an ENHANCEMENT, exactly as it is on the film route. With no JavaScript, no WebGL or
+   * Save-Data on, the storyboard beneath it is seven full-bleed photographs with a line of type
+   * each — finished editorial work, and every word of it in the HTML for a crawler and a screen
+   * reader. Nothing below depends on the canvas having run.
+   */}
+  <FilmStage
+    locale={locale}
+    beats={cinemaBeats}
+    product={FILM_PRODUCT.kind}
+    tint={FILM_PRODUCT.tint}
+    label={t(locale, "filmStageLabel")}
+  />
+
+  {/*
+    THE HANDOFF. One element, one gradient, no script.
+
+    The film's last frame is its brightest — morning, in nude and sand. The homepage's opening
+    section begins at white. Without something between them the film would end on the storyboard's
+    mocha ground the instant the canvas hands back the screen, putting a hard dark edge under the
+    brightest frame in the piece. That is the exact defect the film route's coda was built to
+    avoid, and this is the same fix in one div: the tones the film ends in, resolving into the
+    ground the page starts on.
+  */}
+  <div class="film-handoff" aria-hidden="true"></div>
+
   {/* ================================================================ 1 · opening */}
   <section class="opening opening--portrait" aria-labelledby="hero-title">
     {/* The studio light: a softbox high and right, a champagne bounce low and left, and one
@@ -181,12 +228,14 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
         <span class="organic organic--ring portrait-ring" aria-hidden="true"></span>
         <span class="organic organic--petal organic--drift portrait-petal" aria-hidden="true"></span>
 
+        {/* NOT the LCP any more. The film's opening frame is, and at most one image per page may
+            be eager (tests/phase12.test.mjs); this portrait now sits seven viewports down. */}
         <EditorialImage
           photo="portraitGlow"
           locale={locale}
           mask="arch"
           ratio="4 / 5.3"
-          priority={true}
+          priority={false}
           sizes="(min-width: 1024px) 34vw, (min-width: 768px) 55vw, 82vw"
           widths={[420, 640, 860, 1080]}
           class="portrait-image"
@@ -626,6 +675,39 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
   }
 
   /* ================================================================ 1 · opening */
+
+  /*
+   * THE FILM -> PAGE HANDOFF.
+   *
+   * Nude into porcelain into white: the two tones the film's morning actually ends on
+   * (HAZE_DAY in src/scripts/cinema/stage.ts) resolving into the opening section's own first
+   * colour. Every value is a palette token; nothing here is an invented colour.
+   *
+   * It is a plain block in normal flow, so it costs no sticky context, no script and no scroll
+   * space beyond its own height — and it reads identically when the film never ran.
+   */
+  .film-handoff {
+    /*
+     * TALL ON PURPOSE, and the height is derived rather than chosen.
+     *
+     * The film hands the screen back through `presence` (src/scripts/cinema/stage.ts), which
+     * reaches zero once less than a fifth of a screen of track remains — roughly four fifths of a
+     * viewport after the track's last frame. At the 18vh this started as, the closing caption was
+     * still at a fifth of its opacity when the opening section's headline arrived underneath it,
+     * and "Revisit" sat ghosted across "I test it on my own skin". That is the same defect the
+     * film route's coda was built to avoid, and the same cause: the film needs room to leave.
+     *
+     * 64svh gives it that room without touching the film's verified transport, and it is not dead
+     * space — it is the morning the film ends on, opening into the page.
+     */
+    block-size: 64svh;
+    background: linear-gradient(
+      180deg,
+      var(--palette-nude) 0%,
+      var(--palette-porcelain) 55%,
+      var(--palette-ivory) 100%
+    );
+  }
 
   .opening {
     position: relative;

@@ -39,7 +39,8 @@ import { absoluteUrl, path, robotsContent } from "../../../lib/routing";
 import { jsonLd, personSchema, templatedMeta } from "../../../lib/seo";
 import { t } from "../../../lib/ui-strings";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
-import FilmStage, { type Beat } from "../../../components/cinema/FilmStage.astro";
+import FilmStage from "../../../components/cinema/FilmStage.astro";
+import { filmBeats, FILM_PRODUCT } from "../../../lib/film";
 import BeautyButton from "../../../components/beauty/BeautyButton.astro";
 
 export const getStaticPaths = (() =>
@@ -52,47 +53,14 @@ const personLocale = personRecord.locales[locale]!;
 const methodRecord = method();
 const methodLocale = methodRecord.locales[locale]!;
 
-/** The six stages, in the order the record declares — never re-ordered for the composition. */
-const stages = methodRecord.stageOrder
-  .map((key) => methodLocale.stages.find((stage) => stage.key === key))
-  .filter((stage): stage is NonNullable<typeof stage> => Boolean(stage));
-
-const ordinal = (index: number) => `${t(locale, "chapterLabel")} ${String(index + 1).padStart(2, "0")}`;
-
 /**
- * THE SHOOTING ORDER.
+ * THE SHOOTING ORDER comes from src/lib/film.ts, which the homepage's cinematic opening also
+ * reads. One film, mounted twice — see that file for why it is not written out here.
  *
- * Seven beats, matching `SCENES` in src/scripts/cinema/timeline.ts one for one — the `key` on
- * each side is the same word so the two files can be read together.
- *
- * Only five beats carry a photograph. The opening three share one frame, because the camera is
- * moving through a single space in those beats rather than cutting between three.
- *
- * Every line is existing content: the title card is Zina's tagline, and the six lines after it
- * are the six stage names.
+ * On this route the film's title card carries the page's `h1`: the film's own typography IS the
+ * document outline, because there is nothing else on the page above the coda.
  */
-const beats: Beat[] = [
-  {
-    key: "awakening",
-    label: personLocale.professionalTitle,
-    line: personLocale.tagline,
-    photo: "portraitGlow",
-    scale: "large",
-    heading: true,
-  },
-  { key: "reveal", label: ordinal(0), line: stages[0]?.name ?? methodLocale.name },
-  { key: "product", label: ordinal(1), line: stages[1]?.name ?? methodLocale.name },
-  { key: "together", label: ordinal(2), line: stages[2]?.name ?? methodLocale.name, photo: "closeupComplexion" },
-  { key: "beauty", label: ordinal(3), line: stages[3]?.name ?? methodLocale.name, photo: "beautyCloseup" },
-  { key: "transformation", label: ordinal(4), line: stages[4]?.name ?? methodLocale.name, photo: "editorialRed" },
-  {
-    key: "final",
-    label: ordinal(5),
-    line: stages[5]?.name ?? methodLocale.name,
-    photo: "portraitRadiant",
-    scale: "large",
-  },
-];
+const beats = filmBeats(locale, { heading: true });
 
 const selfPath = path.film(locale);
 const meta = templatedMeta(t(locale, "filmMetaTitle"), t(locale, "filmMetaDescription"), {
@@ -121,8 +89,8 @@ const schemas = [jsonLd(personSchema(personRecord, locale))];
   <FilmStage
     locale={locale}
     beats={beats}
-    product="serum"
-    tint="rose"
+    product={FILM_PRODUCT.kind}
+    tint={FILM_PRODUCT.tint}
     label={t(locale, "filmStageLabel")}
   />
 
