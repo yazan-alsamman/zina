@@ -192,6 +192,16 @@ export interface Scene {
   /** Dust density multiplier — the air thickens in the dark and clears as the world brightens. */
   air: number;
   /**
+   * HOW DRESSED THE SET IS, 0-1.
+   *
+   * The density of the beauty props (props.ts). It is EDITED, not ramped. The packshot is the
+   * emptiest beat in the film after the opening, because that shot is about one object and a
+   * dressed frame is precisely what would take it away; the beat where she and the product first
+   * share a frame is the fullest; and the closing frame clears again so the film ends composed
+   * rather than populated.
+   */
+  props: number;
+  /**
    * FINE LUMINOUS MOTES — powder in a beam, not dust in a room.
    *
    * Zero for most of the film. It lifts only around the beauty moment and the transformation,
@@ -242,6 +252,8 @@ export const SCENES: Scene[] = [
     product: { at: [1.9, -1.5, -0.6], scale: 0.22, spin: 0, reveal: 0 },
     air: 1,
     motes: 0,
+    /* One shape, barely there. The set is not dressed yet. */
+    props: 0.12,
   },
   {
     at: 0.17,
@@ -280,6 +292,8 @@ export const SCENES: Scene[] = [
     product: { at: [1.75, -1.15, 0.3], scale: 0.5, spin: 0.18, reveal: 0.45 },
     air: 0.9,
     motes: 0,
+    /* Glass begins to register at the edges of the frame as the key swings round. */
+    props: 0.66,
   },
   {
     at: 0.35,
@@ -327,6 +341,8 @@ export const SCENES: Scene[] = [
     },
     air: 0.62,
     motes: 0.1,
+    /* THE QUIETEST BEAT. The set clears so the hero packshot has the frame to itself. */
+    props: 0.08,
   },
   {
     at: 0.52,
@@ -359,6 +375,8 @@ export const SCENES: Scene[] = [
     product: { at: [1.4, -0.55, 0.5], scale: 0.55, spin: 1.5, reveal: 1 },
     air: 0.5,
     motes: 0.25,
+    /* THE FULLEST. She and the object share a frame, and the set is dressed around them. */
+    props: 1,
   },
   {
     at: 0.68,
@@ -398,6 +416,8 @@ export const SCENES: Scene[] = [
     /* The one beat that really has something in the air. Fine powder catching a large source is
        a thing that happens on a beauty set, and it is the visual rhyme for what the page is about. */
     motes: 1,
+    /* Pulled back for the closest shot in the film. Skin and light, and only the soft foreground. */
+    props: 0.68,
   },
   {
     at: 0.84,
@@ -426,6 +446,8 @@ export const SCENES: Scene[] = [
     product: { at: [1.35, -0.72, 0.5], scale: 0.62, spin: 3.3, reveal: 1 },
     air: 0.34,
     motes: 0.5,
+    /* Dispersing as the world opens into morning. */
+    props: 0.56,
   },
   {
     at: 1,
@@ -463,6 +485,8 @@ export const SCENES: Scene[] = [
     },
     air: 0.3,
     motes: 0.2,
+    /* Gone but for a trace. The last frame is composed and still. */
+    props: 0.1,
   },
 ];
 

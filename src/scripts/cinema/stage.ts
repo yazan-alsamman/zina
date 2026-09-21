@@ -59,6 +59,7 @@ import { clamp01, clamp, FILM_HALF_LIFE, lerp, makeGovernor, makeTransport, MAX_
 import { makePortrait, type PortraitPlane } from "./portrait";
 import { makePost } from "./post";
 import { mountProduct } from "./product";
+import { mountProps, type FaceZone } from "./props";
 import { captionOpacity, forPortraitViewport, SCENES, smoothstep, span, type Scene as Beat } from "./timeline";
 
 /** Night, and morning. Everything between is an interpolation of these two. */
@@ -89,6 +90,8 @@ const REDUCED = {
   /* Stopped right down. Depth of field is not vestibular, but a shallow frame in a locked-off shot
      puts the only visible change in the film into a blur ramp, and that reads as an eye problem. */
   aperture: 0.12,
+  /* One fixed density for the whole cut, so the set is present but never grows or recedes. */
+  props: 0.45,
 };
 
 export interface CinemaMounts {
@@ -216,6 +219,17 @@ export function startCinema(mounts: CinemaMounts): void {
   const product = mountProduct({ kind: mounts.kind, tint: mounts.tint, refraction });
   scene.add(product.group);
 
+  /* ---------------------------------------------------------------- the set */
+
+  /*
+   * The beauty props. Built from the same catalogue as the hero product, lit by the same baked
+   * studio, defocused by the same depth buffer — no new light, material, texture or pass. They are
+   * placed in CAMERA SPACE rather than on world orbits, which is what keeps their framing and
+   * their apparent size constant while the camera travels. See props.ts.
+   */
+  const props = mountProps({ small });
+  scene.add(props.group);
+
   /* ---------------------------------------------------------------- the camera path */
 
   const beats: Beat[] = portraitViewport ? SCENES.map(forPortraitViewport) : SCENES;
@@ -318,6 +332,11 @@ export function startCinema(mounts: CinemaMounts): void {
 
   const grade = { bloom: 0.6, vignette: 1, exposure: 1, focus: 6, aperture: 0, velocity: 0 };
 
+  /* Where her face is this frame, in world units, and how strongly the plane that supplied it is
+     present. The props keep out of it — see props.ts. */
+  const faceZone: FaceZone = { x: 0, y: 0, z: -1, radius: 1 };
+  let faceWeight = 0;
+
   function frame(now: number): void {
     frameRequested = false;
     const dt = clamp((now - last) / 1000, 0, MAX_STEP);
@@ -409,6 +428,7 @@ export function startCinema(mounts: CinemaMounts): void {
     }
 
     /* ---- the photographs */
+    faceWeight = 0;
     const activeFrom = from.portrait;
     const activeTo = to.portrait;
     for (let i = 0; i < portraits.length; i++) {
@@ -523,6 +543,22 @@ export function startCinema(mounts: CinemaMounts): void {
        */
       const overflowY = Math.max(0, (scale - visibleHeight) / 2);
       plane.mesh.position.y += clamp((plane.focusY - 0.5) * scale, -overflowY, overflowY);
+
+      /*
+       * WHERE HER FACE IS, for the props' exclusion zone.
+       *
+       * Taken from whichever plane is currently dominant. The plane has just been shifted so that
+       * the photograph's own focal point sits at the centre of frame, so after that shift the
+       * plane's centre IS the face. Its radius is about a third of the photograph's width, which
+       * is roughly what a head occupies in a 3:4 portrait.
+       */
+      if (reveal >= faceWeight) {
+        faceWeight = reveal;
+        faceZone.x = plane.mesh.position.x;
+        faceZone.y = plane.mesh.position.y;
+        faceZone.z = plane.mesh.position.z;
+        faceZone.radius = scale * plane.aspect * 0.34;
+      }
       plane.mesh.lookAt(camera.position.x * 0.12, camera.position.y * 0.12, camera.position.z);
       /* PARALLAX IS TIER-ONE MOTION. It is the single most vestibular thing in the film — depth
          implied by differential movement is exactly the cue that triggers self-motion — so the
@@ -555,6 +591,31 @@ export function startCinema(mounts: CinemaMounts): void {
     } else {
       product.apply(from.product, to.product, t, light, time, p);
     }
+
+    /*
+     * ---- the set
+     *
+     * Density rides LIGHT time, with the grade and the air, because how dressed the world is is a
+     * property of the world rather than of where the lens happens to be. `time` is the prop clock
+     * and is already frozen under reduced motion, which stops every drift, bob and tumble at once
+     * without this call needing to know that. The lens's live focus distance is passed because
+     * every prop's depth is measured against it.
+     */
+    /*
+     * IN THE REDUCED CUT THE SET IS DRESSED ONCE AND NEVER RE-DRESSED.
+     *
+     * The props' presence is a SCALE, and the two foreground shapes are large — up to two thirds of
+     * the frame's height. Growing one of those from nothing to full size in a locked-off frame is
+     * exactly the depth cue the locked-off camera exists to remove, so this cut holds them at a
+     * single value and lets only the light move. It matches what the product staging already does.
+     */
+    props.apply(
+      reduced ? REDUCED.props : lerp(from.props, to.props, light),
+      time,
+      camera,
+      grade.focus,
+      faceZone
+    );
 
     /*
      * KEEP THE OBJECT INSIDE A NARROW FRAME — phone staging only.
